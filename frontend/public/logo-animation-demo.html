@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dotcom Publications — Animated Logo Loading Screen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #F5C842;
+      --charcoal: #1F1E1D;
+      --paper: #FAF8F2;
+      --dark-bg: #141413;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--paper);
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    /* Core Animation Keyframes */
+    /* 1. Sunrise & Sunset Cycle: 5.6s ease-in-out infinite */
+    @keyframes sunriseSunset {
+      0% {
+        transform: translateY(46px);
+        opacity: 0;
+      }
+      8% {
+        opacity: 0.3;
+      }
+      20% {
+        opacity: 0.9;
+      }
+      /* Highest zenith position with brief pause */
+      40%, 48% {
+        transform: translateY(0px);
+        opacity: 1;
+      }
+      /* Sunset: descends behind the open book */
+      75% {
+        opacity: 0.85;
+      }
+      88% {
+        transform: translateY(46px);
+        opacity: 0.1;
+      }
+      95%, 100% {
+        transform: translateY(46px);
+        opacity: 0;
+      }
+    }
+
+    /* 2. Progressive Sun Rays Extension */
+    @keyframes sunRays {
+      0%, 6% {
+        opacity: 0;
+        transform: scale(0.65);
+      }
+      22% {
+        opacity: 0.6;
+        transform: scale(0.85);
+      }
+      38%, 50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      70% {
+        opacity: 0.7;
+        transform: scale(0.88);
+      }
+      85%, 100% {
+        opacity: 0;
+        transform: scale(0.65);
+      }
+    }
+
+    /* 3. Gentle Candle Flame Flicker */
+    @keyframes flameFlicker {
+      0%, 100% {
+        transform: scale(1) translateY(0);
+        opacity: 0.96;
+        filter: drop-shadow(0 0 2px rgba(245, 200, 66, 0.4));
+      }
+      25% {
+        transform: scale(1.05, 0.96) translateY(-0.5px);
+        opacity: 1;
+        filter: drop-shadow(0 0 3.5px rgba(245, 200, 66, 0.65));
+      }
+      50% {
+        transform: scale(0.97, 1.04) translateY(0.3px);
+        opacity: 0.92;
+        filter: drop-shadow(0 0 2px rgba(245, 200, 66, 0.4));
+      }
+      75% {
+        transform: scale(1.03, 0.98) translateY(-0.3px);
+        opacity: 0.98;
+        filter: drop-shadow(0 0 4px rgba(245, 200, 66, 0.7));
+      }
+    }
+
+    /* Respect prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .sun-motion, .rays-motion, .flame-motion {
+        animation: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+      }
+    }
+
+    .sun-motion {
+      animation: sunriseSunset 5.6s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+      transform-origin: 100px 48px;
+    }
+
+    .rays-motion {
+      animation: sunRays 5.6s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+      transform-origin: 100px 48px;
+    }
+
+    .flame-motion {
+      animation: flameFlicker 1.4s ease-in-out infinite;
+      transform-origin: 100px 88px;
+    }
+
+    /* Layout & Controls */
+    .controls {
+      position: fixed;
+      top: 20px;
+      display: flex;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      z-index: 100;
+    }
+
+    .btn {
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      color: var(--charcoal);
+      transition: all 0.2s ease;
+    }
+
+    .btn.active, .btn:hover {
+      background: #821D30;
+      color: white;
+    }
+
+    .logo-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .brand-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 18px;
+    }
+
+    .brand-sub {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #821D30;
+      margin-top: 4px;
+    }
+
+    /* Dark Mode Variant */
+    body.dark-mode {
+      background-color: var(--dark-bg);
+      color: #FAF8F2;
+    }
+    body.dark-mode .controls {
+      background: rgba(30, 30, 30, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    body.dark-mode .btn {
+      color: #FAF8F2;
+    }
+    body.dark-mode .btn.active {
+      background: #F5C842;
+      color: #141413;
+    }
+    body.dark-mode .brand-sub {
+      color: #F5C842;
+    }
+
+    /* Checkerboard Pattern for Transparency Testing */
+    body.checkerboard {
+      background-color: #f0f0f0;
+      background-image: 
+        linear-gradient(45deg, #e4e4e4 25%, transparent 25%), 
+        linear-gradient(-45deg, #e4e4e4 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #e4e4e4 75%), 
+        linear-gradient(-45deg, transparent 75%, #e4e4e4 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls for client review -->
+  <div class="controls">
+    <button class="btn active" onclick="setTheme('paper')">Editorial Linen</button>
+    <button class="btn" onclick="setTheme('dark')">Dark Charcoal</button>
+    <button class="btn" onclick="setTheme('transparent')">Transparent Checker</button>
+  </div>
+
+  <div class="logo-card">
+    <!-- Standalone Transparent SVG Emblem -->
+    <svg width="220" height="176" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: currentColor;">
+      <defs>
+        <!-- Clip-path masking the sun so it rises and sets behind the open book leaves -->
+        <clipPath id="sky-clip">
+          <path d="M 0,0 L 200,0 L 200,88 C 172,83 140,78 100,94 C 60,78 28,83 0,88 Z" />
+        </clipPath>
+
+        <radialGradient id="sun-ambient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#F5C842" stop-opacity="0.22" />
+          <stop offset="100%" stop-color="#F5C842" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+
+      <!-- 1. THE SUN (Rises vertically, shines at zenith, sets behind book) -->
+      <g clip-path="url(#sky-clip)">
+        <g class="sun-motion">
+          <!-- Ambient warm glow aura -->
+          <circle cx="100" cy="48" r="28" fill="url(#sun-ambient)" />
+
+          <!-- Sun Rays in #F5C842 -->
+          <g class="rays-motion" stroke="#F5C842" stroke-width="1.6" stroke-linecap="round">
+            <!-- Cardinal Rays -->
+            <line x1="100" y1="21" x2="100" y2="13" />
+            <line x1="100" y1="75" x2="100" y2="83" />
+            <line x1="73" y1="48" x2="65" y2="48" />
+            <line x1="127" y1="48" x2="135" y2="48" />
+
+            <!-- Diagonal Rays -->
+            <line x1="81" y1="29" x2="75" y2="23" />
+            <line x1="119" y1="29" x2="125" y2="23" />
+            <line x1="81" y1="67" x2="75" y2="73" />
+            <line x1="119" y1="67" x2="125" y2="73" />
+
+            <!-- Intermediary Fine Editorial Rays -->
+            <line x1="90" y1="23" x2="87" y2="18" stroke-width="1.2" opacity="0.8" />
+            <line x1="110" y1="23" x2="113" y2="18" stroke-width="1.2" opacity="0.8" />
+            <line x1="75" y1="38" x2="70" y2="36" stroke-width="1.2" opacity="0.8" />
+            <line x1="125" y1="38" x2="130" y2="36" stroke-width="1.2" opacity="0.8" />
+            <line x1="75" y1="58" x2="70" y2="60" stroke-width="1.2" opacity="0.8" />
+            <line x1="125" y1="58" x2="130" y2="60" stroke-width="1.2" opacity="0.8" />
+          </g>
+
+          <!-- Circular Outline in #F5C842 -->
+          <circle cx="100" cy="48" r="17" stroke="#F5C842" stroke-width="2" fill="none" />
+        </g>
+      </g>
+
+      <!-- 2. STATIONARY OPEN BOOK -->
+      <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <!-- Top page contours -->
+        <path d="M 100,94 C 76,82 48,84 22,90" />
+        <path d="M 100,94 C 124,82 152,84 178,90" />
+
+        <!-- Outer side page edges -->
+        <path d="M 22,90 L 22,118" />
+        <path d="M 178,90 L 178,118" />
+
+        <!-- Bottom page curves to center spine -->
+        <path d="M 22,118 C 48,113 76,115 100,126" />
+        <path d="M 178,118 C 152,113 124,115 100,126" />
+
+        <!-- Spine -->
+        <line x1="100" y1="94" x2="100" y2="126" stroke-width="1.8" />
+
+        <!-- Layered lower leaves -->
+        <path d="M 24,122 C 48,117 76,119 98,129" stroke-width="1.2" opacity="0.75" />
+        <path d="M 176,122 C 152,117 124,119 102,129" stroke-width="1.2" opacity="0.75" />
+        <path d="M 96,128 L 100,132 L 104,128" stroke-width="1.5" />
+
+        <!-- Editorial line accents -->
+        <path d="M 36,99 C 56,95 76,97 92,103" stroke-width="1.0" opacity="0.45" />
+        <path d="M 36,106 C 56,102 76,104 92,110" stroke-width="1.0" opacity="0.45" />
+        <path d="M 164,99 C 144,95 124,97 108,103" stroke-width="1.0" opacity="0.45" />
+        <path d="M 164,106 C 144,102 124,104 108,110" stroke-width="1.0" opacity="0.45" />
+      </g>
+
+      <!-- 3. STATIONARY CANDLE HOLDER & CANDLE -->
+      <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path d="M 87,121 C 92,123 108,123 113,121" stroke-width="1.8" />
+        <path d="M 89,121 L 91,125 C 96,127 104,127 109,125 L 111,121" stroke-width="1.4" />
+        <path d="M 87,121 C 82,120 80,123 83,126 C 85,128 89,126 89,124" stroke-width="1.4" />
+        <rect x="96.5" y="94" width="7" height="27" rx="1.5" stroke-width="1.6" />
+        <path d="M 100,94 C 100,91 99.5,89 100,87.5" stroke-width="1.5" />
+      </g>
+
+      <!-- 4. GENTLY FLICKERING FLAME IN #F5C842 -->
+      <g class="flame-motion">
+        <path d="M 100,72 C 95,80 96,86 98,87.5 C 99.2,88.4 100.8,88.4 102,87.5 C 104,86 105,80 100,72 Z"
+              fill="#F5C842" fill-opacity="0.25" stroke="#F5C842" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 100,77 C 98,82 98.5,85 99.5,86 C 100,86.4 100.5,86.4 100.5,86 C 101.5,85 102,82 100,77 Z"
+              fill="#F5C842" />
+      </g>
+    </svg>
+
+    <div class="brand-title">Dotcom Publications</div>
+    <div class="brand-sub">Academic & Educational Publishers</div>
+  </div>
+
+  <script>
+    function setTheme(theme) {
+      document.body.className = '';
+      document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        event.target.classList.add('active');
+      } else if (theme === 'transparent') {
+        document.body.classList.add('checkerboard');
+        event.target.classList.add('active');
+      } else {
+        event.target.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

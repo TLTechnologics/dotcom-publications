@@ -16,6 +16,7 @@ interface LayoutProps {
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
   onLogoutClick?: () => void;
+  onOpenLoaderPreview?: () => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
@@ -26,6 +27,7 @@ export const Layout: React.FC<LayoutProps> = ({
   searchQuery,
   onSearchChange,
   onLogoutClick,
+  onOpenLoaderPreview,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -70,6 +72,7 @@ export const Layout: React.FC<LayoutProps> = ({
           onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           searchQuery={searchQuery}
           onSearchChange={onSearchChange}
+          onOpenLoaderPreview={onOpenLoaderPreview}
         />
 
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">

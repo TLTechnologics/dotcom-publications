@@ -17,6 +17,10 @@ import { CategoryFormModal } from './components/categories/CategoryFormModal';
 import { NavigationTab, DashboardStats, Book, Author, Category, Publisher } from './types';
 import { api } from './services/api';
 import { ToastProvider, useToast } from './context/ToastContext';
+import { LoadingScreen } from './components/ui/LoadingScreen';
+import { Modal } from './components/ui/Modal';
+import { DotcomLogoLoader } from './components/ui/DotcomLogoLoader';
+import { Button } from './components/ui/Button';
 
 export function AdminApp() {
   const toast = useToast();
@@ -29,6 +33,9 @@ export function AdminApp() {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [booksList, setBooksList] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPreloader, setShowPreloader] = useState(true);
+  const [showLoaderModal, setShowLoaderModal] = useState(false);
+  const [loaderModalTheme, setLoaderModalTheme] = useState<'light' | 'dark' | 'transparent'>('light');
 
   // Global Quick Action Modals
   const [isAddBookOpen, setIsAddBookOpen] = useState(false);
@@ -40,6 +47,7 @@ export function AdminApp() {
   const [globalSearch, setGlobalSearch] = useState('');
 
   const loadAllData = async () => {
+    const startTime = Date.now();
     try {
       const [statsData, authorsData, categoriesData, publishersData, booksData] = await Promise.all([
         api.getDashboardStats(),
@@ -56,7 +64,13 @@ export function AdminApp() {
     } catch (err: any) {
       console.warn('Backend data load note:', err);
     } finally {
-      setLoading(false);
+      // Ensure smooth entrance transition
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, 1400 - elapsed);
+      setTimeout(() => {
+        setLoading(false);
+        setTimeout(() => setShowPreloader(false), 300);
+      }, remaining);
     }
   };
 
@@ -86,6 +100,7 @@ export function AdminApp() {
       onLogoutClick={() => {
         toast.info('Active Session', 'Dotcom Publications single-tenant admin workspace active.');
       }}
+      onOpenLoaderPreview={() => setShowLoaderModal(true)}
     >
       {currentTab === 'dashboard' && (
         <DashboardPage
@@ -170,6 +185,100 @@ export function AdminApp() {
         isOpen={!!previewBook}
         onClose={() => setPreviewBook(null)}
       />
+
+      {/* Animated Loading Screen Demonstration Modal */}
+      {showLoaderModal && (
+        <Modal
+          isOpen={showLoaderModal}
+          onClose={() => setShowLoaderModal(false)}
+          title="Dotcom Publications Animated Emblem"
+          subtitle="Sunrise & sunset loop with flickering candle flame outline"
+          size="lg"
+        >
+          <div className="space-y-4">
+            {/* Background Theme Selector */}
+            <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+              <span className="text-xs text-charcoal-500 font-medium">Background preview mode:</span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLoaderModalTheme('light')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                    loaderModalTheme === 'light'
+                      ? 'bg-editorial-burgundy-700 text-white'
+                      : 'bg-stone-100 text-charcoal-700'
+                  }`}
+                >
+                  Warm Paper
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoaderModalTheme('dark')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                    loaderModalTheme === 'dark'
+                      ? 'bg-editorial-burgundy-700 text-white'
+                      : 'bg-stone-100 text-charcoal-700'
+                  }`}
+                >
+                  Charcoal Dark
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoaderModalTheme('transparent')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                    loaderModalTheme === 'transparent'
+                      ? 'bg-editorial-burgundy-700 text-white'
+                      : 'bg-stone-100 text-charcoal-700'
+                  }`}
+                >
+                  Transparent
+                </button>
+              </div>
+            </div>
+
+            {/* Display Box */}
+            <div
+              className={`p-12 rounded-2xl flex flex-col items-center justify-center transition-colors min-h-[280px] border ${
+                loaderModalTheme === 'dark'
+                  ? 'bg-[#181817] border-stone-800 text-white'
+                  : loaderModalTheme === 'transparent'
+                  ? 'bg-transparent border-dashed border-stone-300'
+                  : 'bg-[#FAF8F2] border-stone-200'
+              }`}
+            >
+              <DotcomLogoLoader
+                size={220}
+                theme={loaderModalTheme === 'dark' ? 'dark' : 'light'}
+                showBrandText={true}
+                statusText="Sunrise & Sunset Animation Cycle"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-charcoal-500 pt-2">
+              <a
+                href="/logo-animation-demo.html"
+                target="_blank"
+                rel="noreferrer"
+                className="text-editorial-burgundy-700 hover:underline font-semibold"
+              >
+                Open Fullscreen Standalone Page ↗
+              </a>
+              <Button variant="secondary" size="sm" onClick={() => setShowLoaderModal(false)}>
+                Close Preview
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Fullscreen Initial Preloader */}
+      {showPreloader && (
+        <LoadingScreen
+          message="Advancing Scholarly Knowledge"
+          subtext="Dotcom Publications Editorial System"
+          theme="light"
+        />
+      )}
     </Layout>
   );
 }

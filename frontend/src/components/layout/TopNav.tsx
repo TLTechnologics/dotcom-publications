@@ -9,7 +9,8 @@ import {
   BookOpen,
   User,
   Sliders,
-  LogOut
+  LogOut,
+  Sun
 } from 'lucide-react';
 import { NavigationTab } from '../../types';
 
@@ -18,6 +19,7 @@ interface TopNavProps {
   onTabChange: (tab: NavigationTab) => void;
   onMobileMenuToggle?: () => void;
   onOpenPreview?: () => void;
+  onOpenLoaderPreview?: () => void;
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -62,6 +64,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   onTabChange,
   onMobileMenuToggle,
   onOpenPreview,
+  onOpenLoaderPreview,
   searchQuery,
   onSearchChange,
 }) => {
@@ -121,6 +124,18 @@ export const TopNav: React.FC<TopNavProps> = ({
           />
           <Search className="w-3.5 h-3.5 text-charcoal-400 absolute left-3 top-2.5" />
         </div>
+
+        {/* Animated Loading Screen Preview Trigger */}
+        {onOpenLoaderPreview && (
+          <button
+            onClick={onOpenLoaderPreview}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100/80 border border-amber-200 transition-colors"
+            title="Preview Animated Emblem & Loading Screen"
+          >
+            <Sun className="w-3.5 h-3.5 text-amber-600 animate-spin-slow" />
+            <span className="hidden sm:inline text-[11px] font-semibold">Emblem Loader</span>
+          </button>
+        )}
 
         {/* Notifications Dropdown */}
         <div className="relative">
