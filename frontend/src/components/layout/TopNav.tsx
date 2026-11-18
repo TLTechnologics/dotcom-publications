@@ -83,13 +83,13 @@ export const TopNav: React.FC<TopNavProps> = ({
   };
 
   return (
-    <header className="bg-white/80 backdrop-blur-md border-b border-stone-200/90 sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between">
+    <header className="bg-white/90 backdrop-blur-md border-b border-[#EAE3DE] sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-subtle">
       {/* Left: Mobile Toggle & Title / Breadcrumbs */}
       <div className="flex items-center gap-4">
         {onMobileMenuToggle && (
           <button
             onClick={onMobileMenuToggle}
-            className="md:hidden p-2 rounded-lg text-charcoal-600 hover:bg-stone-100"
+            className="md:hidden p-2 rounded-lg text-[#292326] hover:bg-[#FFF6D9]"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -97,21 +97,21 @@ export const TopNav: React.FC<TopNavProps> = ({
 
         <div>
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-charcoal-400">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#82777A]">
             <span>Dotcom Publications</span>
             <span>/</span>
-            <span className="text-editorial-burgundy-700 font-semibold capitalize">
+            <span className="text-[#651C32] font-semibold capitalize">
               {currentTab}
             </span>
           </div>
 
-          <h2 className="text-base font-serif font-bold text-charcoal-900 tracking-tight leading-tight mt-0.5">
+          <h2 className="text-base font-serif font-bold text-[#292326] tracking-tight leading-tight mt-0.5">
             {currentInfo.title}
           </h2>
         </div>
       </div>
 
-      {/* Right: Search + Notifications + Profile */}
+      {/* Right: Search + Emblem Loader + Notifications + Profile */}
       <div className="flex items-center gap-3">
         {/* Search */}
         <div className="relative hidden lg:block w-64">
@@ -120,20 +120,20 @@ export const TopNav: React.FC<TopNavProps> = ({
             placeholder="Search catalogue..."
             value={searchQuery || ''}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-1.5 text-xs rounded-full border border-stone-200 bg-paper-50 focus:bg-white text-charcoal-800 placeholder-charcoal-400 focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500 transition-all"
+            className="w-full pl-9 pr-3.5 py-1.5 text-xs rounded-full border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-all"
           />
-          <Search className="w-3.5 h-3.5 text-charcoal-400 absolute left-3 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
         </div>
 
         {/* Animated Loading Screen Preview Trigger */}
         {onOpenLoaderPreview && (
           <button
             onClick={onOpenLoaderPreview}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100/80 border border-amber-200 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#431322] bg-[#F6E7A8] hover:bg-[#FBEFC4] border border-[#F6E7A8] transition-all shadow-subtle"
             title="Preview Animated Emblem & Loading Screen"
           >
-            <Sun className="w-3.5 h-3.5 text-amber-600 animate-spin-slow" />
-            <span className="hidden sm:inline text-[11px] font-semibold">Emblem Loader</span>
+            <Sun className="w-3.5 h-3.5 text-[#651C32]" />
+            <span className="hidden sm:inline text-[11px]">Emblem Loader</span>
           </button>
         )}
 
@@ -141,30 +141,30 @@ export const TopNav: React.FC<TopNavProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-full text-charcoal-600 hover:bg-stone-100 relative transition-colors"
+            className="p-2 rounded-full text-[#292326] hover:bg-[#FFF6D9] relative transition-colors border border-transparent hover:border-[#EAE3DE]"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-editorial-burgundy-600 rounded-full" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#651C32] rounded-full ring-2 ring-white" />
           </button>
 
           {showNotifications && (
             <div
-              className="absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-stone-200 shadow-elevated p-3 z-50 text-left animate-in fade-in"
+              className="absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated p-3 z-50 text-left animate-in fade-in"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between border-b border-stone-100 pb-2 px-1">
-                <span className="text-xs font-semibold text-charcoal-900">Notifications</span>
-                <span className="text-[10px] text-editorial-burgundy-700 hover:underline cursor-pointer">
+              <div className="flex items-center justify-between border-b border-[#EAE3DE] pb-2 px-1">
+                <span className="text-xs font-semibold text-[#292326]">Notifications</span>
+                <span className="text-[10px] text-[#651C32] hover:underline cursor-pointer font-medium">
                   Mark all read
                 </span>
               </div>
               <div className="space-y-2 mt-2 max-h-64 overflow-y-auto">
                 {notifications.map((n) => (
-                  <div key={n.id} className="p-2 rounded-xl hover:bg-paper-50 text-xs transition-colors">
-                    <p className="font-medium text-charcoal-800">{n.title}</p>
-                    <p className="text-[11px] text-charcoal-500 mt-0.5">{n.desc}</p>
-                    <span className="text-[10px] text-charcoal-400 mt-1 block">{n.time}</span>
+                  <div key={n.id} className="p-2.5 rounded-xl hover:bg-[#FFF6D9]/50 text-xs transition-colors border border-transparent hover:border-[#F6E7A8]/50">
+                    <p className="font-semibold text-[#292326]">{n.title}</p>
+                    <p className="text-[11px] text-[#82777A] mt-0.5">{n.desc}</p>
+                    <span className="text-[10px] text-[#82777A]/70 mt-1 block">{n.time}</span>
                   </div>
                 ))}
               </div>
@@ -176,46 +176,46 @@ export const TopNav: React.FC<TopNavProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-stone-200 bg-white hover:border-stone-300 transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors"
           >
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
               alt="Admin"
-              className="w-6 h-6 rounded-full object-cover"
+              className="w-6 h-6 rounded-full object-cover border border-[#EAE3DE]"
             />
-            <span className="text-xs font-medium text-charcoal-800 hidden sm:inline">
+            <span className="text-xs font-semibold text-[#292326] hidden sm:inline">
               Dr. Finch
             </span>
-            <ChevronDown className="w-3.5 h-3.5 text-charcoal-400" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#82777A]" />
           </button>
 
           {showProfileMenu && (
             <div
-              className="absolute right-0 mt-2 w-52 rounded-2xl bg-white border border-stone-200 shadow-elevated py-1.5 z-50 text-xs"
+              className="absolute right-0 mt-2 w-52 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
               onClick={() => setShowProfileMenu(false)}
             >
-              <div className="px-3 py-2 border-b border-stone-100">
-                <p className="font-semibold text-charcoal-900">Dr. Alistair Finch</p>
-                <p className="text-[10px] text-charcoal-500">director@dotcompublications.com</p>
+              <div className="px-3 py-2 border-b border-[#EAE3DE] bg-[#FAF8F3]/60">
+                <p className="font-semibold text-[#292326]">Dr. Alistair Finch</p>
+                <p className="text-[10px] text-[#82777A]">director@dotcompublications.com</p>
               </div>
               <button
                 onClick={() => onTabChange('settings')}
-                className="w-full text-left px-3 py-2 text-charcoal-700 hover:bg-stone-50 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
               >
-                <Sliders className="w-3.5 h-3.5 text-charcoal-400" /> Account Settings
+                <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> Account Settings
               </button>
               <button
                 onClick={() => onTabChange('landing')}
-                className="w-full text-left px-3 py-2 text-charcoal-700 hover:bg-stone-50 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
               >
-                <ExternalLink className="w-3.5 h-3.5 text-charcoal-400" /> View Public Preview
+                <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View Public Preview
               </button>
-              <div className="border-t border-stone-100 my-1" />
+              <div className="border-t border-[#EAE3DE] my-1" />
               <button
                 onClick={() => alert('Demo Session Active: To switch administrator account, adjust backend permissions.')}
-                className="w-full text-left px-3 py-2 text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-medium"
+                className="w-full text-left px-3 py-2 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium"
               >
-                <LogOut className="w-3.5 h-3.5 text-rose-600" /> Logout Session
+                <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Logout Session
               </button>
             </div>
           )}

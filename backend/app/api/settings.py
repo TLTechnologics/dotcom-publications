@@ -1,9 +1,14 @@
 import json
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.app.core.database import get_db
-from backend.app.models.models import SiteSettings, ActivityLog
-from backend.app.schemas.schemas import SiteSettingsContent, SiteSettingsResponse
+try:
+    from backend.app.core.database import get_db
+    from backend.app.models.models import SiteSettings, ActivityLog
+    from backend.app.schemas.schemas import SiteSettingsContent, SiteSettingsResponse
+except ImportError:
+    from app.core.database import get_db
+    from app.models.models import SiteSettings, ActivityLog
+    from app.schemas.schemas import SiteSettingsContent, SiteSettingsResponse
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
 

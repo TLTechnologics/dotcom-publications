@@ -17,7 +17,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const base = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-lg';
+  const base = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl';
 
   const sizeStyles = {
     sm: 'text-xs px-3 py-1.5 gap-1.5',
@@ -26,11 +26,11 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const variantStyles = {
-    primary: 'bg-editorial-burgundy-700 hover:bg-editorial-burgundy-800 text-white shadow-subtle focus:ring-editorial-burgundy-600',
-    secondary: 'bg-paper-200 hover:bg-paper-300 text-charcoal-800 border border-paper-300 focus:ring-charcoal-400',
-    outline: 'border border-charcoal-300 hover:bg-paper-100 text-charcoal-800 focus:ring-editorial-burgundy-500',
-    ghost: 'text-charcoal-700 hover:bg-paper-200/60 focus:ring-charcoal-300',
-    danger: 'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-500',
+    primary: 'bg-[#651C32] hover:bg-[#431322] text-white shadow-subtle focus:ring-[#651C32]',
+    secondary: 'bg-[#F6E7A8] hover:bg-[#FBEFC4] text-[#431322] border border-[#F6E7A8] font-semibold focus:ring-[#F6E7A8] shadow-subtle',
+    outline: 'border border-[#EAE3DE] bg-white hover:bg-[#FFF6D9]/60 text-[#292326] hover:border-[#651C32] focus:ring-[#651C32]',
+    ghost: 'text-[#651C32] hover:bg-[#FFF6D9] focus:ring-[#651C32]',
+    danger: 'bg-[#B94B4B] hover:bg-[#9A3838] text-white focus:ring-[#B94B4B]',
   };
 
   return (

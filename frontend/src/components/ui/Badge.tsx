@@ -8,22 +8,22 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral', className = '' }) => {
   const variantStyles = {
-    published: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    draft: 'bg-amber-50 text-amber-800 border-amber-200',
-    featured: 'bg-editorial-burgundy-50 text-editorial-burgundy-800 border-editorial-burgundy-200 font-medium',
-    in_stock: 'bg-blue-50 text-blue-800 border-blue-200',
-    out_of_stock: 'bg-rose-50 text-rose-800 border-rose-200',
-    pre_order: 'bg-purple-50 text-purple-800 border-purple-200',
-    category: 'bg-paper-200 text-charcoal-700 border-paper-300',
-    neutral: 'bg-stone-100 text-charcoal-700 border-stone-200',
+    published: 'bg-[#EAF3ED] text-[#477A58] border-[#477A58]/30',
+    draft: 'bg-[#FFF6D9] text-[#431322] border-[#F6E7A8]',
+    featured: 'bg-[#F5E6EA] text-[#651C32] border-[#8B4055]/30 font-semibold',
+    in_stock: 'bg-[#EAF1F7] text-[#557A9C] border-[#557A9C]/30',
+    out_of_stock: 'bg-[#FCEBEB] text-[#B94B4B] border-[#B94B4B]/30',
+    pre_order: 'bg-[#FAF0E2] text-[#C58B35] border-[#C58B35]/30',
+    category: 'bg-[#FAF8F3] text-[#292326] border-[#EAE3DE]',
+    neutral: 'bg-[#F5F1EE] text-[#82777A] border-[#EAE3DE]',
   };
 
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${variantStyles[variant]} ${className}`}
     >
-      {variant === 'published' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />}
-      {variant === 'draft' && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />}
+      {variant === 'published' && <span className="w-1.5 h-1.5 rounded-full bg-[#477A58] mr-1.5 animate-pulse" />}
+      {variant === 'draft' && <span className="w-1.5 h-1.5 rounded-full bg-[#C58B35] mr-1.5" />}
       {children}
     </span>
   );

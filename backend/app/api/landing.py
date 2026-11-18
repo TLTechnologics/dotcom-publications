@@ -1,9 +1,14 @@
 import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.app.core.database import get_db
-from backend.app.models.models import LandingPage, ActivityLog
-from backend.app.schemas.schemas import LandingPageContent, LandingPageResponse
+try:
+    from backend.app.core.database import get_db
+    from backend.app.models.models import LandingPage, ActivityLog
+    from backend.app.schemas.schemas import LandingPageContent, LandingPageResponse
+except ImportError:
+    from app.core.database import get_db
+    from app.models.models import LandingPage, ActivityLog
+    from app.schemas.schemas import LandingPageContent, LandingPageResponse
 
 router = APIRouter(prefix="/landing", tags=["Landing Page"])
 

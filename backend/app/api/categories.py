@@ -1,14 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from backend.app.core.database import get_db
-from backend.app.models.models import Category, ActivityLog
-from backend.app.schemas.schemas import CategoryCreate, CategoryUpdate, CategoryResponse
+try:
+    from backend.app.core.database import get_db
+    from backend.app.models.models import Category, ActivityLog
+    from backend.app.schemas.schemas import CategoryCreate, CategoryUpdate, CategoryResponse
+except ImportError:
+    from app.core.database import get_db
+    from app.models.models import Category, ActivityLog
+    from app.schemas.schemas import CategoryCreate, CategoryUpdate, CategoryResponse
 
 router = APIRouter(prefix="/categories", tags=["Categories"])
 
 def build_category_response(cat: Category) -> CategoryResponse:
-    sub_responses = [build_category_response(sub) for sub in cat.subcategories]
+    sub_responses = [build_category_response(sub) for sub in (cat.subcategories or [])]
     return CategoryResponse(
         id=cat.id,
         name=cat.name,
@@ -17,7 +22,7 @@ def build_category_response(cat: Category) -> CategoryResponse:
         image_url=cat.image_url,
         parent_id=cat.parent_id,
         parent_name=cat.parent.name if cat.parent else None,
-        books_count=len(cat.books),
+        books_count=len(cat.books) if cat.books else 0,
         subcategories=sub_responses,
         created_at=cat.created_at
     )
@@ -65,13 +70,24 @@ def get_category(category_id: int, db: Session = Depends(get_db)):
 @router.post("", response_model=CategoryResponse, status_code=201)
 def create_category(cat_in: CategoryCreate, db: Session = Depends(get_db)):
     # Check slug uniqueness
-    existing = db.query(Category).filter(Category.slug == cat_in.slug).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Category slug already exists")
+    existing_slug = db.query(Category).filter(Category.slug == cat_in.slug.strip()).first()
+    if existing_slug:
+        raise HTTPException(status_code=400, detail=f"Category slug '{cat_in.slug}' already exists")
+
+    # Check duplicate category name within same hierarchy level
+    existing_name = db.query(Category).filter(
+        Category.name.ilike(cat_in.name.strip()),
+        Category.parent_id == cat_in.parent_id
+    ).first()
+    if existing_name:
+        raise HTTPException(
+            status_code=400,
+            detail=f"A category named '{cat_in.name.strip()}' already exists under this discipline hierarchy"
+        )
 
     cat = Category(
-        name=cat_in.name,
-        slug=cat_in.slug,
+        name=cat_in.name.strip(),
+        slug=cat_in.slug.strip(),
         description=cat_in.description,
         image_url=cat_in.image_url,
         parent_id=cat_in.parent_id
@@ -103,6 +119,19 @@ def update_category(category_id: int, cat_in: CategoryUpdate, db: Session = Depe
         existing = db.query(Category).filter(Category.slug == update_data["slug"]).first()
         if existing and existing.id != cat.id:
             raise HTTPException(status_code=400, detail="Slug already in use by another category")
+
+    if "name" in update_data:
+        target_parent = update_data.get("parent_id", cat.parent_id)
+        existing_name = db.query(Category).filter(
+            Category.name.ilike(update_data["name"].strip()),
+            Category.parent_id == target_parent,
+            Category.id != cat.id
+        ).first()
+        if existing_name:
+            raise HTTPException(
+                status_code=400,
+                detail=f"A category named '{update_data['name'].strip()}' already exists under this discipline hierarchy"
+            )
 
     for field, value in update_data.items():
         setattr(cat, field, value)

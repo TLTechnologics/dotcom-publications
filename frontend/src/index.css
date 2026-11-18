@@ -4,13 +4,14 @@
 
 @layer base {
   body {
-    background-color: #FAF8F2;
-    color: #1F1E1D;
+    background-color: #FAF8F3;
+    color: #292326;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  h1, h2, h3, h4, .font-serif {
-    font-family: 'Newsreader', Georgia, Cambria, serif;
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: 'Playfair Display', Georgia, Cambria, serif;
+    letter-spacing: -0.015em;
   }
 }
 
@@ -25,10 +26,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D5CCBD;
+  background: #EAE3DE;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #BCB8B1;
+  background: #C7BFC2;
 }

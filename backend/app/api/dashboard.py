@@ -1,9 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.app.core.database import get_db
-from backend.app.models.models import Book, Author, Category, Publisher, ActivityLog
-from backend.app.schemas.schemas import DashboardStats, ActivityLogResponse
-from backend.app.api.books import serialize_book
+try:
+    from backend.app.core.database import get_db
+    from backend.app.models.models import Book, Author, Category, Publisher, ActivityLog
+    from backend.app.schemas.schemas import DashboardStats, ActivityLogResponse
+    from backend.app.api.books import serialize_book
+except ImportError:
+    from app.core.database import get_db
+    from app.models.models import Book, Author, Category, Publisher, ActivityLog
+    from app.schemas.schemas import DashboardStats, ActivityLogResponse
+    from app.api.books import serialize_book
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 

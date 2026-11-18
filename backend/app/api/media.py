@@ -4,10 +4,19 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from backend.app.core.database import get_db
-from backend.app.core.config import settings
-from backend.app.models.models import Media, ActivityLog
-from backend.app.schemas.schemas import MediaResponse
+try:
+    from backend.app.core.database import get_db
+    from backend.app.core.config import settings
+    from backend.app.models.models import Media, ActivityLog
+    from backend.app.schemas.schemas import MediaResponse
+except ImportError:
+    from app.core.database import get_db
+    from app.core.config import settings
+    from app.models.models import Media, ActivityLog
+    from app.schemas.schemas import MediaResponse
+
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'}
 
 router = APIRouter(prefix="/media", tags=["Media"])
 
@@ -36,21 +45,58 @@ async def upload_media(
     category: str = Form("general"),
     db: Session = Depends(get_db)
 ):
-    # Validate mime
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Only image files are allowed")
+    # Validate mime and file extension
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if ext not in ALLOWED_EXTENSIONS or not (file.content_type and file.content_type.startswith("image/")):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format '{ext}'. Only images ({', '.join(sorted(ALLOWED_EXTENSIONS))}) are supported."
+        )
 
-    # Generate unique filename
-    ext = os.path.splitext(file.filename)[1]
-    unique_filename = f"{uuid.uuid4().hex[:12]}_{file.filename.replace(' ', '_')}"
-    file_path = os.path.join(settings.UPLOAD_DIR, unique_filename)
+    # Read and validate maximum size
+    file_bytes = await file.read()
+    file_size = len(file_bytes)
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File exceeds maximum allowed upload size of 10MB (Uploaded: {file_size / (1024 * 1024):.1f}MB)"
+        )
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Generate safe unique filename
+    safe_basename = os.path.basename(file.filename or "upload").replace(' ', '_')
+    unique_filename = f"{uuid.uuid4().hex[:12]}_{safe_basename}"
+    file_url = None
 
-    file_size = os.path.getsize(file_path)
-    # The URL will be served via FastAPI static mount at /uploads/...
-    file_url = f"/uploads/{unique_filename}"
+    # Option A: Cloud persistent upload to Supabase Storage (if configured)
+    if settings.SUPABASE_URL and settings.SUPABASE_KEY:
+        try:
+            import urllib.request
+            bucket = settings.SUPABASE_STORAGE_BUCKET or "media"
+            upload_endpoint = f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/{bucket}/{unique_filename}"
+            req = urllib.request.Request(
+                upload_endpoint,
+                data=file_bytes,
+                headers={
+                    "apikey": settings.SUPABASE_KEY,
+                    "Authorization": f"Bearer {settings.SUPABASE_KEY}",
+                    "Content-Type": file.content_type or "application/octet-stream",
+                    "x-upsert": "true",
+                },
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                if resp.status in (200, 201):
+                    file_url = f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{bucket}/{unique_filename}"
+        except Exception as e:
+            print(f"Supabase storage note (falling back to serverless local): {e}")
+
+    # Option B: Fallback to local /tmp storage
+    if not file_url:
+        os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+        file_path = os.path.join(settings.UPLOAD_DIR, unique_filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(file_bytes)
+        file_url = f"/uploads/{unique_filename}"
 
     media = Media(
         filename=unique_filename,

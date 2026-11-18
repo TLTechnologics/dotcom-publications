@@ -19,8 +19,8 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   const containerBg = transparent
     ? 'bg-transparent'
     : theme === 'dark'
-    ? 'bg-[#181817]'
-    : 'bg-[#FAF8F2]/95 backdrop-blur-sm';
+    ? 'bg-[#431322]'
+    : 'bg-[#FAF8F3]/95 backdrop-blur-sm';
 
   const content = (
     <div className="flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
@@ -29,7 +29,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       <div className="mt-5 space-y-1">
         <h3
           className={`font-serif font-bold text-sm sm:text-base tracking-tight ${
-            theme === 'dark' ? 'text-[#FAF8F2]' : 'text-charcoal-900'
+            theme === 'dark' ? 'text-[#FAF8F3]' : 'text-[#292326]'
           }`}
         >
           {message}
@@ -37,7 +37,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         {subtext && (
           <p
             className={`text-xs uppercase tracking-widest font-semibold ${
-              theme === 'dark' ? 'text-stone-400' : 'text-editorial-burgundy-700'
+              theme === 'dark' ? 'text-[#F6E7A8]' : 'text-[#651C32]'
             }`}
           >
             {subtext}
@@ -46,8 +46,8 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       </div>
 
       {/* Minimalist Progress Pulse Indicator */}
-      <div className="w-28 h-0.5 bg-stone-200/80 rounded-full mt-6 overflow-hidden">
-        <div className="w-full h-full bg-[#F5C842] origin-left animate-pulse" />
+      <div className="w-28 h-0.5 bg-[#EAE3DE] rounded-full mt-6 overflow-hidden">
+        <div className="w-full h-full bg-[#651C32] origin-left animate-pulse" />
       </div>
     </div>
   );

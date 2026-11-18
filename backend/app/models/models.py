@@ -1,9 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timezone
+
+def utcnow():
+    return datetime.now(timezone.utc)
 from sqlalchemy import (
     Column, Integer, String, Text, Float, Boolean, DateTime, ForeignKey, Table
 )
 from sqlalchemy.orm import relationship
-from backend.app.core.database import Base
+try:
+    from backend.app.core.database import Base
+except ImportError:
+    from app.core.database import Base
 
 # Association table for Book <-> Author (Many-to-Many)
 book_authors = Table(
@@ -22,8 +28,8 @@ class Author(Base):
     bio = Column(Text, nullable=True)
     email = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
     # Relationships
     books = relationship("Book", secondary=book_authors, back_populates="authors")
@@ -39,7 +45,7 @@ class Publisher(Base):
     phone = Column(String(100), nullable=True)
     address = Column(Text, nullable=True)
     website = Column(String(255), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
 
     # Relationships
     books = relationship("Book", back_populates="publisher")
@@ -53,7 +59,7 @@ class Category(Base):
     description = Column(Text, nullable=True)
     image_url = Column(Text, nullable=True)
     parent_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
 
     # Relationships
     subcategories = relationship("Category", backref="parent", remote_side=[id])
@@ -95,8 +101,8 @@ class Book(Base):
     seo_title = Column(String(300), nullable=True)
     seo_description = Column(Text, nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
     # Relationships
     authors = relationship("Author", secondary=book_authors, back_populates="books")
@@ -114,7 +120,7 @@ class Media(Base):
     file_size = Column(Integer, nullable=False)  # in bytes
     mime_type = Column(String(100), nullable=False)
     category = Column(String(50), default="covers")  # covers, authors, banners, general
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
 
 class LandingPage(Base):
     __tablename__ = "landing_pages"
@@ -133,7 +139,7 @@ class LandingPage(Base):
     contact_phone = Column(String(100), default="+91 11 4567 8900")
     contact_address = Column(Text, default="Knowledge Park III, Institutional Area, Greater Noida, Delhi NCR, India")
     footer_text = Column(Text, default="© 2026 Dotcom Publications. Developed with pride by TL Technologics. All Rights Reserved.")
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 class SiteSettings(Base):
     __tablename__ = "site_settings"
@@ -149,7 +155,7 @@ class SiteSettings(Base):
     currency = Column(String(10), default="INR")
     catalogue_download_url = Column(Text, nullable=True)
     maintenance_mode = Column(Boolean, default=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 class ActivityLog(Base):
     __tablename__ = "activity_logs"
@@ -160,4 +166,4 @@ class ActivityLog(Base):
     entity_id = Column(Integer, nullable=True)
     entity_name = Column(String(255), nullable=True)
     description = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=utcnow, index=True)

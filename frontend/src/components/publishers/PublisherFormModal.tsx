@@ -6,7 +6,7 @@ import { Input } from '../ui/Input';
 import { MediaPickerModal } from '../media/MediaPickerModal';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
-import { Upload, Building2 } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 interface PublisherFormModalProps {
   isOpen: boolean;
@@ -109,7 +109,7 @@ export const PublisherFormModal: React.FC<PublisherFormModalProps> = ({
           />
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Press Logo
             </label>
             <div className="flex gap-2">
@@ -130,12 +130,12 @@ export const PublisherFormModal: React.FC<PublisherFormModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Description & Imprint Specialty
             </label>
             <textarea
               rows={3}
-              className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500"
+              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               placeholder="Scholarly domain, history, peer review board..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -172,8 +172,8 @@ export const PublisherFormModal: React.FC<PublisherFormModalProps> = ({
             onChange={(e) => setWebsite(e.target.value)}
           />
 
-          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-stone-200">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
+          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-[#EAE3DE]">
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancel
             </Button>
             <Button type="submit" variant="primary" loading={loading}>

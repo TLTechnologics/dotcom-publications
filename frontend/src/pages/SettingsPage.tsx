@@ -7,18 +7,15 @@ import { MediaPickerModal } from '../components/media/MediaPickerModal';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import {
-  Settings,
   Save,
   Building,
   Mail,
-  Phone,
-  MapPin,
   Share2,
   Sliders,
   Upload,
-  CheckCircle,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Coins
 } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
@@ -76,30 +73,30 @@ export const SettingsPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-xs text-charcoal-400">Loading system settings...</div>;
+    return <div className="p-12 text-center text-xs text-[#82777A]">Loading system settings...</div>;
   }
 
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-serif font-bold text-charcoal-900 tracking-tight">
+        <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
           System & Publishing House Settings
         </h2>
-        <p className="text-xs text-charcoal-500">
+        <p className="text-xs text-[#82777A]">
           Configure corporate publisher identity, institutional contact routing, and global currency parameters
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Brand Identity */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
-            <h3 className="text-sm font-serif font-bold text-charcoal-900 flex items-center gap-2">
-              <Building className="w-4 h-4 text-editorial-burgundy-700" />
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
+            <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
+              <Building className="w-4 h-4 text-[#651C32]" />
               Corporate Brand Identity
             </h3>
-            <span className="text-[10px] font-bold text-charcoal-500 uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-[#82777A] uppercase tracking-wider">
               Legal Imprint
             </span>
           </div>
@@ -112,7 +109,7 @@ export const SettingsPage: React.FC = () => {
             />
 
             <div>
-              <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
                 Official Publisher Logo
               </label>
               <div className="flex gap-2">
@@ -134,12 +131,12 @@ export const SettingsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Corporate Description / Mission
             </label>
             <textarea
               rows={3}
-              className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500"
+              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               value={settings.description}
               onChange={(e) => setSettings({ ...settings, description: e.target.value })}
             />
@@ -147,10 +144,10 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Official Communications & Address */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3">
-            <h3 className="text-sm font-serif font-bold text-charcoal-900 flex items-center gap-2">
-              <Mail className="w-4 h-4 text-editorial-burgundy-700" />
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3">
+            <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
+              <Mail className="w-4 h-4 text-[#651C32]" />
               Headquarters & Contact Information
             </h3>
           </div>
@@ -177,10 +174,10 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Social Media Links */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3">
-            <h3 className="text-sm font-serif font-bold text-charcoal-900 flex items-center gap-2">
-              <Share2 className="w-4 h-4 text-editorial-burgundy-700" />
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3">
+            <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-[#651C32]" />
               Academic Outreach & Social Media
             </h3>
           </div>
@@ -234,10 +231,10 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Website Configuration & Operations */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3">
-            <h3 className="text-sm font-serif font-bold text-charcoal-900 flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-editorial-burgundy-700" />
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3">
+            <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-[#651C32]" />
               Catalogue & Operational Configuration
             </h3>
           </div>
@@ -248,10 +245,10 @@ export const SettingsPage: React.FC = () => {
               value={settings.currency}
               onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
               options={[
-                { value: 'INR', label: 'INR (₹) — Indian Rupee' },
-                { value: 'USD', label: 'USD ($) — US Dollar' },
-                { value: 'GBP', label: 'GBP (£) — British Pound' },
-                { value: 'EUR', label: 'EUR (€) — Euro' },
+                { value: 'INR', label: 'INR (₹) — Indian Rupee', subtitle: 'Standard billing for domestic institutional orders', icon: <Coins className="w-4 h-4" /> },
+                { value: 'USD', label: 'USD ($) — US Dollar', subtitle: 'Global academic institution invoicing', icon: <Coins className="w-4 h-4" /> },
+                { value: 'GBP', label: 'GBP (£) — British Pound', subtitle: 'UK and Commonwealth university distribution', icon: <Coins className="w-4 h-4" /> },
+                { value: 'EUR', label: 'EUR (€) — Euro', subtitle: 'Continental European academic procurement', icon: <Coins className="w-4 h-4" /> },
               ]}
             />
 
@@ -266,14 +263,14 @@ export const SettingsPage: React.FC = () => {
           </div>
 
           {/* Maintenance Mode Toggle */}
-          <div className="p-4 rounded-xl border border-stone-200 bg-stone-50 flex items-center justify-between mt-2">
+          <div className="p-4 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] flex items-center justify-between mt-2">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <AlertTriangle className="w-5 h-5 text-[#C58B35]" />
               <div>
-                <span className="text-xs font-bold text-charcoal-900 block">
+                <span className="text-xs font-bold text-[#292326] block">
                   Public Website Maintenance Mode
                 </span>
-                <p className="text-[11px] text-charcoal-500">
+                <p className="text-[11px] text-[#82777A]">
                   When enabled, visitors to the public site see an under-construction announcement.
                 </p>
               </div>
@@ -284,7 +281,7 @@ export const SettingsPage: React.FC = () => {
                 setSettings({ ...settings, maintenance_mode: !settings.maintenance_mode })
               }
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                settings.maintenance_mode ? 'bg-amber-600' : 'bg-stone-300'
+                settings.maintenance_mode ? 'bg-[#C58B35]' : 'bg-[#EAE3DE]'
               }`}
             >
               <span
@@ -297,14 +294,14 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Agency Attribution */}
-        <div className="p-4 rounded-xl bg-paper-100 border border-stone-200/80 text-xs text-charcoal-600 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-[#FFF6D9]/40 border border-[#F6E7A8] text-xs text-[#292326] flex items-center justify-between">
           <div>
-            <span className="font-semibold text-charcoal-900">Developed by TL Technologics</span>
-            <p className="text-[11px] text-charcoal-500 mt-0.5">
+            <span className="font-semibold text-[#651C32]">Developed by TL Technologics</span>
+            <p className="text-[11px] text-[#82777A] mt-0.5">
               Client: Dotcom Publications • Phase 01: Admin Panel & Catalogue CMS
             </p>
           </div>
-          <ShieldCheck className="w-5 h-5 text-editorial-burgundy-700" />
+          <ShieldCheck className="w-5 h-5 text-[#651C32]" />
         </div>
 
         {/* Save Button */}

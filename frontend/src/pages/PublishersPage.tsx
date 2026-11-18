@@ -73,10 +73,10 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-serif font-bold text-charcoal-900 tracking-tight">
+          <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
             Publisher Imprints & Presses
           </h2>
-          <p className="text-xs text-charcoal-500">
+          <p className="text-xs text-[#82777A]">
             {publishers.length} scholarly imprints, university presses, and co-publishing partners
           </p>
         </div>
@@ -93,20 +93,20 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
       </div>
 
       {/* Search Header */}
-      <div className="p-4 bg-white rounded-2xl border border-stone-200 shadow-subtle flex items-center justify-between gap-4">
+      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex items-center justify-between gap-4">
         <div className="max-w-md w-full">
           <Input
             placeholder="Search imprints..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
+            icon={<Search className="w-4 h-4 text-[#82777A]" />}
           />
         </div>
       </div>
 
       {/* Publishers Grid */}
       {loading ? (
-        <div className="p-12 text-center text-xs text-charcoal-400">Loading publishers...</div>
+        <div className="p-12 text-center text-xs text-[#82777A]">Loading publishers...</div>
       ) : publishers.length === 0 ? (
         <EmptyState
           icon={<Building2 className="w-8 h-8" />}
@@ -123,7 +123,7 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
           {publishers.map((pub) => (
             <div
               key={pub.id}
-              className="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-subtle hover:shadow-card hover:border-editorial-burgundy-300 transition-all flex flex-col justify-between group"
+              className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-start gap-3.5">
@@ -131,59 +131,59 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
                     <img
                       src={pub.logo_url}
                       alt={pub.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-stone-300 shadow-sm shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border border-[#EAE3DE] shadow-sm shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-paper-200 text-charcoal-700 flex items-center justify-center shrink-0 border border-stone-300">
+                    <div className="w-12 h-12 rounded-xl bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8] flex items-center justify-center shrink-0">
                       <Building2 className="w-6 h-6" />
                     </div>
                   )}
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-serif font-bold text-charcoal-900 group-hover:text-editorial-burgundy-700 truncate">
+                    <h3 className="text-sm font-serif font-bold text-[#292326] group-hover:text-[#651C32] truncate">
                       {pub.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs text-charcoal-500">
-                      <BookOpen className="w-3.5 h-3.5 text-editorial-burgundy-600" />
-                      <span className="font-semibold text-charcoal-800">{pub.books_count || 0}</span>
+                    <div className="flex items-center gap-1.5 mt-1 text-xs text-[#82777A]">
+                      <BookOpen className="w-3.5 h-3.5 text-[#651C32]" />
+                      <span className="font-semibold text-[#292326]">{pub.books_count || 0}</span>
                       <span>Titles in Catalogue</span>
                     </div>
                   </div>
                 </div>
 
                 {pub.description && (
-                  <p className="text-xs text-charcoal-600 mt-3 line-clamp-3 leading-relaxed">
+                  <p className="text-xs text-[#82777A] mt-3 line-clamp-3 leading-relaxed">
                     {pub.description}
                   </p>
                 )}
 
-                <div className="mt-4 pt-3 border-t border-stone-100 space-y-1.5 text-xs text-charcoal-500">
+                <div className="mt-4 pt-3 border-t border-[#EAE3DE] space-y-1.5 text-xs text-[#82777A]">
                   {pub.email && (
                     <div className="flex items-center gap-2 truncate">
-                      <Mail className="w-3.5 h-3.5 shrink-0 text-charcoal-400" />
+                      <Mail className="w-3.5 h-3.5 shrink-0 text-[#82777A]" />
                       <span className="truncate">{pub.email}</span>
                     </div>
                   )}
                   {pub.phone && (
                     <div className="flex items-center gap-2 truncate">
-                      <Phone className="w-3.5 h-3.5 shrink-0 text-charcoal-400" />
+                      <Phone className="w-3.5 h-3.5 shrink-0 text-[#82777A]" />
                       <span>{pub.phone}</span>
                     </div>
                   )}
                   {pub.address && (
-                    <div className="flex items-start gap-2 text-[11px] leading-tight text-charcoal-400">
-                      <MapPin className="w-3.5 h-3.5 shrink-0 text-charcoal-400 mt-0.5" />
+                    <div className="flex items-start gap-2 text-[11px] leading-tight text-[#82777A]">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-[#82777A] mt-0.5" />
                       <span className="line-clamp-2">{pub.address}</span>
                     </div>
                   )}
                   {pub.website && (
                     <div className="flex items-center gap-2 truncate pt-1">
-                      <Globe className="w-3.5 h-3.5 shrink-0 text-charcoal-400" />
+                      <Globe className="w-3.5 h-3.5 shrink-0 text-[#82777A]" />
                       <a
                         href={pub.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="truncate text-editorial-burgundy-700 hover:underline"
+                        className="truncate text-[#651C32] hover:underline"
                       >
                         {pub.website.replace('https://', '')}
                       </a>
@@ -193,20 +193,20 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
               </div>
 
               {/* Actions */}
-              <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-end gap-1">
+              <div className="mt-4 pt-3 border-t border-[#EAE3DE] flex items-center justify-end gap-1">
                 <button
                   onClick={() => {
                     setPublisherToEdit(pub);
                     setIsFormOpen(true);
                   }}
-                  className="p-1.5 rounded-lg text-charcoal-400 hover:text-charcoal-800 hover:bg-stone-100 transition-colors"
+                  className="p-1.5 rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
                   title="Edit Publisher"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setPublisherToDelete(pub)}
-                  className="p-1.5 rounded-lg text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                   title="Delete Publisher"
                 >
                   <Trash2 className="w-3.5 h-3.5" />

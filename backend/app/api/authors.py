@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from backend.app.core.database import get_db
-from backend.app.models.models import Author, ActivityLog
-from backend.app.schemas.schemas import AuthorCreate, AuthorUpdate, AuthorResponse
+try:
+    from backend.app.core.database import get_db
+    from backend.app.models.models import Author, ActivityLog
+    from backend.app.schemas.schemas import AuthorCreate, AuthorUpdate, AuthorResponse
+except ImportError:
+    from app.core.database import get_db
+    from app.models.models import Author, ActivityLog
+    from app.schemas.schemas import AuthorCreate, AuthorUpdate, AuthorResponse
 
 router = APIRouter(prefix="/authors", tags=["Authors"])
 

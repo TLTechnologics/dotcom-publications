@@ -16,8 +16,7 @@ import {
   Trash2,
   BookOpen,
   Mail,
-  Globe,
-  ExternalLink
+  Globe
 } from 'lucide-react';
 
 interface AuthorsPageProps {
@@ -75,10 +74,10 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
       {/* Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-serif font-bold text-charcoal-900 tracking-tight">
+          <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
             Academic Faculty & Authors Registry
           </h2>
-          <p className="text-xs text-charcoal-500">
+          <p className="text-xs text-[#82777A]">
             {authors.length} scholars, researchers, and editorial contributors
           </p>
         </div>
@@ -95,20 +94,20 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
       </div>
 
       {/* Search Header */}
-      <div className="p-4 bg-white rounded-2xl border border-stone-200 shadow-subtle flex items-center justify-between gap-4">
+      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex items-center justify-between gap-4">
         <div className="max-w-md w-full">
           <Input
             placeholder="Search scholars by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
+            icon={<Search className="w-4 h-4 text-[#82777A]" />}
           />
         </div>
       </div>
 
       {/* Authors Grid */}
       {loading ? (
-        <div className="p-12 text-center text-xs text-charcoal-400">Loading authors registry...</div>
+        <div className="p-12 text-center text-xs text-[#82777A]">Loading authors registry...</div>
       ) : authors.length === 0 ? (
         <EmptyState
           icon={<Users className="w-8 h-8" />}
@@ -125,7 +124,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
           {authors.map((author) => (
             <div
               key={author.id}
-              className="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-subtle hover:shadow-card hover:border-editorial-burgundy-300 transition-all flex flex-col justify-between group"
+              className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-start gap-3.5">
@@ -135,18 +134,18 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'
                     }
                     alt={author.name}
-                    className="w-14 h-14 rounded-full object-cover border border-stone-300 shadow-sm shrink-0"
+                    className="w-14 h-14 rounded-full object-cover border border-[#EAE3DE] shadow-sm shrink-0"
                   />
                   <div className="min-w-0 flex-1">
                     <h3
                       onClick={() => setAuthorToView(author)}
-                      className="text-sm font-serif font-bold text-charcoal-900 group-hover:text-editorial-burgundy-700 cursor-pointer truncate"
+                      className="text-sm font-serif font-bold text-[#292326] group-hover:text-[#651C32] cursor-pointer truncate"
                     >
                       {author.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs text-charcoal-500">
-                      <BookOpen className="w-3.5 h-3.5 text-editorial-burgundy-600" />
-                      <span className="font-semibold text-charcoal-800">
+                    <div className="flex items-center gap-1.5 mt-1 text-xs text-[#82777A]">
+                      <BookOpen className="w-3.5 h-3.5 text-[#651C32]" />
+                      <span className="font-semibold text-[#292326]">
                         {author.books_count || 0}
                       </span>
                       <span>Volumes Authored</span>
@@ -155,27 +154,27 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                 </div>
 
                 {author.bio && (
-                  <p className="text-xs text-charcoal-600 mt-3 line-clamp-3 leading-relaxed">
+                  <p className="text-xs text-[#82777A] mt-3 line-clamp-3 leading-relaxed">
                     {author.bio}
                   </p>
                 )}
 
                 {/* Email / Website */}
-                <div className="mt-3 pt-3 border-t border-stone-100 space-y-1 text-xs text-charcoal-500">
+                <div className="mt-3 pt-3 border-t border-[#EAE3DE] space-y-1 text-xs text-[#82777A]">
                   {author.email && (
                     <div className="flex items-center gap-2 truncate">
-                      <Mail className="w-3.5 h-3.5 shrink-0 text-charcoal-400" />
+                      <Mail className="w-3.5 h-3.5 shrink-0 text-[#82777A]" />
                       <span className="truncate">{author.email}</span>
                     </div>
                   )}
                   {author.website && (
                     <div className="flex items-center gap-2 truncate">
-                      <Globe className="w-3.5 h-3.5 shrink-0 text-charcoal-400" />
+                      <Globe className="w-3.5 h-3.5 shrink-0 text-[#82777A]" />
                       <a
                         href={author.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="truncate text-editorial-burgundy-700 hover:underline"
+                        className="truncate text-[#651C32] hover:underline"
                       >
                         {author.website.replace('https://', '')}
                       </a>
@@ -185,10 +184,10 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
               </div>
 
               {/* Bottom Actions */}
-              <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
+              <div className="mt-4 pt-3 border-t border-[#EAE3DE] flex items-center justify-between">
                 <button
                   onClick={() => setAuthorToView(author)}
-                  className="text-xs font-semibold text-editorial-burgundy-700 hover:text-editorial-burgundy-800 flex items-center gap-1"
+                  className="text-xs font-semibold text-[#651C32] hover:text-[#431322] flex items-center gap-1"
                 >
                   View Associated Works ({author.books_count || 0}) →
                 </button>
@@ -198,14 +197,14 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                       setAuthorToEdit(author);
                       setIsFormOpen(true);
                     }}
-                    className="p-1.5 rounded-lg text-charcoal-400 hover:text-charcoal-800 hover:bg-stone-100 transition-colors"
+                    className="p-1.5 rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
                     title="Edit Profile"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setAuthorToDelete(author)}
-                    className="p-1.5 rounded-lg text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                     title="Delete Author"
                   >
                     <Trash2 className="w-3.5 h-3.5" />

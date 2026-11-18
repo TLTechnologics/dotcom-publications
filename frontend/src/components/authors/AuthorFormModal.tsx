@@ -102,15 +102,15 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
 
           {/* Profile Picture */}
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Profile Portrait Photo
             </label>
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full overflow-hidden border border-stone-300 bg-stone-100 shrink-0">
+              <div className="w-14 h-14 rounded-full overflow-hidden border border-[#EAE3DE] bg-[#FAF8F3] shrink-0">
                 {profilePicture ? (
                   <img src={profilePicture} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-7 h-7 text-charcoal-300 m-auto mt-3" />
+                  <User className="w-7 h-7 text-[#82777A] m-auto mt-3" />
                 )}
               </div>
               <div className="flex-1 space-y-1">
@@ -133,12 +133,12 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Academic Biography & Research Disciplines
             </label>
             <textarea
               rows={4}
-              className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500"
+              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               placeholder="Academic appointments, research awards, university department..."
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -149,22 +149,22 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
             <Input
               label="Contact Email (Optional)"
               type="email"
-              icon={<Mail className="w-3.5 h-3.5" />}
+              icon={<Mail className="w-3.5 h-3.5 text-[#82777A]" />}
               placeholder="author@institution.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <Input
               label="Faculty / Personal Website (Optional)"
-              icon={<Globe className="w-3.5 h-3.5" />}
+              icon={<Globe className="w-3.5 h-3.5 text-[#82777A]" />}
               placeholder="https://scholar.org"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
             />
           </div>
 
-          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-stone-200">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
+          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-[#EAE3DE]">
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancel
             </Button>
             <Button type="submit" variant="primary" loading={loading}>

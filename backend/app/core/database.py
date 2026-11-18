@@ -1,16 +1,30 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from backend.app.core.config import settings
+try:
+    from backend.app.core.config import settings
+except ImportError:
+    from app.core.config import settings
 
-# Handle sqlite specific arguments
 connect_args = {}
+engine_kwargs = {
+    "pool_pre_ping": True,
+}
+
 if settings.DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
+else:
+    # PostgreSQL / Supabase connection tuning
+    # pool_recycle=300 prevents dropped connections on cloud Supabase pools
+    engine_kwargs.update({
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_recycle": 300,
+    })
 
 engine = create_engine(
     settings.DATABASE_URL,
     connect_args=connect_args,
-    pool_pre_ping=True
+    **engine_kwargs
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

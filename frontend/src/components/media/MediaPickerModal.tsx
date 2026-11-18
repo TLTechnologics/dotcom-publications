@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Image as ImageIcon, Search, Check, Link as LinkIcon } from 'lucide-react';
+import { Upload, Search, Check, Link as LinkIcon } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -79,13 +79,13 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Select Asset" subtitle="Choose from media library or upload a new image" size="lg">
-      <div className="flex gap-2 border-b border-stone-200 pb-3 mb-4">
+      <div className="flex gap-2 border-b border-[#EAE3DE] pb-3 mb-4">
         <button
           onClick={() => setActiveTab('library')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             activeTab === 'library'
-              ? 'bg-editorial-burgundy-50 text-editorial-burgundy-800 border border-editorial-burgundy-200'
-              : 'text-charcoal-600 hover:bg-stone-100'
+              ? 'bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]'
+              : 'text-[#82777A] hover:bg-[#FAF8F3]'
           }`}
         >
           Media Library ({items.length})
@@ -94,8 +94,8 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
           onClick={() => setActiveTab('upload')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
             activeTab === 'upload'
-              ? 'bg-editorial-burgundy-50 text-editorial-burgundy-800 border border-editorial-burgundy-200'
-              : 'text-charcoal-600 hover:bg-stone-100'
+              ? 'bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]'
+              : 'text-[#82777A] hover:bg-[#FAF8F3]'
           }`}
         >
           <Upload className="w-3.5 h-3.5" /> Upload File
@@ -104,8 +104,8 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
           onClick={() => setActiveTab('url')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
             activeTab === 'url'
-              ? 'bg-editorial-burgundy-50 text-editorial-burgundy-800 border border-editorial-burgundy-200'
-              : 'text-charcoal-600 hover:bg-stone-100'
+              ? 'bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]'
+              : 'text-[#82777A] hover:bg-[#FAF8F3]'
           }`}
         >
           <LinkIcon className="w-3.5 h-3.5" /> Direct URL
@@ -119,14 +119,14 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
               placeholder="Search assets by filename..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              icon={<Search className="w-4 h-4" />}
+              icon={<Search className="w-4 h-4 text-[#82777A]" />}
             />
           </div>
 
           {loading ? (
-            <div className="py-12 text-center text-xs text-charcoal-500">Loading media library...</div>
+            <div className="py-12 text-center text-xs text-[#82777A]">Loading media library...</div>
           ) : items.length === 0 ? (
-            <div className="py-12 text-center text-xs text-charcoal-500">
+            <div className="py-12 text-center text-xs text-[#82777A]">
               No media found. Upload an image or switch to direct URL.
             </div>
           ) : (
@@ -139,8 +139,8 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
                     onClick={() => setSelectedUrl(item.url)}
                     className={`group relative aspect-[3/4] rounded-lg overflow-hidden border cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-editorial-burgundy-600 ring-2 ring-editorial-burgundy-500 shadow-md'
-                        : 'border-stone-200 hover:border-stone-400'
+                        ? 'border-[#651C32] ring-2 ring-[#651C32] shadow-md'
+                        : 'border-[#EAE3DE] hover:border-[#651C32]/40'
                     }`}
                   >
                     <img
@@ -148,13 +148,13 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
                       alt={item.original_name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-charcoal-900/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-[#431322]/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {isSelected && (
-                      <div className="absolute top-1.5 right-1.5 bg-editorial-burgundy-700 text-white rounded-full p-1 shadow">
+                      <div className="absolute top-1.5 right-1.5 bg-[#651C32] text-white rounded-full p-1 shadow">
                         <Check className="w-3.5 h-3.5" />
                       </div>
                     )}
-                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-charcoal-900/90 to-transparent p-1.5 text-left">
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#292326]/90 to-transparent p-1.5 text-left">
                       <p className="text-[10px] text-white truncate font-medium">{item.original_name}</p>
                     </div>
                   </div>
@@ -167,12 +167,12 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
 
       {activeTab === 'upload' && (
         <div className="py-8">
-          <label className="border-2 border-dashed border-stone-300 hover:border-editorial-burgundy-500 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors bg-paper-50/50">
-            <Upload className="w-10 h-10 text-editorial-burgundy-600 mb-3" />
-            <span className="text-sm font-medium text-charcoal-800">
+          <label className="border-2 border-dashed border-[#EAE3DE] hover:border-[#651C32] rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#FAF8F3]">
+            <Upload className="w-10 h-10 text-[#651C32] mb-3" />
+            <span className="text-sm font-medium text-[#292326]">
               {uploading ? 'Uploading asset...' : 'Click to select image file'}
             </span>
-            <span className="text-xs text-charcoal-400 mt-1">Supports PNG, JPG, WebP up to 10MB</span>
+            <span className="text-xs text-[#82777A] mt-1">Supports PNG, JPG, WebP up to 10MB</span>
             <input
               type="file"
               accept="image/*"
@@ -194,21 +194,21 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             helper="Enter a direct image link (e.g. from Unsplash or public CDN)"
           />
           {customUrl && (
-            <div className="flex items-center gap-4 p-3 bg-stone-50 rounded-lg border border-stone-200">
+            <div className="flex items-center gap-4 p-3 bg-[#FAF8F3] rounded-lg border border-[#EAE3DE]">
               <img
                 src={customUrl}
                 alt="Preview"
-                className="w-16 h-20 object-cover rounded shadow-sm border border-stone-300"
+                className="w-16 h-20 object-cover rounded shadow-sm border border-[#EAE3DE]"
                 onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
               />
-              <span className="text-xs text-charcoal-600 truncate">URL preview active</span>
+              <span className="text-xs text-[#82777A] truncate">URL preview active</span>
             </div>
           )}
         </div>
       )}
 
-      <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-stone-200">
-        <Button variant="secondary" onClick={onClose}>
+      <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-[#EAE3DE]">
+        <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
         <Button

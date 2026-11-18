@@ -7,7 +7,7 @@ import { Select } from '../ui/Select';
 import { MediaPickerModal } from '../media/MediaPickerModal';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
-import { Upload } from 'lucide-react';
+import { Upload, FolderTree } from 'lucide-react';
 
 interface CategoryFormModalProps {
   isOpen: boolean;
@@ -134,18 +134,27 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             placeholder="None (This is a Top-Level Root Discipline)"
             value={parentId || ''}
             onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : undefined)}
-            options={parentCategories
-              .filter((c) => !categoryToEdit || c.id !== categoryToEdit.id)
-              .map((c) => ({ value: c.id, label: c.name }))}
+            options={[
+              { value: '', label: 'None (Root Discipline)', subtitle: 'Independent primary academic field', icon: <FolderTree className="w-4 h-4" /> },
+              ...parentCategories
+                .filter((c) => !categoryToEdit || c.id !== categoryToEdit.id)
+                .map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                  subtitle: c.description || (c.subcategories?.length ? `${c.subcategories.length} sub-disciplines` : 'Parent Academic Discipline'),
+                  icon: <FolderTree className="w-4 h-4" />,
+                  badge: c.subcategories?.length ? `${c.subcategories.length} sub` : undefined,
+                })),
+            ]}
           />
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Category Description & Scope
             </label>
             <textarea
               rows={3}
-              className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500"
+              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               placeholder="Curriculum coverage, academic subjects included..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -153,7 +162,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Banner / Discipline Header Image
             </label>
             <div className="flex gap-2">
@@ -173,8 +182,8 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-stone-200">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
+          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-[#EAE3DE]">
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
               Cancel
             </Button>
             <Button type="submit" variant="primary" loading={loading}>

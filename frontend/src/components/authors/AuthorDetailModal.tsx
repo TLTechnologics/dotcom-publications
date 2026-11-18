@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Author, Book } from '../../types';
 import { Modal } from '../ui/Modal';
 import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
 import { api } from '../../services/api';
-import { Mail, Globe, BookOpen, ExternalLink } from 'lucide-react';
+import { Mail, Globe, ExternalLink } from 'lucide-react';
 
 interface AuthorDetailModalProps {
   author: Author | null;
@@ -53,26 +52,26 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
     >
       <div className="space-y-6">
         {/* Profile Card */}
-        <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-xl bg-paper-100 border border-stone-200">
+        <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-xl bg-[#FAF8F3] border border-[#EAE3DE]">
           <img
             src={
               author.profile_picture ||
               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
             }
             alt={author.name}
-            className="w-20 h-20 rounded-xl object-cover border border-stone-300 shadow-sm shrink-0"
+            className="w-20 h-20 rounded-xl object-cover border border-[#EAE3DE] shadow-sm shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-serif font-bold text-charcoal-900">{author.name}</h3>
+            <h3 className="text-base font-serif font-bold text-[#292326]">{author.name}</h3>
             {author.bio && (
-              <p className="text-xs text-charcoal-600 mt-1 leading-relaxed">{author.bio}</p>
+              <p className="text-xs text-[#82777A] mt-1 leading-relaxed">{author.bio}</p>
             )}
 
-            <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-stone-200/60 text-xs text-charcoal-600">
+            <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-[#EAE3DE] text-xs text-[#82777A]">
               {author.email && (
                 <a
                   href={`mailto:${author.email}`}
-                  className="flex items-center gap-1.5 hover:text-editorial-burgundy-700"
+                  className="flex items-center gap-1.5 hover:text-[#651C32]"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>{author.email}</span>
@@ -83,7 +82,7 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
                   href={author.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 hover:text-editorial-burgundy-700"
+                  className="flex items-center gap-1.5 hover:text-[#651C32]"
                 >
                   <Globe className="w-3.5 h-3.5" />
                   <span className="truncate">{author.website}</span>
@@ -97,15 +96,15 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
         {/* Associated Books */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-charcoal-700">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#651C32]">
               Published Works in Dotcom Catalogue ({books.length})
             </h4>
           </div>
 
           {loading ? (
-            <div className="py-8 text-center text-xs text-charcoal-400">Loading bibliography...</div>
+            <div className="py-8 text-center text-xs text-[#82777A]">Loading bibliography...</div>
           ) : books.length === 0 ? (
-            <div className="p-6 text-center text-xs text-charcoal-400 bg-stone-50 rounded-xl border border-stone-200">
+            <div className="p-6 text-center text-xs text-[#82777A] bg-[#FAF8F3] rounded-xl border border-[#EAE3DE]">
               No books currently linked to this author.
             </div>
           ) : (
@@ -117,25 +116,25 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
                     onClose();
                     onBookClick?.(b);
                   }}
-                  className="flex items-center justify-between p-3 rounded-xl border border-stone-200 hover:border-editorial-burgundy-300 hover:bg-paper-50 transition-all cursor-pointer group"
+                  className="flex items-center justify-between p-3 rounded-xl border border-[#EAE3DE] hover:border-[#651C32]/40 hover:bg-[#FFF6D9]/30 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={b.cover_image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'}
                       alt={b.title}
-                      className="w-10 h-14 object-cover rounded shadow-sm shrink-0 border border-stone-200"
+                      className="w-10 h-14 object-cover rounded shadow-sm shrink-0 border border-[#EAE3DE]"
                     />
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-charcoal-900 group-hover:text-editorial-burgundy-700 truncate">
+                      <p className="text-xs font-semibold text-[#292326] group-hover:text-[#651C32] truncate">
                         {b.title}
                       </p>
-                      <p className="text-[11px] text-charcoal-500 mt-0.5">
+                      <p className="text-[11px] text-[#82777A] mt-0.5">
                         ISBN: {b.isbn || 'N/A'} • {b.edition || '1st Ed.'} • {b.publication_year || '2026'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-xs font-serif font-bold text-charcoal-800">
+                    <span className="text-xs font-serif font-bold text-[#651C32]">
                       ₹{b.selling_price.toLocaleString('en-IN')}
                     </span>
                     <Badge variant={b.is_draft ? 'draft' : 'published'}>

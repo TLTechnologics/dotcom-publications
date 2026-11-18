@@ -121,6 +121,8 @@ export function AdminApp() {
           publishers={publishers}
           onRefreshStats={loadAllData}
           onRefreshAuthors={loadAllData}
+          onRefreshCategories={loadAllData}
+          onRefreshPublishers={loadAllData}
         />
       )}
 
@@ -159,6 +161,8 @@ export function AdminApp() {
         categories={categories}
         publishers={publishers}
         onRefreshAuthors={loadAllData}
+        onRefreshCategories={loadAllData}
+        onRefreshPublishers={loadAllData}
       />
 
       <AuthorFormModal
@@ -197,16 +201,16 @@ export function AdminApp() {
         >
           <div className="space-y-4">
             {/* Background Theme Selector */}
-            <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <span className="text-xs text-charcoal-500 font-medium">Background preview mode:</span>
+            <div className="flex items-center justify-between border-b border-[#EAE3DE] pb-3">
+              <span className="text-xs text-[#82777A] font-medium">Background preview mode:</span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setLoaderModalTheme('light')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                     loaderModalTheme === 'light'
-                      ? 'bg-editorial-burgundy-700 text-white'
-                      : 'bg-stone-100 text-charcoal-700'
+                      ? 'bg-[#651C32] text-white shadow-subtle'
+                      : 'bg-[#FAF8F3] text-[#82777A] border border-[#EAE3DE]'
                   }`}
                 >
                   Warm Paper
@@ -214,10 +218,10 @@ export function AdminApp() {
                 <button
                   type="button"
                   onClick={() => setLoaderModalTheme('dark')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                     loaderModalTheme === 'dark'
-                      ? 'bg-editorial-burgundy-700 text-white'
-                      : 'bg-stone-100 text-charcoal-700'
+                      ? 'bg-[#651C32] text-white shadow-subtle'
+                      : 'bg-[#FAF8F3] text-[#82777A] border border-[#EAE3DE]'
                   }`}
                 >
                   Charcoal Dark
@@ -225,10 +229,10 @@ export function AdminApp() {
                 <button
                   type="button"
                   onClick={() => setLoaderModalTheme('transparent')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                     loaderModalTheme === 'transparent'
-                      ? 'bg-editorial-burgundy-700 text-white'
-                      : 'bg-stone-100 text-charcoal-700'
+                      ? 'bg-[#651C32] text-white shadow-subtle'
+                      : 'bg-[#FAF8F3] text-[#82777A] border border-[#EAE3DE]'
                   }`}
                 >
                   Transparent
@@ -240,10 +244,10 @@ export function AdminApp() {
             <div
               className={`p-12 rounded-2xl flex flex-col items-center justify-center transition-colors min-h-[280px] border ${
                 loaderModalTheme === 'dark'
-                  ? 'bg-[#181817] border-stone-800 text-white'
+                  ? 'bg-[#431322] border-[#651C32] text-white'
                   : loaderModalTheme === 'transparent'
-                  ? 'bg-transparent border-dashed border-stone-300'
-                  : 'bg-[#FAF8F2] border-stone-200'
+                  ? 'bg-transparent border-dashed border-[#EAE3DE]'
+                  : 'bg-[#FAF8F3] border-[#EAE3DE]'
               }`}
             >
               <DotcomLogoLoader
@@ -254,12 +258,12 @@ export function AdminApp() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs text-charcoal-500 pt-2">
+            <div className="flex items-center justify-between text-xs text-[#82777A] pt-2">
               <a
                 href="/logo-animation-demo.html"
                 target="_blank"
                 rel="noreferrer"
-                className="text-editorial-burgundy-700 hover:underline font-semibold"
+                className="text-[#651C32] hover:underline font-semibold"
               >
                 Open Fullscreen Standalone Page ↗
               </a>

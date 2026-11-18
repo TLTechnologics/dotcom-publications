@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Category } from '../types';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Badge } from '../components/ui/Badge';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { CategoryFormModal } from '../components/categories/CategoryFormModal';
@@ -14,9 +13,7 @@ import {
   Plus,
   Edit2,
   Trash2,
-  BookOpen,
-  CornerDownRight,
-  Layers
+  CornerDownRight
 } from 'lucide-react';
 
 interface CategoriesPageProps {
@@ -77,10 +74,10 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
       {/* Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-serif font-bold text-charcoal-900 tracking-tight">
+          <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
             Disciplines & Categories Taxonomy
           </h2>
-          <p className="text-xs text-charcoal-500">
+          <p className="text-xs text-[#82777A]">
             Hierarchical academic knowledge classifications, syllabi, and research clusters
           </p>
         </div>
@@ -97,20 +94,20 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
       </div>
 
       {/* Search Header */}
-      <div className="p-4 bg-white rounded-2xl border border-stone-200 shadow-subtle flex items-center justify-between gap-4">
+      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex items-center justify-between gap-4">
         <div className="max-w-md w-full">
           <Input
             placeholder="Search disciplines..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
+            icon={<Search className="w-4 h-4 text-[#82777A]" />}
           />
         </div>
       </div>
 
       {/* Category List */}
       {loading ? (
-        <div className="p-12 text-center text-xs text-charcoal-400">Loading disciplines...</div>
+        <div className="p-12 text-center text-xs text-[#82777A]">Loading disciplines...</div>
       ) : categories.length === 0 ? (
         <EmptyState
           icon={<FolderTree className="w-8 h-8" />}
@@ -127,33 +124,33 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
           {categories.map((parent) => (
             <div
               key={parent.id}
-              className="bg-white rounded-2xl border border-stone-200/90 shadow-subtle overflow-hidden"
+              className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden"
             >
               {/* Parent Category Header */}
-              <div className="p-4 sm:p-5 bg-paper-50/70 border-b border-stone-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="p-4 sm:p-5 bg-[#FAF8F3] border-b border-[#EAE3DE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3.5 min-w-0">
                   {parent.image_url ? (
                     <img
                       src={parent.image_url}
                       alt={parent.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-stone-300 shadow-sm shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border border-[#EAE3DE] shadow-sm shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-editorial-burgundy-100 text-editorial-burgundy-800 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8] flex items-center justify-center shrink-0">
                       <FolderTree className="w-6 h-6" />
                     </div>
                   )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-serif font-bold text-charcoal-900 truncate">
+                      <h3 className="text-sm font-serif font-bold text-[#292326] truncate">
                         {parent.name}
                       </h3>
-                      <span className="text-[10px] bg-stone-200 text-charcoal-700 font-mono px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] bg-[#FAF8F3] text-[#82777A] font-mono px-2 py-0.5 rounded-md border border-[#EAE3DE]">
                         /{parent.slug}
                       </span>
                     </div>
                     {parent.description && (
-                      <p className="text-xs text-charcoal-500 line-clamp-1 mt-0.5">
+                      <p className="text-xs text-[#82777A] line-clamp-1 mt-0.5">
                         {parent.description}
                       </p>
                     )}
@@ -162,28 +159,28 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
 
                 <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0">
                   <div className="text-right">
-                    <span className="text-xs font-bold text-charcoal-900 block">
+                    <span className="text-xs font-bold text-[#292326] block">
                       {parent.books_count || 0} Titles
                     </span>
-                    <span className="text-[10px] text-charcoal-400">
+                    <span className="text-[10px] text-[#82777A]">
                       {parent.subcategories?.length || 0} Subcategories
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 border-l border-stone-200 pl-3">
+                  <div className="flex items-center gap-1 border-l border-[#EAE3DE] pl-3">
                     <button
                       onClick={() => {
                         setCategoryToEdit(parent);
                         setIsFormOpen(true);
                       }}
-                      className="p-1.5 rounded-lg text-charcoal-400 hover:text-charcoal-800 hover:bg-stone-100 transition-colors"
+                      className="p-1.5 rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
                       title="Edit Category"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setCategoryToDelete(parent)}
-                      className="p-1.5 rounded-lg text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                       title="Delete Category"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -194,26 +191,26 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
 
               {/* Subcategories */}
               {parent.subcategories && parent.subcategories.length > 0 ? (
-                <div className="divide-y divide-stone-100 px-4 py-1">
+                <div className="divide-y divide-[#EAE3DE] px-4 py-1">
                   {parent.subcategories.map((sub) => (
                     <div
                       key={sub.id}
-                      className="py-3 px-2 flex items-center justify-between hover:bg-paper-50 rounded-lg transition-colors group"
+                      className="py-3 px-2 flex items-center justify-between hover:bg-[#FFF6D9]/40 rounded-lg transition-colors group"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <CornerDownRight className="w-4 h-4 text-editorial-burgundy-600 shrink-0 ml-2" />
+                        <CornerDownRight className="w-4 h-4 text-[#651C32] shrink-0 ml-2" />
                         <div className="min-w-0">
-                          <span className="text-xs font-medium text-charcoal-900 group-hover:text-editorial-burgundy-700">
+                          <span className="text-xs font-medium text-[#292326] group-hover:text-[#651C32]">
                             {sub.name}
                           </span>
-                          <span className="text-[10px] font-mono text-charcoal-400 ml-2">
+                          <span className="text-[10px] font-mono text-[#82777A] ml-2">
                             {sub.slug}
                           </span>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-[11px] text-charcoal-500">
+                        <span className="text-[11px] text-[#82777A]">
                           {sub.books_count || 0} titles
                         </span>
                         <div className="flex items-center gap-1">
@@ -222,13 +219,13 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                               setCategoryToEdit(sub);
                               setIsFormOpen(true);
                             }}
-                            className="p-1 rounded-md text-charcoal-400 hover:text-charcoal-800 hover:bg-stone-100"
+                            className="p-1 rounded-md text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9]"
                           >
                             <Edit2 className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() => setCategoryToDelete(sub)}
-                            className="p-1 rounded-md text-charcoal-400 hover:text-rose-600 hover:bg-rose-50"
+                            className="p-1 rounded-md text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -238,7 +235,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                   ))}
                 </div>
               ) : (
-                <div className="p-3 text-center text-[11px] text-charcoal-400 bg-stone-50/50">
+                <div className="p-3 text-center text-[11px] text-[#82777A] bg-[#FAF8F3]">
                   No subcategories assigned yet to this discipline.
                 </div>
               )}

@@ -2,9 +2,14 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from backend.app.core.database import get_db
-from backend.app.models.models import Book, Author, Publisher, Category, ActivityLog
-from backend.app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookAuthorBrief
+try:
+    from backend.app.core.database import get_db
+    from backend.app.models.models import Book, Author, Publisher, Category, ActivityLog
+    from backend.app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookAuthorBrief
+except ImportError:
+    from app.core.database import get_db
+    from app.models.models import Book, Author, Publisher, Category, ActivityLog
+    from app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookAuthorBrief
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
@@ -123,7 +128,26 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
 
 @router.post("", response_model=BookResponse, status_code=201)
 def create_book(book_in: BookCreate, db: Session = Depends(get_db)):
+    # Validate pricing
+    if book_in.mrp > 0 and book_in.selling_price > book_in.mrp:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Selling price (₹{book_in.selling_price}) cannot exceed MRP (₹{book_in.mrp})"
+        )
+
+    # Validate ISBN uniqueness if provided
+    if book_in.isbn and book_in.isbn.strip():
+        clean_isbn = book_in.isbn.strip()
+        existing_isbn = db.query(Book).filter(Book.isbn == clean_isbn).first()
+        if existing_isbn:
+            raise HTTPException(
+                status_code=400,
+                detail=f"A book with ISBN '{clean_isbn}' already exists: '{existing_isbn.title}'"
+            )
+
     book_dict = book_in.model_dump(exclude={"author_ids", "additional_images"})
+    if book_dict.get("isbn"):
+        book_dict["isbn"] = book_dict["isbn"].strip()
     book = Book(**book_dict)
 
     if book_in.additional_images:
@@ -159,6 +183,26 @@ def update_book(book_id: int, book_in: BookUpdate, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Book not found")
 
     update_data = book_in.model_dump(exclude_unset=True)
+
+    # Validate pricing if either price or mrp is updated
+    effective_sp = update_data.get("selling_price", book.selling_price)
+    effective_mrp = update_data.get("mrp", book.mrp)
+    if effective_mrp > 0 and effective_sp > effective_mrp:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Selling price (₹{effective_sp}) cannot exceed MRP (₹{effective_mrp})"
+        )
+
+    # Validate ISBN uniqueness if updated
+    if "isbn" in update_data and update_data["isbn"]:
+        clean_isbn = update_data["isbn"].strip()
+        update_data["isbn"] = clean_isbn
+        existing_isbn = db.query(Book).filter(Book.isbn == clean_isbn, Book.id != book_id).first()
+        if existing_isbn:
+            raise HTTPException(
+                status_code=400,
+                detail=f"A book with ISBN '{clean_isbn}' already exists: '{existing_isbn.title}'"
+            )
 
     if "author_ids" in update_data:
         author_ids = update_data.pop("author_ids")

@@ -9,7 +9,7 @@ import {
   Globe,
   Settings,
   LogOut,
-  ChevronRight,
+  Sparkles,
   BookMarked
 } from 'lucide-react';
 import { NavigationTab } from '../../types';
@@ -49,25 +49,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-paper-50 border-r border-stone-200/90 flex flex-col h-screen select-none shrink-0 sticky top-0">
+    <aside className="w-64 bg-[#651C32] text-white flex flex-col h-screen select-none shrink-0 sticky top-0 border-r border-[#431322] shadow-elevated">
       {/* Brand Header */}
-      <div className="p-5 border-b border-stone-200/80 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-editorial-burgundy-700 text-white flex items-center justify-center shadow-subtle shrink-0">
-          <BookMarked className="w-5 h-5" />
+      <div className="p-5 border-b border-[#431322]/80 flex items-center gap-3">
+        <div className="w-11 h-11 rounded-xl bg-white border border-[#F6E7A8]/60 overflow-hidden shadow-md shrink-0 p-0.5">
+          <img
+            src="/logo.jpg"
+            alt="Dotcom Publications"
+            className="w-full h-full object-cover rounded-[9px]"
+          />
         </div>
         <div className="min-w-0">
-          <h1 className="font-serif font-bold text-charcoal-900 text-base leading-tight truncate tracking-tight">
+          <h1 className="font-serif font-bold text-white text-base leading-tight truncate tracking-tight">
             Dotcom Publications
           </h1>
-          <p className="text-[10px] uppercase font-semibold text-editorial-burgundy-700 tracking-wider mt-0.5">
+          <p className="text-[10px] uppercase font-semibold text-[#F6E7A8] tracking-widest mt-0.5">
             Phase 01 • Admin Portal
           </p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-2 text-[10px] font-semibold text-charcoal-400 uppercase tracking-widest">
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <div className="px-3 pb-2 text-[10px] font-semibold text-[#F6E7A8]/70 uppercase tracking-widest">
           Publishing Core
         </div>
         {navItems.map((item) => {
@@ -76,22 +80,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all group ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group ${
                 isActive
-                  ? 'bg-editorial-burgundy-700 text-white shadow-subtle'
-                  : 'text-charcoal-700 hover:bg-stone-200/60 hover:text-charcoal-900'
+                  ? 'bg-[#F6E7A8] text-[#431322] font-semibold shadow-pastel'
+                  : 'text-white/85 hover:bg-[#431322]/80 hover:text-white'
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0 truncate">
-                <span className={`${isActive ? 'text-white' : 'text-charcoal-500 group-hover:text-charcoal-800'}`}>
+                <span
+                  className={`transition-colors ${
+                    isActive
+                      ? 'text-[#431322]'
+                      : 'text-[#F6E7A8]/80 group-hover:text-[#F6E7A8]'
+                  }`}
+                >
                   {item.icon}
                 </span>
                 <span className="truncate">{item.label}</span>
               </div>
               {item.count !== undefined && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${
-                    isActive ? 'bg-editorial-burgundy-800 text-white/90' : 'bg-stone-200 text-charcoal-600'
+                  className={`text-[10px] px-2 py-0.5 rounded-md font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-[#651C32] text-white'
+                      : 'bg-[#431322] text-[#F6E7A8]'
                   }`}
                 >
                   {item.count}
@@ -102,26 +114,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* System info note */}
-      <div className="mx-3 mb-2 p-2.5 rounded-xl bg-editorial-burgundy-50 border border-editorial-burgundy-100 text-[11px] text-editorial-burgundy-900">
-        <p className="font-semibold text-editorial-burgundy-900">TL Technologics</p>
-        <p className="text-[10px] text-editorial-burgundy-700 mt-0.5">Commercial Publishing Platform v1.0</p>
+      {/* System Note */}
+      <div className="mx-3 mb-2 p-3 rounded-xl bg-[#431322] border border-[#8B4055]/30 text-[11px]">
+        <div className="flex items-center gap-1.5 text-[#F6E7A8] font-semibold">
+          <Sparkles className="w-3 h-3 text-[#F6E7A8]" />
+          <span>TL Technologics</span>
+        </div>
+        <p className="text-[10px] text-[#FAF8F3]/70 mt-0.5">
+          Maroon × Pastel Yellow Edition v1.2
+        </p>
       </div>
 
       {/* Sidebar Footer */}
-      <div className="p-3 border-t border-stone-200/90 bg-white/50">
-        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer group">
+      <div className="p-3 border-t border-[#431322] bg-[#431322]/60">
+        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-[#431322] transition-colors cursor-pointer group">
           <div className="relative">
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
               alt="Admin"
-              className="w-9 h-9 rounded-full object-cover border border-stone-300"
+              className="w-9 h-9 rounded-full object-cover border border-[#F6E7A8]/50"
             />
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#477A58] border-2 border-[#651C32] rounded-full" />
           </div>
           <div className="flex-1 min-w-0" onClick={() => onTabChange('settings')}>
-            <p className="text-xs font-semibold text-charcoal-900 truncate">Dr. Alistair Finch</p>
-            <p className="text-[10px] text-charcoal-500 truncate">Editorial Director</p>
+            <p className="text-xs font-semibold text-white truncate group-hover:text-[#F6E7A8] transition-colors">
+              Dr. Alistair Finch
+            </p>
+            <p className="text-[10px] text-[#F6E7A8]/80 truncate">Editorial Director</p>
           </div>
           <button
             onClick={(e) => {
@@ -129,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onLogoutClick?.();
             }}
             title="Account Options / Sign Out"
-            className="p-1.5 rounded-lg text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+            className="p-1.5 rounded-lg text-white/70 hover:text-[#B94B4B] hover:bg-[#300D18] transition-colors"
           >
             <LogOut className="w-4 h-4" />
           </button>

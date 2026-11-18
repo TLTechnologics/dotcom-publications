@@ -7,18 +7,14 @@ import { LandingPreviewModal } from '../components/landing/LandingPreviewModal';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import {
-  Globe,
   Upload,
   Eye,
   Save,
-  CheckCircle,
   Plus,
   Trash2,
   BookOpen,
   FolderTree,
   Mail,
-  Phone,
-  MapPin,
   Sparkles
 } from 'lucide-react';
 
@@ -126,7 +122,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-xs text-charcoal-400">Loading landing page CMS...</div>;
+    return <div className="p-12 text-center text-xs text-[#82777A]">Loading landing page CMS...</div>;
   }
 
   return (
@@ -134,10 +130,10 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
       {/* Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-serif font-bold text-charcoal-900 tracking-tight">
-            Landing Page CMS Manager
+          <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
+            Landing Page CMS Studio
           </h2>
-          <p className="text-xs text-charcoal-500">
+          <p className="text-xs text-[#82777A]">
             Dynamically powers the future public-facing website at dotcompublications.com
           </p>
         </div>
@@ -164,17 +160,17 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
       {/* Structured Sections */}
       <div className="space-y-6">
         {/* Section 1: Hero Section */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-serif font-bold text-charcoal-900">
+              <h3 className="text-sm font-serif font-bold text-[#292326]">
                 1. Hero Presentation Banner
               </h3>
-              <p className="text-xs text-charcoal-500">
+              <p className="text-xs text-[#82777A]">
                 Primary headline, vision statement, and panoramic banner backdrop
               </p>
             </div>
-            <span className="text-[10px] font-bold text-editorial-burgundy-700 bg-editorial-burgundy-50 px-2 py-0.5 rounded border border-editorial-burgundy-200">
+            <span className="text-[10px] font-bold text-[#651C32] bg-[#FFF6D9] px-2.5 py-1 rounded-md border border-[#F6E7A8]">
               Homepage Header
             </span>
           </div>
@@ -187,19 +183,19 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
             />
 
             <div>
-              <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
                 Hero Supporting Description
               </label>
               <textarea
                 rows={3}
-                className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500 leading-relaxed"
+                className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed transition-colors"
                 value={content.hero_description}
                 onChange={(e) => setContent({ ...content, hero_description: e.target.value })}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
                 Hero Background Image
               </label>
               <div className="flex gap-2">
@@ -217,7 +213,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                 </Button>
               </div>
               {content.hero_image && (
-                <div className="mt-2 h-28 rounded-xl overflow-hidden border border-stone-200">
+                <div className="mt-2 h-28 rounded-xl overflow-hidden border border-[#EAE3DE]">
                   <img
                     src={content.hero_image}
                     alt="Hero preview"
@@ -230,17 +226,17 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 2: Featured Books Selector */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-serif font-bold text-charcoal-900">
+              <h3 className="text-sm font-serif font-bold text-[#292326]">
                 2. Featured Academic Titles Selector
               </h3>
-              <p className="text-xs text-charcoal-500">
-                Select which books from the catalogue appear prominently in the homepage spotlight carousel ({content.featured_book_ids.length} selected)
+              <p className="text-xs text-[#82777A]">
+                Select which books from the catalogue appear prominently in the homepage spotlight ({content.featured_book_ids.length} selected)
               </p>
             </div>
-            <BookOpen className="w-5 h-5 text-editorial-burgundy-700" />
+            <BookOpen className="w-5 h-5 text-[#651C32]" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-80 overflow-y-auto p-1">
@@ -252,20 +248,20 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                   onClick={() => toggleFeaturedBook(book.id)}
                   className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-editorial-burgundy-50 border-editorial-burgundy-400 ring-1 ring-editorial-burgundy-300'
-                      : 'bg-white border-stone-200 hover:border-stone-300'
+                      ? 'bg-[#FFF6D9]/50 border-[#F6E7A8] ring-1 ring-[#F6E7A8]'
+                      : 'bg-white border-[#EAE3DE] hover:border-[#651C32]/40'
                   }`}
                 >
                   <img
                     src={book.cover_image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=80&auto=format&fit=crop&q=80'}
                     alt={book.title}
-                    className="w-10 h-14 object-cover rounded shadow-sm border border-stone-200 shrink-0"
+                    className="w-10 h-14 object-cover rounded shadow-sm border border-[#EAE3DE] shrink-0"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-serif font-bold text-charcoal-900 truncate">
+                    <p className="text-xs font-serif font-bold text-[#292326] truncate">
                       {book.title}
                     </p>
-                    <p className="text-[10px] text-charcoal-500 mt-0.5 truncate">
+                    <p className="text-[10px] text-[#82777A] mt-0.5 truncate">
                       ₹{book.selling_price} • {book.category_name}
                     </p>
                   </div>
@@ -273,7 +269,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                     type="checkbox"
                     checked={isSelected}
                     readOnly
-                    className="rounded text-editorial-burgundy-700 focus:ring-editorial-burgundy-500 w-4 h-4"
+                    className="rounded text-[#651C32] focus:ring-[#651C32] accent-[#651C32] w-4 h-4"
                   />
                 </div>
               );
@@ -282,17 +278,17 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 3: Popular Categories Display Selector */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-serif font-bold text-charcoal-900">
+              <h3 className="text-sm font-serif font-bold text-[#292326]">
                 3. Popular Disciplines & Faculties
               </h3>
-              <p className="text-xs text-charcoal-500">
+              <p className="text-xs text-[#82777A]">
                 Choose primary subject disciplines highlighted for prospective students and faculty ({content.popular_categories.length} selected)
               </p>
             </div>
-            <FolderTree className="w-5 h-5 text-editorial-burgundy-700" />
+            <FolderTree className="w-5 h-5 text-[#651C32]" />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -304,22 +300,22 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                   onClick={() => togglePopularCategory(cat.id)}
                   className={`p-3 rounded-xl border cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-editorial-burgundy-50 border-editorial-burgundy-400'
-                      : 'bg-paper-50 border-stone-200 hover:border-stone-300'
+                      ? 'bg-[#FFF6D9]/50 border-[#F6E7A8] ring-1 ring-[#F6E7A8]'
+                      : 'bg-[#FAF8F3] border-[#EAE3DE] hover:border-[#651C32]/40'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-serif font-bold text-charcoal-900 truncate">
+                    <span className="text-xs font-serif font-bold text-[#292326] truncate">
                       {cat.name}
                     </span>
                     <input
                       type="checkbox"
                       checked={isSelected}
                       readOnly
-                      className="rounded text-editorial-burgundy-700 focus:ring-editorial-burgundy-500 w-3.5 h-3.5"
+                      className="rounded text-[#651C32] focus:ring-[#651C32] accent-[#651C32] w-3.5 h-3.5"
                     />
                   </div>
-                  <span className="text-[10px] text-charcoal-400 block mt-1">
+                  <span className="text-[10px] text-[#82777A] block mt-1">
                     {cat.books_count || 0} Titles
                   </span>
                 </div>
@@ -329,17 +325,17 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 4: About Dotcom Publications & Impact Metrics */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-serif font-bold text-charcoal-900">
+              <h3 className="text-sm font-serif font-bold text-[#292326]">
                 4. About Dotcom Publications & Key Metrics
               </h3>
-              <p className="text-xs text-charcoal-500">
+              <p className="text-xs text-[#82777A]">
                 Company mission, pedagogical philosophy, and dynamic impact counters
               </p>
             </div>
-            <Sparkles className="w-5 h-5 text-editorial-burgundy-700" />
+            <Sparkles className="w-5 h-5 text-[#651C32]" />
           </div>
 
           <Input
@@ -349,12 +345,12 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
           />
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
               Institutional Narrative / Story
             </label>
             <textarea
               rows={4}
-              className="w-full rounded-lg border border-stone-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-editorial-burgundy-500 leading-relaxed"
+              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed transition-colors"
               value={content.about_description}
               onChange={(e) => setContent({ ...content, about_description: e.target.value })}
             />
@@ -363,13 +359,13 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
           {/* Dynamic Metrics */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-charcoal-700 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider">
                 Impact Metric Badges
               </label>
               <button
                 type="button"
                 onClick={addStat}
-                className="text-xs font-semibold text-editorial-burgundy-700 hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-[#651C32] hover:text-[#431322] flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Metric
               </button>
@@ -377,7 +373,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               {content.about_stats.map((st, idx) => (
-                <div key={idx} className="p-3 bg-stone-50 rounded-xl border border-stone-200 relative group">
+                <div key={idx} className="p-3 bg-[#FAF8F3] rounded-xl border border-[#EAE3DE] relative group">
                   <Input
                     label="Value"
                     value={st.value}
@@ -393,7 +389,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                   <button
                     type="button"
                     onClick={() => removeStat(idx)}
-                    className="absolute top-2 right-2 text-charcoal-400 hover:text-rose-600 p-1"
+                    className="absolute top-2 right-2 text-[#82777A] hover:text-[#B94B4B] p-1"
                     title="Remove Metric"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -405,17 +401,17 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 5: Contact Information & Public Footer */}
-        <div className="p-6 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-4">
-          <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
+        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+          <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-serif font-bold text-charcoal-900">
+              <h3 className="text-sm font-serif font-bold text-[#292326]">
                 5. Contact Information & Footer Content
               </h3>
-              <p className="text-xs text-charcoal-500">
+              <p className="text-xs text-[#82777A]">
                 Official editorial inquiries, customer service line, and legal copyright text
               </p>
             </div>
-            <Mail className="w-5 h-5 text-editorial-burgundy-700" />
+            <Mail className="w-5 h-5 text-[#651C32]" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -447,8 +443,8 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
       </div>
 
       {/* Floating Save Bar */}
-      <div className="sticky bottom-4 z-20 p-4 bg-white/90 backdrop-blur-md rounded-2xl border border-stone-200 shadow-xl flex items-center justify-between">
-        <span className="text-xs text-charcoal-600 font-medium">
+      <div className="sticky bottom-4 z-20 p-4 bg-white/95 backdrop-blur-md rounded-2xl border border-[#EAE3DE] shadow-xl flex items-center justify-between">
+        <span className="text-xs text-[#82777A] font-medium">
           Changes will dynamically reflect on the public website upon saving.
         </span>
         <div className="flex items-center gap-3">

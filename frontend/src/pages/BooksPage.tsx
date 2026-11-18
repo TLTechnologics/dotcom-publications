@@ -22,7 +22,14 @@ import {
   ArrowUpDown,
   CheckCircle,
   XCircle,
-  ExternalLink
+  ExternalLink,
+  Users,
+  User,
+  FolderTree,
+  Globe,
+  Clock,
+  Layers,
+  Coins
 } from 'lucide-react';
 
 interface BooksPageProps {
@@ -31,6 +38,8 @@ interface BooksPageProps {
   publishers: Publisher[];
   onRefreshStats?: () => void;
   onRefreshAuthors?: () => void;
+  onRefreshCategories?: () => void;
+  onRefreshPublishers?: () => void;
 }
 
 export const BooksPage: React.FC<BooksPageProps> = ({
@@ -39,6 +48,8 @@ export const BooksPage: React.FC<BooksPageProps> = ({
   publishers,
   onRefreshStats,
   onRefreshAuthors,
+  onRefreshCategories,
+  onRefreshPublishers,
 }) => {
   const toast = useToast();
 
@@ -137,10 +148,10 @@ export const BooksPage: React.FC<BooksPageProps> = ({
       {/* Top Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-serif font-bold text-charcoal-900 tracking-tight">
+          <h2 className="text-lg font-serif font-bold text-[#292326] tracking-tight text-xl">
             Book Catalogue Management
           </h2>
-          <p className="text-xs text-charcoal-500">
+          <p className="text-xs text-[#82777A]">
             Total of {total} academic publications, monographs, and textbooks registered
           </p>
         </div>
@@ -157,7 +168,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 bg-white rounded-2xl border border-stone-200 shadow-subtle space-y-3">
+      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search by Title / ISBN */}
           <div className="lg:col-span-2">
@@ -180,7 +191,16 @@ export const BooksPage: React.FC<BooksPageProps> = ({
               setSelectedCategory(e.target.value);
               setPage(1);
             }}
-            options={categories.map((c) => ({ value: c.id, label: c.name }))}
+            options={[
+              { value: '', label: 'All Disciplines', subtitle: 'View entire curriculum catalogue', icon: <Layers className="w-4 h-4" /> },
+              ...categories.map((c) => ({
+                value: c.id,
+                label: c.name,
+                subtitle: c.description || (c.subcategories?.length ? `${c.subcategories.length} sub-disciplines available` : 'Primary Discipline'),
+                icon: <BookOpen className="w-4 h-4" />,
+                badge: c.subcategories?.length ? `${c.subcategories.length} sub` : undefined,
+              })),
+            ]}
           />
 
           {/* Filter by Author */}
@@ -191,7 +211,16 @@ export const BooksPage: React.FC<BooksPageProps> = ({
               setSelectedAuthor(e.target.value);
               setPage(1);
             }}
-            options={authors.map((a) => ({ value: a.id, label: a.name }))}
+            options={[
+              { value: '', label: 'All Authors & Faculty', subtitle: 'All contributing scholars', icon: <Users className="w-4 h-4" /> },
+              ...authors.map((a) => ({
+                value: a.id,
+                label: a.name,
+                subtitle: a.bio || a.email || 'Academic Author & Researcher',
+                icon: <User className="w-4 h-4" />,
+                badge: a.books_count ? `${a.books_count} titles` : undefined,
+              })),
+            ]}
           />
 
           {/* Filter by Status */}
@@ -202,64 +231,46 @@ export const BooksPage: React.FC<BooksPageProps> = ({
               setPage(1);
             }}
             options={[
-              { value: 'all', label: 'All Publication Statuses' },
-              { value: 'published', label: 'Published / Live' },
-              { value: 'draft', label: 'Draft / Peer Review' },
+              { value: 'all', label: 'All Publication Statuses', subtitle: 'Published and draft titles', icon: <Layers className="w-4 h-4" /> },
+              { value: 'published', label: 'Published / Live', subtitle: 'Live on public website', icon: <Globe className="w-4 h-4" /> },
+              { value: 'draft', label: 'Draft / Peer Review', subtitle: 'Internal review / unreleased', icon: <Clock className="w-4 h-4" /> },
             ]}
           />
         </div>
 
         {/* Sort Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-stone-100 text-xs text-charcoal-500">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DE] text-xs text-[#82777A]">
           <div className="flex items-center gap-3">
-            <span className="font-semibold text-charcoal-700 flex items-center gap-1">
-              <ArrowUpDown className="w-3 h-3" /> Sort by:
+            <span className="font-semibold text-[#292326] flex items-center gap-1.5 shrink-0">
+              <ArrowUpDown className="w-3.5 h-3.5 text-[#651C32]" /> Sort catalogue by:
             </span>
-            <button
-              onClick={() => {
-                setSortBy('created_at');
-                setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
-              }}
-              className={`px-2.5 py-1 rounded-lg border transition-colors ${
-                sortBy === 'created_at'
-                  ? 'bg-paper-200 border-paper-300 text-charcoal-900 font-semibold'
-                  : 'border-transparent text-charcoal-500 hover:bg-stone-50'
-              }`}
-            >
-              Date Added ({sortBy === 'created_at' ? (sortOrder === 'desc' ? 'Newest' : 'Oldest') : 'Date'})
-            </button>
-            <button
-              onClick={() => {
-                setSortBy('title');
-                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-              }}
-              className={`px-2.5 py-1 rounded-lg border transition-colors ${
-                sortBy === 'title'
-                  ? 'bg-paper-200 border-paper-300 text-charcoal-900 font-semibold'
-                  : 'border-transparent text-charcoal-500 hover:bg-stone-50'
-              }`}
-            >
-              Title (A-Z)
-            </button>
-            <button
-              onClick={() => {
-                setSortBy('selling_price');
-                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-              }}
-              className={`px-2.5 py-1 rounded-lg border transition-colors ${
-                sortBy === 'selling_price'
-                  ? 'bg-paper-200 border-paper-300 text-charcoal-900 font-semibold'
-                  : 'border-transparent text-charcoal-500 hover:bg-stone-50'
-              }`}
-            >
-              Price ({sortBy === 'selling_price' ? (sortOrder === 'asc' ? 'Low-High' : 'High-Low') : 'Price'})
-            </button>
+            <div className="w-64">
+              <Select
+                size="sm"
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const parts = String(e.target.value).split('-');
+                  if (parts.length === 2) {
+                    setSortBy(parts[0] as any);
+                    setSortOrder(parts[1] as any);
+                  }
+                }}
+                options={[
+                  { value: 'created_at-desc', label: 'Date Added (Newest First)', subtitle: 'Latest catalogue publications', icon: <Clock className="w-3.5 h-3.5" /> },
+                  { value: 'created_at-asc', label: 'Date Added (Oldest First)', subtitle: 'Earliest registered monographs', icon: <Clock className="w-3.5 h-3.5" /> },
+                  { value: 'title-asc', label: 'Title (Alphabetical A → Z)', subtitle: 'A to Z index', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                  { value: 'title-desc', label: 'Title (Reverse Z → A)', subtitle: 'Z to A index', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                  { value: 'selling_price-asc', label: 'Price (Lowest First)', subtitle: 'Student & entry edition', icon: <Coins className="w-3.5 h-3.5" /> },
+                  { value: 'selling_price-desc', label: 'Price (Highest First)', subtitle: 'Premium & reference sets', icon: <Coins className="w-3.5 h-3.5" /> },
+                ]}
+              />
+            </div>
           </div>
 
           {(search || selectedCategory || selectedAuthor || selectedStatus !== 'all') && (
             <button
               onClick={resetFilters}
-              className="text-editorial-burgundy-700 hover:underline font-medium"
+              className="text-[#651C32] hover:text-[#431322] hover:underline font-semibold"
             >
               Reset All Filters
             </button>
@@ -268,9 +279,9 @@ export const BooksPage: React.FC<BooksPageProps> = ({
       </div>
 
       {/* Professional Books Data Table */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-subtle overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-charcoal-400">Loading catalogue data...</div>
+          <div className="p-12 text-center text-xs text-[#82777A]">Loading catalogue data...</div>
         ) : books.length === 0 ? (
           <EmptyState
             icon={<BookOpen className="w-8 h-8" />}
@@ -285,7 +296,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-paper-100/80 border-b border-stone-200 text-charcoal-600 uppercase font-semibold text-[10px] tracking-wider">
+              <thead className="bg-[#FAF8F3] border-b border-[#EAE3DE] text-[#82777A] uppercase font-semibold text-[10px] tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4 w-16">Cover</th>
                   <th className="py-3.5 px-4">Title & Details</th>
@@ -298,7 +309,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100">
+              <tbody className="divide-y divide-[#EAE3DE]/60">
                 {books.map((book) => {
                   const discountPercent =
                     book.mrp && book.mrp > book.selling_price
@@ -308,7 +319,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                   return (
                     <tr
                       key={book.id}
-                      className="hover:bg-paper-50/60 transition-colors group"
+                      className="hover:bg-[#FFF6D9]/25 transition-colors group"
                     >
                       {/* Cover Thumbnail */}
                       <td className="py-3 px-4">
@@ -318,7 +329,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                             'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'
                           }
                           alt={book.title}
-                          className="w-10 h-14 object-cover rounded shadow-sm border border-stone-200 shrink-0"
+                          className="w-10 h-14 object-cover rounded shadow-subtle border border-[#EAE3DE] shrink-0"
                         />
                       </td>
 
@@ -327,59 +338,59 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                         <div className="flex items-center gap-1.5">
                           <span
                             onClick={() => setBookToPreview(book)}
-                            className="font-serif font-bold text-charcoal-900 group-hover:text-editorial-burgundy-700 cursor-pointer line-clamp-1 text-xs"
+                            className="font-serif font-bold text-[#292326] group-hover:text-[#651C32] cursor-pointer line-clamp-1 text-xs"
                           >
                             {book.title}
                           </span>
                           {book.is_featured && (
-                            <span className="shrink-0 text-[9px] bg-editorial-burgundy-50 text-editorial-burgundy-800 font-bold px-1.5 py-0.5 rounded border border-editorial-burgundy-200">
+                            <span className="shrink-0 text-[9px] bg-[#F5E6EA] text-[#651C32] font-bold px-1.5 py-0.5 rounded border border-[#8B4055]/30">
                               Featured
                             </span>
                           )}
                         </div>
                         {book.subtitle && (
-                          <p className="text-[11px] text-charcoal-500 italic line-clamp-1 mt-0.5 font-serif">
+                          <p className="text-[11px] text-[#82777A] italic line-clamp-1 mt-0.5 font-serif">
                             {book.subtitle}
                           </p>
                         )}
-                        <span className="text-[10px] text-charcoal-400 mt-1 block">
+                        <span className="text-[10px] text-[#82777A]/80 mt-1 block">
                           Format: {book.book_format} • {book.edition || '1st Ed.'}
                         </span>
                       </td>
 
                       {/* Author */}
-                      <td className="py-3 px-4 text-charcoal-700 max-w-[150px]">
+                      <td className="py-3 px-4 text-[#292326] max-w-[150px]">
                         <span className="line-clamp-2">
                           {book.authors?.map((a) => a.name).join(', ') || 'Unassigned'}
                         </span>
                       </td>
 
                       {/* Category */}
-                      <td className="py-3 px-4 text-charcoal-600">
+                      <td className="py-3 px-4 text-[#82777A]">
                         <Badge variant="category">{book.category_name || 'General'}</Badge>
                         {book.subcategory_name && (
-                          <span className="text-[10px] text-charcoal-400 block mt-1">
+                          <span className="text-[10px] text-[#82777A] block mt-1">
                             {book.subcategory_name}
                           </span>
                         )}
                       </td>
 
                       {/* ISBN */}
-                      <td className="py-3 px-4 font-mono text-[11px] text-charcoal-600">
+                      <td className="py-3 px-4 font-mono text-[11px] text-[#292326]">
                         {book.isbn || 'Pending'}
                       </td>
 
                       {/* Price */}
                       <td className="py-3 px-4">
-                        <div className="font-serif font-bold text-charcoal-900 text-xs">
+                        <div className="font-serif font-bold text-[#651C32] text-xs">
                           ₹{book.selling_price.toLocaleString('en-IN')}
                         </div>
                         {book.mrp > book.selling_price && (
                           <div className="flex items-center gap-1 mt-0.5 text-[10px]">
-                            <span className="text-charcoal-400 line-through">
+                            <span className="text-[#82777A] line-through">
                               ₹{book.mrp.toLocaleString('en-IN')}
                             </span>
-                            <span className="text-emerald-700 font-semibold">
+                            <span className="text-[#477A58] font-semibold">
                               {discountPercent}%
                             </span>
                           </div>
@@ -400,7 +411,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                       </td>
 
                       {/* Last Updated */}
-                      <td className="py-3 px-4 text-charcoal-400 text-[11px]">
+                      <td className="py-3 px-4 text-[#82777A] text-[11px]">
                         {new Date(book.updated_at).toLocaleDateString('en-GB', {
                           day: 'numeric',
                           month: 'short',
@@ -414,7 +425,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                           <button
                             onClick={() => setBookToPreview(book)}
                             title="Preview Book Presentation"
-                            className="p-1.5 rounded-lg text-charcoal-500 hover:text-charcoal-800 hover:bg-stone-100 transition-colors"
+                            className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -424,14 +435,14 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                               setIsFormOpen(true);
                             }}
                             title="Edit Book Details"
-                            className="p-1.5 rounded-lg text-charcoal-500 hover:text-charcoal-800 hover:bg-stone-100 transition-colors"
+                            className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setBookToDelete(book)}
                             title="Delete Book"
-                            className="p-1.5 rounded-lg text-charcoal-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                            className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -471,6 +482,8 @@ export const BooksPage: React.FC<BooksPageProps> = ({
         categories={categories}
         publishers={publishers}
         onRefreshAuthors={onRefreshAuthors}
+        onRefreshCategories={onRefreshCategories}
+        onRefreshPublishers={onRefreshPublishers}
       />
 
       {/* Book Preview Modal */}
