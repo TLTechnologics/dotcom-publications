@@ -6,6 +6,7 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { MediaPickerModal } from '../media/MediaPickerModal';
 import { BookPreviewModal } from './BookPreviewModal';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import {
@@ -108,6 +109,15 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
   // Preview modal state
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+
+  const handleRequestClose = () => {
+    if (formData.title.trim().length > 0 && !loading) {
+      setShowDiscardConfirm(true);
+    } else {
+      onClose();
+    }
+  };
 
   // Quick author create state
   const [showAuthorDrawer, setShowAuthorDrawer] = useState(false);
@@ -381,7 +391,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
     <>
       <Modal
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={handleRequestClose}
         title={bookToEdit ? `Edit Monograph: ${bookToEdit.title}` : 'Add New Academic Title'}
         subtitle="Catalogue Entry & Metadata Specifications"
         size="full"
@@ -1194,7 +1204,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           </Button>
 
           <div className="flex items-center gap-3">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>
+            <Button type="button" variant="secondary" onClick={handleRequestClose} disabled={loading}>
               Cancel
             </Button>
             <Button
@@ -1216,6 +1226,21 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           </div>
         </div>
       </Modal>
+
+      {/* Unsaved Changes Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDiscardConfirm}
+        onClose={() => setShowDiscardConfirm(false)}
+        onConfirm={() => {
+          setShowDiscardConfirm(false);
+          onClose();
+        }}
+        title="Discard Unsaved Changes?"
+        message="You have unsaved changes in this monograph catalogue entry. Discarding will lose any changes you have made."
+        confirmText="Discard Changes"
+        cancelText="Continue Editing"
+        isDestructive={true}
+      />
 
       {/* Media Picker Modal */}
       <MediaPickerModal

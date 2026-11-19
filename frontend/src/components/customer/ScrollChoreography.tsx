@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Book } from '../../types';
+import { Book, LandingPageContent, SiteSettings } from '../../types';
 import { HeroPrintCanvas, ContourChaptersCanvas } from './EditorialCanvases';
 import { EditorialTicker } from './EditorialTicker';
 import {
@@ -26,6 +26,8 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface ScrollChoreographyProps {
   books: Book[];
+  landingContent?: LandingPageContent | null;
+  siteSettings?: SiteSettings | null;
   onOpenReader: (book: Book) => void;
   onOpenDetails: (book: Book) => void;
   onAddToCart: (book: Book) => void;
@@ -73,11 +75,20 @@ const EDITORIAL_FAQS = [
 
 export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
   books,
+  landingContent,
+  siteSettings,
   onOpenReader,
   onOpenDetails,
   onAddToCart,
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic CMS Hero Text parsing
+  const heroHeading = (landingContent?.hero_heading || 'KNOWLEDGE BEYOND PAGES').trim();
+  const headingParts = heroHeading.split(/\s+/);
+  const midpoint = Math.ceil(headingParts.length / 2);
+  const heroWord1 = headingParts.slice(0, midpoint).join(' ') || 'KNOWLEDGE';
+  const heroWord2 = headingParts.slice(midpoint).join(' ') || 'BEYOND PAGES';
 
   // Section Container Refs
   const heroRef = useRef<HTMLDivElement>(null);
@@ -497,14 +508,14 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
           </div>
 
           <h1 className="font-serif font-bold tracking-tight text-[#FAF9F5] leading-none whitespace-nowrap text-[12vw] sm:text-[10vw] md:text-[8.5vw] uppercase drop-shadow-sm select-none">
-            {splitWords('KNOWLEDGE', 0, 42)}
+            {splitWords(heroWord1, 0, 42)}
           </h1>
           <h2 className="font-serif font-bold tracking-tight text-[#EED97A] leading-none whitespace-nowrap text-[12vw] sm:text-[10vw] md:text-[8.5vw] uppercase mt-2 sm:mt-4 select-none">
-            {splitWords('BEYOND PAGES', 220, 42)}
+            {splitWords(heroWord2, 220, 42)}
           </h2>
 
           <p className="mt-6 sm:mt-8 max-w-xl mx-auto text-xs sm:text-sm text-[#E0DCD4] font-normal leading-relaxed px-4">
-            Dotcom Publications authors and publishes authoritative pedagogical literature, university textbooks, and scholarly monographs trusted by educational faculties across disciplines.
+            {landingContent?.hero_description || 'Dotcom Publications authors and publishes authoritative pedagogical literature, university textbooks, and scholarly monographs trusted by educational faculties across disciplines.'}
           </p>
         </div>
 
@@ -1068,8 +1079,17 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             THE EDITORIAL MISSION
           </span>
           <h2 className="font-serif font-bold text-3xl sm:text-5xl md:text-6xl text-[#181716] leading-[1.1] tracking-tight">
-            KNOWLEDGE DOES NOT END<br />WHERE THE PAGE DOES.
+            {landingContent?.about_title ? (
+              landingContent.about_title.toUpperCase()
+            ) : (
+              <>KNOWLEDGE DOES NOT END<br />WHERE THE PAGE DOES.</>
+            )}
           </h2>
+          {landingContent?.about_description && (
+            <p className="mt-4 text-xs sm:text-sm text-[#524B42] max-w-2xl mx-auto leading-relaxed">
+              {landingContent.about_description}
+            </p>
+          )}
         </div>
 
         {/* Three Publication-Related Content Blocks (Exactly one active at a time) */}

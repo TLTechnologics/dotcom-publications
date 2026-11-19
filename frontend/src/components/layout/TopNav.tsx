@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Bell,
@@ -7,12 +7,15 @@ import {
   CheckCircle2,
   ExternalLink,
   BookOpen,
-  User,
+  User as UserIcon,
   Sliders,
   LogOut,
-  Sun
+  Users,
+  ShieldCheck,
+  Check
 } from 'lucide-react';
-import { NavigationTab } from '../../types';
+import { NavigationTab, User, NotificationItem } from '../../types';
+import { api } from '../../services/api';
 
 interface TopNavProps {
   currentTab: NavigationTab;
@@ -20,7 +23,9 @@ interface TopNavProps {
   onMobileMenuToggle?: () => void;
   onOpenPreview?: () => void;
   onSwitchToCustomer?: () => void;
-  userRole?: 'admin' | 'super-admin';
+  onLogoutClick?: () => void;
+  currentUser?: User | null;
+  userRole?: string;
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -62,6 +67,10 @@ const TAB_TITLES: Record<NavigationTab, { title: string; subtitle: string }> = {
     title: 'System & Publisher Settings',
     subtitle: 'Global publishing house metadata, currency rules, and infrastructure parameters',
   },
+  users: {
+    title: 'Administrator Accounts & Access Control',
+    subtitle: 'Manage staff credentials, assigned operational roles, and system permissions',
+  },
 };
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -70,55 +79,124 @@ export const TopNav: React.FC<TopNavProps> = ({
   onMobileMenuToggle,
   onOpenPreview,
   onSwitchToCustomer,
+  onLogoutClick,
+  currentUser,
   userRole = 'super-admin',
   searchQuery,
   onSearchChange,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  const notifications = [
-    { id: 1, title: 'New Monograph Published', desc: 'Principles of Modern Deep Learning is now live', time: '10m ago' },
-    { id: 2, title: 'Pricing Updated', desc: 'Macroeconomic Modeling discounted rate adjusted', time: '2h ago' },
-    { id: 3, title: 'Draft Review Required', desc: 'Contemporary Behavioral Econometrics awaiting ISBN', time: '1d ago' },
-  ];
+  const loadNotifications = async () => {
+    try {
+      const data = await api.getNotifications(10);
+      setNotifications(data);
+      setUnreadCount(data.filter((n) => !n.is_read).length);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 30000); // 30s background check
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleMarkAllRead = async () => {
+    try {
+      await api.markAllNotificationsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleNotificationClick = async (notif: NotificationItem) => {
+    if (!notif.is_read) {
+      try {
+        await api.markNotificationRead(notif.id);
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notif.id ? { ...n, is_read: true } : n))
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      } catch {
+        // ignore
+      }
+    }
+    if (notif.link?.includes('orders')) {
+      onTabChange('orders');
+    } else if (notif.link?.includes('books')) {
+      onTabChange('books');
+    }
+    setShowNotifications(false);
+  };
 
   const currentInfo = TAB_TITLES[currentTab] || {
     title: 'Admin Portal',
     subtitle: 'Dotcom Publications',
   };
 
+  const roleDisplayName = (role?: string) => {
+    switch (role) {
+      case 'super-admin':
+        return 'Super Administrator';
+      case 'content_manager':
+        return 'Content Manager';
+      case 'order_manager':
+        return 'Order Manager';
+      case 'viewer':
+        return 'Auditor (Viewer)';
+      default:
+        return 'Administrator';
+    }
+  };
+
+  const userInitials = currentUser?.full_name
+    ? currentUser.full_name
+        .split(' ')
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'DP';
+
   return (
-    <header className="bg-white/90 backdrop-blur-md border-b border-[#EAE3DE] sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between shadow-subtle">
+    <header className="bg-white/95 backdrop-blur-md border-b border-[#EAE3DE] sticky top-0 z-30 px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-subtle">
       {/* Left: Mobile Toggle & Title / Breadcrumbs */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
         {onMobileMenuToggle && (
           <button
             onClick={onMobileMenuToggle}
-            className="md:hidden p-2 rounded-lg text-[#292326] hover:bg-[#FFF6D9]"
+            className="md:hidden p-2 rounded-xl text-[#292326] hover:bg-[#FFF6D9] border border-[#EAE3DE] transition-colors shrink-0"
+            aria-label="Toggle Navigation Drawer"
           >
             <Menu className="w-5 h-5" />
           </button>
         )}
 
-        <div>
+        <div className="min-w-0">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#82777A]">
-            <span>Dotcom Publications</span>
+            <span>Dotcom Publishing</span>
             <span>/</span>
-            <span className="text-[#651C32] font-semibold capitalize">
+            <span className="text-[#651C32] font-semibold capitalize truncate">
               {currentTab}
             </span>
           </div>
 
-          <h2 className="text-base font-serif font-bold text-[#292326] tracking-tight leading-tight mt-0.5">
+          <h2 className="text-sm sm:text-base font-serif font-bold text-[#292326] tracking-tight leading-tight mt-0.5 truncate">
             {currentInfo.title}
           </h2>
         </div>
       </div>
 
-      {/* Right: Search + Emblem Loader + Notifications + Profile */}
-      <div className="flex items-center gap-3">
+      {/* Right: Search + Storefront link + Notifications + Profile */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {/* Search */}
         <div className="relative hidden lg:block w-64">
           <input
@@ -136,7 +214,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           <button
             onClick={onSwitchToCustomer}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#431322] bg-[#F6E7A8] hover:bg-[#FFF6D9] border border-[#F6E7A8] transition-all shadow-subtle"
-            title="Switch to Customer Storefront"
+            title="Open Public Storefront"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
             <span className="hidden sm:inline text-[11px]">Storefront</span>
@@ -148,10 +226,12 @@ export const TopNav: React.FC<TopNavProps> = ({
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="p-2 rounded-full text-[#292326] hover:bg-[#FFF6D9] relative transition-colors border border-transparent hover:border-[#EAE3DE]"
-            title="Notifications"
+            title="System Notifications"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#651C32] rounded-full ring-2 ring-white" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#651C32] rounded-full ring-2 ring-white animate-pulse" />
+            )}
           </button>
 
           {showNotifications && (
@@ -160,19 +240,47 @@ export const TopNav: React.FC<TopNavProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between border-b border-[#EAE3DE] pb-2 px-1">
-                <span className="text-xs font-semibold text-[#292326]">Notifications</span>
-                <span className="text-[10px] text-[#651C32] hover:underline cursor-pointer font-medium">
-                  Mark all read
+                <span className="text-xs font-semibold text-[#292326]">
+                  Notifications {unreadCount > 0 && `(${unreadCount} new)`}
                 </span>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-[10px] text-[#651C32] hover:underline cursor-pointer font-medium flex items-center gap-1"
+                  >
+                    <Check className="w-3 h-3" /> Mark all read
+                  </button>
+                )}
               </div>
-              <div className="space-y-2 mt-2 max-h-64 overflow-y-auto">
-                {notifications.map((n) => (
-                  <div key={n.id} className="p-2.5 rounded-xl hover:bg-[#FFF6D9]/50 text-xs transition-colors border border-transparent hover:border-[#F6E7A8]/50">
-                    <p className="font-semibold text-[#292326]">{n.title}</p>
-                    <p className="text-[11px] text-[#82777A] mt-0.5">{n.desc}</p>
-                    <span className="text-[10px] text-[#82777A]/70 mt-1 block">{n.time}</span>
-                  </div>
-                ))}
+              <div className="space-y-1.5 mt-2 max-h-64 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="text-xs text-[#82777A] text-center py-4">No recent notifications</p>
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => handleNotificationClick(n)}
+                      className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer border ${
+                        !n.is_read
+                          ? 'bg-[#FFF6D9]/50 border-[#F6E7A8] hover:bg-[#FFF6D9]'
+                          : 'hover:bg-[#FAF8F3] border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-1">
+                        <p className="font-semibold text-[#292326] text-[11px] leading-tight">
+                          {n.title}
+                        </p>
+                        {!n.is_read && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#651C32] shrink-0 mt-1" />
+                        )}
+                      </div>
+                      <p className="text-[11px] text-[#82777A] mt-0.5 line-clamp-2">{n.message}</p>
+                      <span className="text-[9px] text-[#82777A]/80 mt-1 block">
+                        {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -182,54 +290,78 @@ export const TopNav: React.FC<TopNavProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors"
+            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors"
           >
             <div className="w-6 h-6 rounded-full bg-[#651C32] text-white flex items-center justify-center text-[10px] font-bold">
-              TL
+              {userInitials}
             </div>
-            <span className="text-xs font-semibold text-[#292326] hidden sm:inline">
-              TL Technologics
+            <span className="text-xs font-semibold text-[#292326] hidden sm:inline max-w-[100px] truncate">
+              {currentUser?.full_name || 'Administrator'}
             </span>
             <ChevronDown className="w-3.5 h-3.5 text-[#82777A]" />
           </button>
 
           {showProfileMenu && (
             <div
-              className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
+              className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
               onClick={() => setShowProfileMenu(false)}
             >
-              <div className="px-3 py-2 border-b border-[#EAE3DE] bg-[#FAF8F3]/60">
-                <p className="font-semibold text-[#292326]">TL Technologics</p>
-                <p className="text-[10px] text-[#82777A]">
-                  {userRole === 'super-admin' ? 'Super Administrator' : 'Publisher Administrator'}
+              <div className="px-3.5 py-2.5 border-b border-[#EAE3DE] bg-[#FAF8F3]/60">
+                <p className="font-semibold text-[#292326] text-xs truncate">
+                  {currentUser?.full_name || 'Dotcom Administrator'}
+                </p>
+                <p className="text-[10px] font-medium text-[#651C32] mt-0.5">
+                  {roleDisplayName(currentUser?.role || userRole)}
+                </p>
+                <p className="text-[9px] text-[#82777A] truncate">
+                  {currentUser?.email || 'admin@dotcompublications.com'}
                 </p>
               </div>
+
               {onSwitchToCustomer && (
                 <button
                   onClick={onSwitchToCustomer}
-                  className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors font-medium"
+                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors font-medium"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View Storefront
                 </button>
               )}
+
+              {(currentUser?.role === 'super-admin' || userRole === 'super-admin') && (
+                <button
+                  onClick={() => onTabChange('users')}
+                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
+                >
+                  <Users className="w-3.5 h-3.5 text-[#651C32]" /> Admin Accounts
+                </button>
+              )}
+
               <button
                 onClick={() => onTabChange('orders')}
-                className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
+                className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
               >
                 <BookOpen className="w-3.5 h-3.5 text-[#651C32]" /> Customer Orders
               </button>
-              <button
-                onClick={() => onTabChange('settings')}
-                className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
-              >
-                <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> Account Settings
-              </button>
+
+              {(currentUser?.role === 'super-admin' || userRole === 'super-admin') && (
+                <button
+                  onClick={() => onTabChange('settings')}
+                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> System Settings
+                </button>
+              )}
+
               <div className="border-t border-[#EAE3DE] my-1" />
+
+              {/* CRITICAL FIX: Logout Button properly invokes onLogoutClick to purge session */}
               <button
                 onClick={() => {
-                  if (onSwitchToCustomer) onSwitchToCustomer();
+                  if (onLogoutClick) {
+                    onLogoutClick();
+                  }
                 }}
-                className="w-full text-left px-3 py-2 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium"
+                className="w-full text-left px-3.5 py-2 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Exit Admin Portal
               </button>

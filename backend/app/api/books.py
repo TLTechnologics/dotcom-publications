@@ -1,17 +1,30 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException, Query
+import re
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 try:
     from backend.app.core.database import get_db
-    from backend.app.models.models import Book, Author, Publisher, Category, ActivityLog
+    from backend.app.core.deps import require_content_manager, get_current_user
+    from backend.app.models.models import Book, Author, Publisher, Category, ActivityLog, User
     from backend.app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookAuthorBrief
 except ImportError:
     from app.core.database import get_db
-    from app.models.models import Book, Author, Publisher, Category, ActivityLog
+    from app.core.deps import require_content_manager, get_current_user
+    from app.models.models import Book, Author, Publisher, Category, ActivityLog, User
     from app.schemas.schemas import BookCreate, BookUpdate, BookResponse, BookAuthorBrief
 
 router = APIRouter(prefix="/books", tags=["Books"])
+
+def sanitize_html(text: Optional[str]) -> Optional[str]:
+    """Strip dangerous HTML script tags to prevent stored XSS."""
+    if not text:
+        return text
+    # Strip script tags and dangerous javascript: URIs
+    cleaned = re.sub(r'<\s*script[^>]*>.*?<\s*/\s*script\s*>', '', text, flags=re.IGNORECASE | re.DOTALL)
+    cleaned = re.sub(r'<\s*iframe[^>]*>.*?<\s*/\s*iframe\s*>', '', cleaned, flags=re.IGNORECASE | re.DOTALL)
+    cleaned = re.sub(r'on\w+\s*=', '', cleaned, flags=re.IGNORECASE)
+    return cleaned.strip()
 
 def serialize_book(book: Book) -> BookResponse:
     additional = []
@@ -47,8 +60,8 @@ def serialize_book(book: Book) -> BookResponse:
         category_name=book.category.name if book.category else None,
         subcategory_id=book.subcategory_id,
         subcategory_name=book.subcategory.name if book.subcategory else None,
-        selling_price=book.selling_price,
-        mrp=book.mrp,
+        selling_price=float(book.selling_price),
+        mrp=float(book.mrp),
         currency=book.currency,
         is_draft=book.is_draft,
         is_featured=book.is_featured,
@@ -67,16 +80,17 @@ def get_books(
     author_id: Optional[int] = None,
     status: Optional[str] = None,  # "published", "draft", "all"
     is_featured: Optional[bool] = None,
-    sort_by: str = "created_at",  # "created_at", "title", "selling_price"
-    sort_order: str = "desc",     # "asc", "desc"
+    sort_by: str = "created_at",
+    sort_order: str = "desc",
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
+    """Public catalogue search and pagination endpoint."""
     query = db.query(Book)
 
     if search:
-        search_filter = f"%{search}%"
+        search_filter = f"%{search.strip()}%"
         query = query.filter(
             (Book.title.ilike(search_filter)) |
             (Book.isbn.ilike(search_filter)) |
@@ -121,13 +135,19 @@ def get_books(
 
 @router.get("/{book_id}", response_model=BookResponse)
 def get_book(book_id: int, db: Session = Depends(get_db)):
+    """Public single monograph lookup."""
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
     return serialize_book(book)
 
-@router.post("", response_model=BookResponse, status_code=201)
-def create_book(book_in: BookCreate, db: Session = Depends(get_db)):
+@router.post("", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+def create_book(
+    book_in: BookCreate,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Register a new academic title (Content Manager / Super Admin only)."""
     # Validate pricing
     if book_in.mrp > 0 and book_in.selling_price > book_in.mrp:
         raise HTTPException(
@@ -148,6 +168,12 @@ def create_book(book_in: BookCreate, db: Session = Depends(get_db)):
     book_dict = book_in.model_dump(exclude={"author_ids", "additional_images"})
     if book_dict.get("isbn"):
         book_dict["isbn"] = book_dict["isbn"].strip()
+    
+    # Sanitize text
+    book_dict["title"] = sanitize_html(book_dict.get("title"))
+    book_dict["short_description"] = sanitize_html(book_dict.get("short_description"))
+    book_dict["full_description"] = sanitize_html(book_dict.get("full_description"))
+
     book = Book(**book_dict)
 
     if book_in.additional_images:
@@ -165,11 +191,13 @@ def create_book(book_in: BookCreate, db: Session = Depends(get_db)):
 
     # Activity log
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="publish" if not book.is_draft else "create",
         entity_type="book",
         entity_id=book.id,
         entity_name=book.title,
-        description=f"{'Published' if not book.is_draft else 'Created draft for'} book '{book.title}'"
+        description=f"Administrator '{current_admin.username}' {'published' if not book.is_draft else 'created draft'} monograph '{book.title}'"
     )
     db.add(log)
     db.commit()
@@ -177,7 +205,13 @@ def create_book(book_in: BookCreate, db: Session = Depends(get_db)):
     return serialize_book(book)
 
 @router.put("/{book_id}", response_model=BookResponse)
-def update_book(book_id: int, book_in: BookUpdate, db: Session = Depends(get_db)):
+def update_book(
+    book_id: int,
+    book_in: BookUpdate,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Update title details (Content Manager / Super Admin only)."""
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -216,14 +250,18 @@ def update_book(book_id: int, book_in: BookUpdate, db: Session = Depends(get_db)
             book.additional_images = json.dumps(add_imgs)
 
     for field, value in update_data.items():
+        if field in ["title", "short_description", "full_description"]:
+            value = sanitize_html(value)
         setattr(book, field, value)
 
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="update",
         entity_type="book",
         entity_id=book.id,
         entity_name=book.title,
-        description=f"Updated details for book '{book.title}'"
+        description=f"Administrator '{current_admin.username}' updated monograph '{book.title}'"
     )
     db.add(log)
     db.commit()
@@ -232,7 +270,12 @@ def update_book(book_id: int, book_in: BookUpdate, db: Session = Depends(get_db)
     return serialize_book(book)
 
 @router.post("/{book_id}/toggle-publish")
-def toggle_publish(book_id: int, db: Session = Depends(get_db)):
+def toggle_publish(
+    book_id: int,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Toggle draft / published visibility status (Content Manager / Super Admin only)."""
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -241,11 +284,13 @@ def toggle_publish(book_id: int, db: Session = Depends(get_db)):
     new_status = "draft" if book.is_draft else "published"
 
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="unpublish" if book.is_draft else "publish",
         entity_type="book",
         entity_id=book.id,
         entity_name=book.title,
-        description=f"Changed publication status of '{book.title}' to {new_status}"
+        description=f"Administrator '{current_admin.username}' changed status of '{book.title}' to {new_status}"
     )
     db.add(log)
     db.commit()
@@ -254,7 +299,12 @@ def toggle_publish(book_id: int, db: Session = Depends(get_db)):
     return {"id": book.id, "is_draft": book.is_draft, "status": new_status}
 
 @router.post("/{book_id}/toggle-featured")
-def toggle_featured(book_id: int, db: Session = Depends(get_db)):
+def toggle_featured(
+    book_id: int,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Toggle homepage featured badge status (Content Manager / Super Admin only)."""
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -266,18 +316,25 @@ def toggle_featured(book_id: int, db: Session = Depends(get_db)):
     return {"id": book.id, "is_featured": book.is_featured}
 
 @router.delete("/{book_id}")
-def delete_book(book_id: int, db: Session = Depends(get_db)):
+def delete_book(
+    book_id: int,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Delete a book record (Content Manager / Super Admin only)."""
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
 
     title = book.title
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="delete",
         entity_type="book",
         entity_id=book_id,
         entity_name=title,
-        description=f"Deleted book catalogue entry '{title}'"
+        description=f"Administrator '{current_admin.username}' deleted book catalogue entry '{title}'"
     )
     db.add(log)
     db.delete(book)

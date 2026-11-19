@@ -1,7 +1,8 @@
-import React from 'react';
-import { DashboardStats, Book, NavigationTab } from '../types';
+import React, { useState, useEffect } from 'react';
+import { DashboardStats, DashboardAnalytics, Book, NavigationTab } from '../types';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { api } from '../services/api';
 import {
   BookOpen,
   CheckCircle2,
@@ -16,7 +17,13 @@ import {
   BookMarked,
   Eye,
   Layers,
-  ChevronRight
+  ChevronRight,
+  ShoppingBag,
+  IndianRupee,
+  BarChart3,
+  Package,
+  Activity,
+  ArrowUpRight
 } from 'lucide-react';
 
 interface DashboardPageProps {
@@ -38,11 +45,29 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onAddCategory,
   onViewBook,
 }) => {
+  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      setAnalyticsLoading(true);
+      try {
+        const data = await api.getDashboardAnalytics();
+        setAnalytics(data);
+      } catch (err) {
+        console.warn('Analytics loading note:', err);
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
   if (loading || !stats) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-28 rounded-2xl bg-[#EAE3DE]/60" />
           ))}
         </div>
@@ -54,63 +79,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     );
   }
 
-  const statCards = [
-    {
-      title: 'Total Titles in Catalogue',
-      value: stats.total_books,
-      icon: <BookOpen className="w-5 h-5 text-[#651C32]" />,
-      iconBg: 'bg-[#F5E6EA]',
-      subtext: `${stats.total_publishers} active imprints`,
-      tab: 'books' as NavigationTab,
-    },
-    {
-      title: 'Published Titles',
-      value: stats.published_books,
-      icon: <CheckCircle2 className="w-5 h-5 text-[#477A58]" />,
-      iconBg: 'bg-[#EAF3ED]',
-      subtext: 'Publicly discoverable',
-      tab: 'books' as NavigationTab,
-    },
-    {
-      title: 'Draft Manuscripts',
-      value: stats.draft_books,
-      icon: <FileEdit className="w-5 h-5 text-[#C58B35]" />,
-      iconBg: 'bg-[#FFF6D9]',
-      subtext: 'Under editorial peer review',
-      tab: 'books' as NavigationTab,
-    },
-    {
-      title: 'Faculty & Authors',
-      value: stats.total_authors,
-      icon: <Users className="w-5 h-5 text-[#557A9C]" />,
-      iconBg: 'bg-[#EAF1F7]',
-      subtext: 'Contributing professors',
-      tab: 'authors' as NavigationTab,
-    },
-    {
-      title: 'Disciplines & Categories',
-      value: stats.total_categories,
-      icon: <FolderTree className="w-5 h-5 text-[#651C32]" />,
-      iconBg: 'bg-[#FBEFC4]',
-      subtext: 'Curriculum areas',
-      tab: 'categories' as NavigationTab,
-    },
-  ];
+  // Calculate highest monthly revenue for relative bar heights
+  const maxMonthlyRevenue = analytics?.monthly_revenue?.reduce(
+    (max, item) => (item.revenue > max ? item.revenue : max),
+    1
+  ) || 1;
 
   return (
     <div className="space-y-8">
-      {/* Demonstration Banner — Maroon & Pastel Yellow */}
+      {/* Platform Status Banner */}
       <div className="bg-[#FFF6D9] border border-[#F6E7A8] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-subtle">
         <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-xl bg-[#651C32] text-[#F6E7A8] flex items-center justify-center shadow-subtle shrink-0">
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-serif font-bold text-[#431322] tracking-tight text-sm">
-              Demonstration Environment Active — Dotcom Publications
+            <h4 className="text-sm font-serif font-bold text-[#431322] tracking-tight">
+              Publishing Executive Dashboard — Dotcom Publications
             </h4>
             <p className="text-[11px] text-[#651C32] mt-0.5 font-medium">
-              Live database state rendered with dynamic counters and persistent CRUD workflows.
+              Synchronized real-time catalogue metrics, order fulfillment statuses, and audited transactions.
             </p>
           </div>
         </div>
@@ -124,48 +112,234 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </div>
 
-      {/* Primary Statistics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {statCards.map((card, idx) => (
-          <div
-            key={idx}
-            onClick={() => onNavigate(card.tab)}
-            className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
-          >
-            <div className="flex items-start justify-between">
-              <span className="text-xs font-semibold text-[#82777A] leading-tight">{card.title}</span>
-              <div className={`p-2.5 rounded-xl ${card.iconBg} transition-transform group-hover:scale-105 shadow-subtle`}>
-                {card.icon}
-              </div>
-            </div>
-            <div className="mt-4">
-              <span className="text-3xl font-bold text-[#292326] block tracking-tight">
-                {card.value}
-              </span>
-              <div className="flex items-center justify-between mt-1 text-[11px] text-[#82777A]">
-                <span>{card.subtext}</span>
-                <span className="text-[#651C32] font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-                  View <ChevronRight className="w-3 h-3" />
-                </span>
-              </div>
+      {/* Primary KPI Grid (Revenue, Orders, Books, Authors) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Revenue */}
+        <div
+          onClick={() => onNavigate('orders')}
+          className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Total Gross Revenue</span>
+            <div className="p-2.5 rounded-xl bg-[#FFF6D9] text-[#651C32] group-hover:scale-105 transition-transform shadow-subtle">
+              <span className="font-serif font-bold text-sm">₹</span>
             </div>
           </div>
-        ))}
+          <div className="mt-4">
+            <span className="text-3xl font-serif font-bold text-[#292326] block tracking-tight">
+              ₹{(stats.total_revenue || 0).toLocaleString('en-IN')}
+            </span>
+            <div className="flex items-center justify-between mt-1 text-[11px] text-[#82777A]">
+              <span>Real-time processed sales</span>
+              <span className="text-[#651C32] font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                Orders <ChevronRight className="w-3 h-3" />
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Total Customer Orders */}
+        <div
+          onClick={() => onNavigate('orders')}
+          className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Customer Orders</span>
+            <div className="p-2.5 rounded-xl bg-[#EAF1F7] text-[#557A9C] group-hover:scale-105 transition-transform shadow-subtle">
+              <ShoppingBag className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className="text-3xl font-bold text-[#292326] block tracking-tight">
+              {stats.total_orders || 0}
+            </span>
+            <div className="flex items-center justify-between mt-1 text-[11px] text-[#82777A]">
+              <span>
+                {stats.completed_orders || 0} delivered • {stats.pending_orders || 0} active
+              </span>
+              <span className="text-[#651C32] font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                Manage <ChevronRight className="w-3 h-3" />
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Catalogue Titles */}
+        <div
+          onClick={() => onNavigate('books')}
+          className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Published Titles</span>
+            <div className="p-2.5 rounded-xl bg-[#F5E6EA] text-[#651C32] group-hover:scale-105 transition-transform shadow-subtle">
+              <BookOpen className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className="text-3xl font-bold text-[#292326] block tracking-tight">
+              {stats.published_books} <span className="text-sm font-normal text-[#82777A]">/ {stats.total_books} total</span>
+            </span>
+            <div className="flex items-center justify-between mt-1 text-[11px] text-[#82777A]">
+              <span>{stats.draft_books} draft manuscripts</span>
+              <span className="text-[#651C32] font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                Catalogue <ChevronRight className="w-3 h-3" />
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Faculty & Authors */}
+        <div
+          onClick={() => onNavigate('authors')}
+          className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+        >
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Faculty Authors & Imprints</span>
+            <div className="p-2.5 rounded-xl bg-[#FAF0E2] text-[#C58B35] group-hover:scale-105 transition-transform shadow-subtle">
+              <Users className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className="text-3xl font-bold text-[#292326] block tracking-tight">
+              {stats.total_authors}
+            </span>
+            <div className="flex items-center justify-between mt-1 text-[11px] text-[#82777A]">
+              <span>{stats.total_publishers} imprints • {stats.total_categories} disciplines</span>
+              <span className="text-[#651C32] font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                Faculty <ChevronRight className="w-3 h-3" />
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Analytics Row: Monthly Revenue Chart & Order Status Distribution */}
+      {analytics && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Monthly Revenue Bars (8 cols) */}
+          <div className="lg:col-span-8 p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-6 pb-3 border-b border-[#EAE3DE]">
+              <div>
+                <h3 className="text-base font-serif font-bold text-[#292326] tracking-tight flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-[#651C32]" />
+                  Monthly Publication Sales & Revenue
+                </h3>
+                <p className="text-xs text-[#82777A]">
+                  Track fiscal performance across academic terms and institutional procurement cycles
+                </p>
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]">
+                Last 6 Months
+              </span>
+            </div>
+
+            {/* Bar Visualizer */}
+            <div className="grid grid-cols-6 gap-3 items-end h-44 pt-4">
+              {analytics.monthly_revenue.map((item, idx) => {
+                const heightPercent = Math.max(12, Math.round((item.revenue / maxMonthlyRevenue) * 100));
+                return (
+                  <div key={idx} className="flex flex-col items-center gap-2 h-full justify-end group">
+                    <div className="text-[10px] font-bold text-[#651C32] opacity-0 group-hover:opacity-100 transition-opacity text-center">
+                      ₹{item.revenue.toLocaleString('en-IN')}
+                    </div>
+                    <div className="w-full max-w-[48px] bg-[#FAF8F3] rounded-t-xl overflow-hidden flex flex-col justify-end p-1 border border-[#EAE3DE] group-hover:border-[#651C32] transition-all">
+                      <div
+                        style={{ height: `${heightPercent}%` }}
+                        className="w-full bg-gradient-to-t from-[#651C32] to-[#8C2745] rounded-t-lg transition-all group-hover:brightness-110 shadow-sm"
+                      />
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[11px] font-semibold text-[#292326] block">
+                        {item.month}
+                      </span>
+                      <span className="text-[10px] text-[#82777A]">
+                        {item.orders_count} {item.orders_count === 1 ? 'order' : 'orders'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Order Status Distribution (4 cols) */}
+          <div className="lg:col-span-4 p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#EAE3DE]">
+                <h3 className="text-base font-serif font-bold text-[#292326] tracking-tight">
+                  Fulfillment Pipeline
+                </h3>
+                <Package className="w-4 h-4 text-[#651C32]" />
+              </div>
+
+              <div className="space-y-3 pt-1">
+                {analytics.order_status_distribution.map((dist, idx) => {
+                  const percent = stats.total_orders > 0 ? Math.round((dist.count / stats.total_orders) * 100) : 0;
+                  const getStatusColor = (s: string) => {
+                    switch (s) {
+                      case 'Confirmed':
+                        return 'bg-emerald-500';
+                      case 'Processing':
+                        return 'bg-amber-500';
+                      case 'Shipped':
+                        return 'bg-blue-500';
+                      case 'Delivered':
+                        return 'bg-purple-500';
+                      case 'Cancelled':
+                        return 'bg-rose-500';
+                      default:
+                        return 'bg-stone-500';
+                    }
+                  };
+
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-medium">
+                        <span className="text-[#292326] flex items-center gap-1.5">
+                          <span className={`w-2 h-2 rounded-full ${getStatusColor(dist.status)}`} />
+                          {dist.status}
+                        </span>
+                        <span className="text-[#82777A]">
+                          {dist.count} orders ({percent}%)
+                        </span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-[#FAF8F3] border border-[#EAE3DE] overflow-hidden">
+                        <div
+                          style={{ width: `${percent}%` }}
+                          className={`h-full ${getStatusColor(dist.status)} transition-all`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onNavigate('orders')}
+              className="w-full mt-6"
+            >
+              Manage All Orders
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Sections: 2-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column (8 cols): Section A (Recently Added) + Section B (Featured) */}
+        {/* Left Column (8 cols): Recently Added Books + Featured Titles */}
         <div className="lg:col-span-8 space-y-8">
-          {/* SECTION A — Recently Added Books */}
+          {/* Recently Added Books */}
           <div className="p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#EAE3DE]">
               <div>
                 <h3 className="text-base font-serif font-bold text-[#292326] tracking-tight">
-                  Recently Added Books
+                  Recently Registered Titles
                 </h3>
                 <p className="text-xs text-[#82777A]">
-                  Newest academic monographs registered in the catalogue
+                  Newest academic monographs registered in the catalogue database
                 </p>
               </div>
               <button
@@ -230,7 +404,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           </div>
 
-          {/* SECTION B — Popular / Featured Books */}
+          {/* Featured Academic Titles */}
           <div className="p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
             <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#EAE3DE]">
               <div>
@@ -282,12 +456,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
 
-        {/* Right Column (4 cols): Section D (Quick Actions) + Section C (Recent Activity) */}
+        {/* Right Column (4 cols): Quick Publishing Actions + Recent System Activity */}
         <div className="lg:col-span-4 space-y-6">
-          {/* SECTION D — Quick Actions */}
+          {/* Quick Publishing Actions */}
           <div className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#82777A] mb-3">
-              Section D: Quick Actions
+              Publishing Actions
             </h3>
             <div className="space-y-2">
               <button
@@ -300,10 +474,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-[#292326] block group-hover:text-[#651C32]">
-                      Add New Book
+                      Add New Title
                     </span>
                     <span className="text-[10px] text-[#82777A]">
-                      5-section catalogue editor
+                      Catalogue editor & ISBN setup
                     </span>
                   </div>
                 </div>
@@ -320,7 +494,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-[#292326] block group-hover:text-[#651C32]">
-                      Add New Author
+                      Add Faculty Author
                     </span>
                     <span className="text-[10px] text-[#82777A]">
                       Faculty credentials & bio
@@ -340,7 +514,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-[#292326] block group-hover:text-[#651C32]">
-                      Create Category
+                      Create Discipline
                     </span>
                     <span className="text-[10px] text-[#82777A]">
                       Discipline classification
@@ -360,7 +534,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-[#292326] block group-hover:text-[#651C32]">
-                      Edit Landing Page
+                      Landing Page CMS
                     </span>
                     <span className="text-[10px] text-[#82777A]">
                       Hero banners & showcases
@@ -372,31 +546,38 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           </div>
 
-          {/* SECTION C — Recent Administrative Activity */}
+          {/* Recent System Activity */}
           <div className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAE3DE]">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#82777A]">
-                Section C: Recent Activity
+                Recent System Activity
               </h3>
               <Clock className="w-4 h-4 text-[#651C32]" />
             </div>
 
             <div className="space-y-4">
-              {stats.recent_activity.map((act) => (
+              {stats.recent_activity.slice(0, 8).map((act) => (
                 <div key={act.id} className="flex items-start gap-3 text-xs">
                   <div className="mt-1 w-2 h-2 rounded-full bg-[#651C32] shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[#292326] font-medium leading-snug">
                       {act.description}
                     </p>
-                    <span className="text-[10px] text-[#82777A] block mt-1">
-                      {new Date(act.timestamp).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                    <div className="flex items-center gap-2 mt-1 text-[10px] text-[#82777A]">
+                      <span>
+                        {new Date(act.timestamp).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                      {act.user_name && (
+                        <span className="px-1.5 py-0.2 rounded bg-[#FAF8F3] border border-[#EAE3DE] text-[#651C32] font-semibold">
+                          {act.user_name}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

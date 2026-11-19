@@ -448,6 +448,36 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
     }
   };
 
+  // Maintenance Mode Guard
+  if (siteSettings?.maintenance_mode && !isAdminLoggedIn && !isSuperAdminLoggedIn) {
+    return (
+      <div className="min-h-screen bg-[#FAF9F5] flex flex-col items-center justify-center p-6 text-center text-[#181716] font-sans selection:bg-[#EED97A]">
+        <div className="w-16 h-16 rounded-2xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mb-6">
+          <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-xl" />
+        </div>
+        <div className="max-w-md space-y-4">
+          <span className="inline-block px-3 py-1 rounded-full bg-[#FAF2BA] text-[#181716] text-xs font-bold uppercase tracking-wider border border-[#EED97A]">
+            Scheduled Maintenance
+          </span>
+          <h1 className="font-serif font-bold text-3xl text-[#181716]">
+            Catalogue Temporarily Offline
+          </h1>
+          <p className="text-xs text-[#524B42] leading-relaxed">
+            Dotcom Publications is currently performing scheduled infrastructure maintenance. Our bookstore, catalog, and reader will return shortly.
+          </p>
+          <div className="pt-4 border-t border-[#EAE3DE] flex justify-center gap-3">
+            <button
+              onClick={() => onNavigate('/admin')}
+              className="text-xs font-semibold text-[#651C32] hover:underline"
+            >
+              Administrator Sign In
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF9F5] font-sans text-[#181716] flex flex-col selection:bg-[#EED97A] selection:text-[#181716]">
       {/* Top Utility Notice Bar */}
@@ -694,6 +724,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       {/* 5-Stage Pinned Scroll-Choreographed Academic Showcase (Stages 1 through 5) */}
       <ScrollChoreography
         books={publishedBooks}
+        landingContent={landingContent}
+        siteSettings={siteSettings}
         onOpenReader={(b) => setReadingBook(b)}
         onOpenDetails={(b) => setSelectedBook(b)}
         onAddToCart={(b) => addToCart(b)}

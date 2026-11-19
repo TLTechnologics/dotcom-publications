@@ -6,21 +6,53 @@ import {
   Publisher,
   MediaItem,
   DashboardStats,
+  DashboardAnalytics,
   ActivityLog,
   LandingPageContent,
   SiteSettings,
-  Order
+  Order,
+  PaginatedOrdersResponse,
+  User,
+  NotificationItem,
+  GlobalSearchResults
 } from '../types';
 
 const API_BASE = '/api';
 
+export function getAuthToken(): string | null {
+  try {
+    return localStorage.getItem('dotcom_auth_token');
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token: string | null) {
+  try {
+    if (token) {
+      localStorage.setItem('dotcom_auth_token', token);
+    } else {
+      localStorage.removeItem('dotcom_auth_token');
+    }
+  } catch {
+    // ignore
+  }
+}
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
     ...options,
+    headers,
   });
 
   if (!response.ok) {
@@ -31,6 +63,12 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
     } catch {
       errorDetail = response.statusText;
     }
+
+    if (response.status === 401 && window.location.pathname.startsWith('/admin')) {
+      // Token expired or invalid
+      setAuthToken(null);
+    }
+
     throw new Error(errorDetail);
   }
 
@@ -38,13 +76,112 @@ async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  // --- Dashboard ---
+  getAuthToken,
+  setAuthToken,
+  clearAuthToken: () => setAuthToken(null),
+
+  // --- Authentication ---
+  async login(username_or_email: string, password: string): Promise<{ access_token: string; user: User }> {
+    const res = await fetchJSON<{ access_token: string; token_type: string; user: User }>(
+      `${API_BASE}/auth/login`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ username_or_email, password }),
+      }
+    );
+    setAuthToken(res.access_token);
+    return { access_token: res.access_token, user: res.user };
+  },
+
+  async getProfile(): Promise<User> {
+    return fetchJSON<User>(`${API_BASE}/auth/me`);
+  },
+
+  async changePassword(current_password: string, new_password: string): Promise<{ message: string }> {
+    return fetchJSON<{ message: string }>(`${API_BASE}/auth/change-password`, {
+      method: 'POST',
+      body: JSON.stringify({ current_password, new_password }),
+    });
+  },
+
+  async logout(): Promise<void> {
+    try {
+      await fetchJSON(`${API_BASE}/auth/logout`, { method: 'POST' });
+    } catch {
+      // ignore
+    } finally {
+      setAuthToken(null);
+    }
+  },
+
+  // --- User Management (RBAC) ---
+  async getUsers(search?: string, role?: string): Promise<User[]> {
+    const query = new URLSearchParams();
+    if (search) query.append('search', search);
+    if (role && role !== 'all') query.append('role', role);
+    return fetchJSON<User[]>(`${API_BASE}/users?${query.toString()}`);
+  },
+
+  async createUser(data: {
+    username: string;
+    email: string;
+    full_name: string;
+    role: string;
+    password: string;
+    is_active?: boolean;
+  }): Promise<User> {
+    return fetchJSON<User>(`${API_BASE}/users`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateUser(id: number, data: Partial<User> & { password?: string }): Promise<User> {
+    return fetchJSON<User>(`${API_BASE}/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteUser(id: number): Promise<{ message: string }> {
+    return fetchJSON<{ message: string }>(`${API_BASE}/users/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Notifications ---
+  async getNotifications(limit: number = 20): Promise<NotificationItem[]> {
+    return fetchJSON<NotificationItem[]>(`${API_BASE}/notifications?limit=${limit}`);
+  },
+
+  async markNotificationRead(id: number): Promise<NotificationItem> {
+    return fetchJSON<NotificationItem>(`${API_BASE}/notifications/${id}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  async markAllNotificationsRead(): Promise<{ message: string }> {
+    return fetchJSON<{ message: string }>(`${API_BASE}/notifications/mark-all-read`, {
+      method: 'POST',
+    });
+  },
+
+  // --- Global Unified Search ---
+  async globalSearch(query: string): Promise<GlobalSearchResults> {
+    return fetchJSON<GlobalSearchResults>(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+  },
+
+  // --- Dashboard & Analytics ---
   async getDashboardStats(): Promise<DashboardStats> {
     return fetchJSON<DashboardStats>(`${API_BASE}/dashboard/stats`);
   },
 
-  async getActivityLogs(): Promise<ActivityLog[]> {
-    return fetchJSON<ActivityLog[]>(`${API_BASE}/dashboard/activity`);
+  async getDashboardAnalytics(): Promise<DashboardAnalytics> {
+    return fetchJSON<DashboardAnalytics>(`${API_BASE}/dashboard/analytics`);
+  },
+
+  async getActivityLogs(limit: number = 50): Promise<ActivityLog[]> {
+    return fetchJSON<ActivityLog[]>(`${API_BASE}/dashboard/activity?limit=${limit}`);
   },
 
   // --- Books ---
@@ -212,12 +349,17 @@ export const api = {
   },
 
   async uploadMedia(file: File, category: string = 'general'): Promise<MediaItem> {
+    const token = getAuthToken();
     const formData = new FormData();
     formData.append('file', file);
     formData.append('category', category);
 
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     const response = await fetch(`${API_BASE}/media/upload`, {
       method: 'POST',
+      headers,
       body: formData,
     });
 
@@ -241,7 +383,7 @@ export const api = {
     });
   },
 
-  // --- Landing Page ---
+  // --- Landing Page CMS ---
   async getLandingPage(): Promise<LandingPageContent> {
     return fetchJSON<LandingPageContent>(`${API_BASE}/landing`);
   },
@@ -265,7 +407,7 @@ export const api = {
     });
   },
 
-  // --- Orders ---
+  // --- Customer Orders ---
   async createOrder(data: any): Promise<Order> {
     return fetchJSON<Order>(`${API_BASE}/orders`, {
       method: 'POST',
@@ -273,9 +415,23 @@ export const api = {
     });
   },
 
-  async getOrders(status?: string): Promise<Order[]> {
-    const url = status ? `${API_BASE}/orders?status=${encodeURIComponent(status)}` : `${API_BASE}/orders`;
-    return fetchJSON<Order[]>(url);
+  async getOrders(params?: {
+    search?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedOrdersResponse> {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.status && params.status !== 'all') query.append('status', params.status);
+    if (params?.page) query.append('page', params.page.toString());
+    if (params?.limit) query.append('limit', params.limit.toString());
+
+    return fetchJSON<PaginatedOrdersResponse>(`${API_BASE}/orders?${query.toString()}`);
+  },
+
+  async getOrder(id: number): Promise<Order> {
+    return fetchJSON<Order>(`${API_BASE}/orders/${id}`);
   },
 
   async updateOrderStatus(id: number, status: string): Promise<Order> {
@@ -283,5 +439,22 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
+  },
+
+  async downloadOrdersCsv(status?: string): Promise<void> {
+    const token = getAuthToken();
+    const query = status && status !== 'all' ? `?status=${encodeURIComponent(status)}` : '';
+    const res = await fetch(`${API_BASE}/orders/export/csv${query}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) throw new Error('Failed to export orders spreadsheet.');
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dotcom_orders_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   },
 };

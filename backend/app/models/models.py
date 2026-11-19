@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
+from sqlalchemy import (
+    Column, Integer, String, Text, Float, Boolean, DateTime, ForeignKey, Table, Numeric
+)
+from sqlalchemy.orm import relationship
 
 def utcnow():
     return datetime.now(timezone.utc)
-from sqlalchemy import (
-    Column, Integer, String, Text, Float, Boolean, DateTime, ForeignKey, Table
-)
-from sqlalchemy.orm import relationship
+
 try:
     from backend.app.core.database import Base
 except ImportError:
@@ -18,6 +19,27 @@ book_authors = Table(
     Column("book_id", Integer, ForeignKey("books.id", ondelete="CASCADE"), primary_key=True),
     Column("author_id", Integer, ForeignKey("authors.id", ondelete="CASCADE"), primary_key=True)
 )
+
+# -------------------------------------------------------------
+# User & Administrator Management Model (RBAC)
+# -------------------------------------------------------------
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    username = Column(String(100), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
+    full_name = Column(String(255), nullable=False)
+    # Roles: "super-admin", "content_manager", "order_manager", "viewer"
+    role = Column(String(50), nullable=False, default="viewer", index=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
+    last_login = Column(DateTime, nullable=True)
+
+    # Relationships
+    activity_logs = relationship("ActivityLog", back_populates="user")
 
 class Author(Base):
     __tablename__ = "authors"
@@ -89,9 +111,9 @@ class Book(Base):
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     subcategory_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
 
-    # Pricing
-    selling_price = Column(Float, nullable=False, default=0.0)
-    mrp = Column(Float, nullable=False, default=0.0)
+    # Pricing (Numeric 10,2 for accurate currency calculation)
+    selling_price = Column(Numeric(10, 2, asdecimal=False), nullable=False, default=0.0)
+    mrp = Column(Numeric(10, 2, asdecimal=False), nullable=False, default=0.0)
     currency = Column(String(10), default="INR")
 
     # Publishing Options
@@ -161,12 +183,33 @@ class ActivityLog(Base):
     __tablename__ = "activity_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    action_type = Column(String(50), nullable=False)  # "create", "update", "delete", "publish", "unpublish"
-    entity_type = Column(String(50), nullable=False)  # "book", "author", "category", "publisher", "landing", "settings"
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    user_name = Column(String(255), nullable=True)
+    action_type = Column(String(50), nullable=False)  # "create", "update", "delete", "publish", "login", "logout"
+    entity_type = Column(String(50), nullable=False)  # "book", "author", "category", "publisher", "order", "user", "landing", "settings"
     entity_id = Column(Integer, nullable=True)
     entity_name = Column(String(255), nullable=True)
     description = Column(Text, nullable=False)
+    ip_address = Column(String(100), nullable=True)
     timestamp = Column(DateTime, default=utcnow, index=True)
+
+    # Relationships
+    user = relationship("User", back_populates="activity_logs")
+
+class OrderItem(Base):
+    __tablename__ = "order_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False, index=True)
+    book_id = Column(Integer, ForeignKey("books.id", ondelete="SET NULL"), nullable=True, index=True)
+    title = Column(String(300), nullable=False)
+    price = Column(Numeric(10, 2, asdecimal=False), nullable=False, default=0.0)
+    quantity = Column(Integer, nullable=False, default=1)
+    cover_image = Column(Text, nullable=True)
+
+    # Relationships
+    order = relationship("Order", back_populates="items")
+    book = relationship("Book")
 
 class Order(Base):
     __tablename__ = "orders"
@@ -180,9 +223,22 @@ class Order(Base):
     city = Column(String(100), nullable=True)
     state = Column(String(100), nullable=True)
     pincode = Column(String(20), nullable=True)
-    items_json = Column(Text, nullable=False)  # JSON serialized list of books ordered
-    total_amount = Column(Float, nullable=False, default=0.0)
+    items_json = Column(Text, nullable=False)  # JSON serialized list of books ordered (for archival snapshot)
+    total_amount = Column(Numeric(10, 2, asdecimal=False), nullable=False, default=0.0)
     payment_method = Column(String(50), default="Cash on Delivery")
     status = Column(String(50), default="Confirmed")  # Confirmed, Processing, Shipped, Delivered, Cancelled
     created_at = Column(DateTime, default=utcnow, index=True)
 
+    # Relationships
+    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    type = Column(String(50), default="info")  # "order", "inventory", "system", "security"
+    link = Column(String(255), nullable=True)
+    is_read = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=utcnow, index=True)

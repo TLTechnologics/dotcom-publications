@@ -1,13 +1,16 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timezone
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 try:
     from backend.app.core.database import get_db
-    from backend.app.models.models import LandingPage, ActivityLog
+    from backend.app.core.deps import require_content_manager, get_current_user
+    from backend.app.models.models import LandingPage, ActivityLog, User
     from backend.app.schemas.schemas import LandingPageContent, LandingPageResponse
 except ImportError:
     from app.core.database import get_db
-    from app.models.models import LandingPage, ActivityLog
+    from app.core.deps import require_content_manager, get_current_user
+    from app.models.models import LandingPage, ActivityLog, User
     from app.schemas.schemas import LandingPageContent, LandingPageResponse
 
 router = APIRouter(prefix="/landing", tags=["Landing Page"])
@@ -33,6 +36,7 @@ def serialize_landing(landing: LandingPage) -> LandingPageResponse:
 
 @router.get("", response_model=LandingPageResponse)
 def get_landing_content(db: Session = Depends(get_db)):
+    """Public storefront reads active homepage configuration."""
     landing = db.query(LandingPage).first()
     if not landing:
         landing = LandingPage(id=1)
@@ -42,7 +46,12 @@ def get_landing_content(db: Session = Depends(get_db)):
     return serialize_landing(landing)
 
 @router.put("", response_model=LandingPageResponse)
-def update_landing_content(content_in: LandingPageContent, db: Session = Depends(get_db)):
+def update_landing_content(
+    content_in: LandingPageContent,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Update landing page content (Content Manager / Super Admin only)."""
     landing = db.query(LandingPage).first()
     if not landing:
         landing = LandingPage(id=1)
@@ -61,13 +70,16 @@ def update_landing_content(content_in: LandingPageContent, db: Session = Depends
     landing.contact_phone = content_in.contact_phone
     landing.contact_address = content_in.contact_address
     landing.footer_text = content_in.footer_text
+    landing.updated_at = datetime.now(timezone.utc)
 
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="update",
         entity_type="landing",
         entity_id=landing.id,
         entity_name="Public Homepage Content",
-        description="Updated landing page hero, featured sections, and institutional profile"
+        description=f"Administrator '{current_admin.username}' updated homepage hero, statistics, and showcase modules."
     )
     db.add(log)
     db.commit()

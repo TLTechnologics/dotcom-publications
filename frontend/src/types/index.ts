@@ -124,12 +124,37 @@ export interface MediaItem {
 
 export interface ActivityLog {
   id: number;
-  action_type: 'create' | 'update' | 'delete' | 'publish' | 'unpublish';
+  user_id?: number | null;
+  user_name?: string | null;
+  action_type: string;
   entity_type: string;
   entity_id?: number | null;
   entity_name?: string | null;
   description: string;
+  ip_address?: string | null;
   timestamp: string;
+}
+
+export interface NotificationItem {
+  id: number;
+  title: string;
+  message: string;
+  type: string;
+  link?: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  full_name: string;
+  role: 'super-admin' | 'content_manager' | 'order_manager' | 'viewer';
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+  last_login?: string | null;
 }
 
 export interface DashboardStats {
@@ -139,9 +164,41 @@ export interface DashboardStats {
   total_authors: number;
   total_categories: number;
   total_publishers: number;
+  total_orders: number;
+  total_revenue: number;
+  pending_orders: number;
+  processing_orders: number;
+  completed_orders: number;
+  cancelled_orders: number;
   recently_added_books: Book[];
   featured_books: Book[];
   recent_activity: ActivityLog[];
+}
+
+export interface MonthlyRevenueItem {
+  month: string;
+  revenue: number;
+  orders_count: number;
+}
+
+export interface OrderStatusCount {
+  status: string;
+  count: number;
+}
+
+export interface TopSellingBook {
+  book_id: number;
+  title: string;
+  cover_image?: string | null;
+  units_sold: number;
+  total_revenue: number;
+}
+
+export interface DashboardAnalytics {
+  monthly_revenue: MonthlyRevenueItem[];
+  order_status_distribution: OrderStatusCount[];
+  top_selling_books: TopSellingBook[];
+  recent_orders: Order[];
 }
 
 export interface LandingPageContent {
@@ -183,6 +240,7 @@ export interface SiteSettings {
 }
 
 export interface OrderItem {
+  id?: number;
   book_id: number;
   title: string;
   price: number;
@@ -201,10 +259,27 @@ export interface Order {
   state?: string;
   pincode?: string;
   items_json: string;
+  items?: OrderItem[];
   total_amount: number;
   payment_method: string;
   status: string;
   created_at: string;
+}
+
+export interface PaginatedOrdersResponse {
+  items: Order[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface GlobalSearchResults {
+  query: string;
+  books: Book[];
+  authors: { id: number; name: string; profile_picture?: string | null; books_count: number }[];
+  publishers: { id: number; name: string; logo_url?: string | null; books_count: number }[];
+  orders: Order[];
 }
 
 export type NavigationTab = 
@@ -216,4 +291,5 @@ export type NavigationTab =
   | 'media'
   | 'landing'
   | 'settings'
-  | 'orders';
+  | 'orders'
+  | 'users';

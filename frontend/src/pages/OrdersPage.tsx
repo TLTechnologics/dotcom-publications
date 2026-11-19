@@ -11,7 +11,11 @@ import {
   Mail,
   MapPin,
   RefreshCw,
-  Package
+  Package,
+  Download,
+  Printer,
+  FileText,
+  X
 } from 'lucide-react';
 import { Order, OrderItem } from '../types';
 import { api } from '../services/api';
@@ -25,12 +29,19 @@ export const OrdersPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  // Invoice Modal State
+  const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<Order | null>(null);
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const data = await api.getOrders();
-      setOrders(data);
+      const res = await api.getOrders({
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        search: search.trim() || undefined,
+      });
+      setOrders(res.items || []);
     } catch (err: any) {
       toast.error('Failed to load orders', err.message);
     } finally {
@@ -40,7 +51,12 @@ export const OrdersPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [statusFilter]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchOrders();
+  };
 
   const handleStatusChange = async (orderId: number, newStatus: string) => {
     setUpdatingId(orderId);
@@ -55,15 +71,17 @@ export const OrdersPage: React.FC = () => {
     }
   };
 
-  const filteredOrders = orders.filter((o) => {
-    const matchesSearch =
-      o.order_number.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer_phone.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer_email.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const handleExportCsv = async () => {
+    setExporting(true);
+    try {
+      await api.downloadOrdersCsv(statusFilter !== 'all' ? statusFilter : undefined);
+      toast.success('Orders Exported', 'CSV file generated and downloaded successfully.');
+    } catch (err: any) {
+      toast.error('Export Failed', err.message);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -158,8 +176,8 @@ export const OrdersPage: React.FC = () => {
 
         <div className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-[#82777A] uppercase tracking-wider">Total Revenue</p>
-            <h3 className="text-2xl font-serif font-bold text-[#292326] mt-1">₹{totalRevenue.toLocaleString()}</h3>
+            <p className="text-xs font-semibold text-[#82777A] uppercase tracking-wider">Processed Value</p>
+            <h3 className="text-2xl font-serif font-bold text-[#292326] mt-1">₹{totalRevenue.toLocaleString('en-IN')}</h3>
           </div>
           <div className="w-12 h-12 rounded-xl bg-[#F6E7A8] text-[#431322] flex items-center justify-center font-bold font-serif text-lg">
             ₹
@@ -167,20 +185,20 @@ export const OrdersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter and Action Bar */}
       <div className="p-4 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-80">
+        <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-[#82777A] absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search by order #, customer or phone..."
+            placeholder="Search order #, customer, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
           />
-        </div>
+        </form>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -194,6 +212,16 @@ export const OrdersPage: React.FC = () => {
             <option value="Cancelled">Cancelled</option>
           </select>
 
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleExportCsv}
+            disabled={exporting || orders.length === 0}
+            icon={<Download className="w-3.5 h-3.5" />}
+          >
+            {exporting ? 'Exporting...' : 'Export CSV'}
+          </Button>
+
           <Button variant="secondary" size="sm" onClick={fetchOrders} disabled={loading}>
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
@@ -201,13 +229,13 @@ export const OrdersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders List / Table */}
+      {/* Orders List / Cards */}
       {loading ? (
         <div className="p-12 text-center bg-white rounded-2xl border border-[#EAE3DE]">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#651C32]" />
           <p className="text-xs text-[#82777A] mt-2">Loading customer orders...</p>
         </div>
-      ) : filteredOrders.length === 0 ? (
+      ) : orders.length === 0 ? (
         <div className="p-16 text-center bg-white rounded-2xl border border-[#EAE3DE]">
           <Package className="w-12 h-12 text-stone-300 mx-auto" />
           <h3 className="font-serif font-bold text-[#292326] mt-3">No orders found</h3>
@@ -217,7 +245,7 @@ export const OrdersPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredOrders.map((order) => {
+          {orders.map((order) => {
             const items = parseItems(order.items_json);
             return (
               <div
@@ -248,21 +276,32 @@ export const OrdersPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Status Actions */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#82777A] font-medium hidden sm:inline">Update Status:</span>
-                    <select
-                      value={order.status}
-                      disabled={updatingId === order.id}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF8F3] text-[#431322] focus:ring-2 focus:ring-[#651C32] focus:outline-none"
+                  {/* Status Actions & Invoice Button */}
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <button
+                      onClick={() => setSelectedInvoiceOrder(order)}
+                      className="px-3 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-white text-xs font-semibold text-[#651C32] hover:border-[#651C32] flex items-center gap-1.5 transition-all shadow-xs"
+                      title="Generate and print official invoice receipt"
                     >
-                      <option value="Confirmed">Confirmed</option>
-                      <option value="Processing">Processing</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Invoice</span>
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-[#82777A] font-medium hidden sm:inline">Status:</span>
+                      <select
+                        value={order.status}
+                        disabled={updatingId === order.id}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF8F3] text-[#431322] focus:ring-2 focus:ring-[#651C32] focus:outline-none"
+                      >
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -299,7 +338,7 @@ export const OrdersPage: React.FC = () => {
                       </p>
                     </div>
                     <p className="text-[11px] text-[#82777A]">
-                      Payment: <span className="font-semibold text-[#292326]">{order.payment_method}</span>
+                      Payment Method: <span className="font-semibold text-[#292326]">{order.payment_method}</span>
                     </p>
                   </div>
 
@@ -310,7 +349,7 @@ export const OrdersPage: React.FC = () => {
                         Items ({items.length})
                       </p>
                       <span className="font-serif font-bold text-sm text-[#651C32]">
-                        Total: ₹{order.total_amount.toLocaleString()}
+                        Total: ₹{order.total_amount.toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
@@ -321,7 +360,7 @@ export const OrdersPage: React.FC = () => {
                             <span className="text-[10px] text-[#82777A]">Qty: {it.quantity} × ₹{it.price}</span>
                           </div>
                           <span className="font-semibold text-[#292326] shrink-0">
-                            ₹{it.price * it.quantity}
+                            ₹{(it.price * it.quantity).toLocaleString('en-IN')}
                           </span>
                         </div>
                       ))}
@@ -331,6 +370,140 @@ export const OrdersPage: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Printable Invoice Modal */}
+      {selectedInvoiceOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#431322]/60 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl border border-[#EAE3DE] shadow-elevated overflow-hidden my-8">
+            {/* Modal Actions Header */}
+            <div className="px-6 py-4 border-b border-[#EAE3DE] bg-[#FAF8F3] flex items-center justify-between print:hidden">
+              <span className="text-xs font-semibold text-[#651C32] uppercase tracking-wider">
+                Official Tax Invoice Preview
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => window.print()}
+                  icon={<Printer className="w-3.5 h-3.5" />}
+                >
+                  Print Invoice
+                </Button>
+                <button
+                  onClick={() => setSelectedInvoiceOrder(null)}
+                  className="p-1.5 rounded-lg text-[#82777A] hover:bg-[#EAE3DE]/60 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Printable Invoice Document Body */}
+            <div id="invoice-printable" className="p-8 space-y-6 text-[#292326] font-sans">
+              {/* Invoice Top Header */}
+              <div className="flex justify-between items-start border-b border-[#EAE3DE] pb-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <img src="/logo.jpg" alt="Dotcom Publications" className="w-8 h-8 rounded-lg object-cover" />
+                    <h2 className="font-serif font-bold text-xl text-[#651C32]">Dotcom Publications</h2>
+                  </div>
+                  <p className="text-xs text-[#82777A]">Academic & Educational Book Publishing House</p>
+                  <p className="text-xs text-[#82777A]">Institutional Area, Delhi NCR, India</p>
+                  <p className="text-xs text-[#82777A]">Email: support@dotcompublications.com</p>
+                </div>
+                <div className="text-right">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]">
+                    Tax Invoice
+                  </span>
+                  <p className="text-sm font-mono font-bold text-[#292326] mt-2">
+                    {selectedInvoiceOrder.order_number}
+                  </p>
+                  <p className="text-xs text-[#82777A]">
+                    Date: {new Date(selectedInvoiceOrder.created_at).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </p>
+                  <p className="text-xs text-[#82777A]">
+                    Status: <span className="font-semibold text-[#651C32]">{selectedInvoiceOrder.status}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Bill To & Ship To */}
+              <div className="grid grid-cols-2 gap-6 text-xs border-b border-[#EAE3DE] pb-6">
+                <div>
+                  <h4 className="font-bold text-[#82777A] uppercase text-[10px] tracking-wider mb-1">Customer & Bill To:</h4>
+                  <p className="font-bold text-sm text-[#292326]">{selectedInvoiceOrder.customer_name}</p>
+                  <p className="text-[#82777A] mt-0.5">{selectedInvoiceOrder.customer_phone}</p>
+                  <p className="text-[#82777A]">{selectedInvoiceOrder.customer_email}</p>
+                </div>
+                <div>
+                  <h4 className="font-bold text-[#82777A] uppercase text-[10px] tracking-wider mb-1">Shipping Destination:</h4>
+                  <p className="text-[#292326] leading-relaxed">
+                    {selectedInvoiceOrder.shipping_address}
+                    {selectedInvoiceOrder.city ? `, ${selectedInvoiceOrder.city}` : ''}
+                    {selectedInvoiceOrder.state ? `, ${selectedInvoiceOrder.state}` : ''}
+                    {selectedInvoiceOrder.pincode ? ` - ${selectedInvoiceOrder.pincode}` : ''}
+                  </p>
+                  <p className="text-[11px] text-[#82777A] mt-1">
+                    Payment Method: <span className="font-semibold text-[#292326]">{selectedInvoiceOrder.payment_method}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Line Items Table */}
+              <div className="space-y-2">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-[#EAE3DE] text-[#82777A] uppercase text-[10px] font-semibold text-left">
+                      <th className="py-2">Item Description</th>
+                      <th className="py-2 text-center">Qty</th>
+                      <th className="py-2 text-right">Unit Price</th>
+                      <th className="py-2 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#EAE3DE]/60">
+                    {parseItems(selectedInvoiceOrder.items_json).map((item, idx) => (
+                      <tr key={idx} className="py-2">
+                        <td className="py-2.5 font-medium text-[#292326]">{item.title}</td>
+                        <td className="py-2.5 text-center text-[#82777A]">{item.quantity}</td>
+                        <td className="py-2.5 text-right text-[#82777A]">₹{item.price.toLocaleString('en-IN')}</td>
+                        <td className="py-2.5 text-right font-semibold text-[#292326]">
+                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Total Summary */}
+              <div className="border-t border-[#EAE3DE] pt-4 flex justify-between items-start">
+                <div className="text-[11px] text-[#82777A] space-y-1">
+                  <p>Computer-generated invoice. No physical signature required.</p>
+                  <p>Dotcom Publications • Academic Integrity & Research Excellence</p>
+                </div>
+                <div className="text-right space-y-1">
+                  <div className="text-xs text-[#82777A] flex justify-between gap-8">
+                    <span>Subtotal:</span>
+                    <span>₹{selectedInvoiceOrder.total_amount.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="text-xs text-[#82777A] flex justify-between gap-8">
+                    <span>Shipping & Handling:</span>
+                    <span className="text-[#477A58] font-semibold">FREE</span>
+                  </div>
+                  <div className="text-base font-serif font-bold text-[#651C32] flex justify-between gap-8 border-t border-[#EAE3DE] pt-2">
+                    <span>Grand Total:</span>
+                    <span>₹{selectedInvoiceOrder.total_amount.toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,6 +1,47 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel, Field
+
+# ----------------- User & Authentication Schemas -----------------
+class UserBase(BaseModel):
+    email: str = Field(..., min_length=3, max_length=255)
+    username: str = Field(..., min_length=2, max_length=100)
+    full_name: str = Field(..., min_length=1, max_length=255)
+    role: str = Field("viewer", description="Role: super-admin, content_manager, order_manager, viewer")
+    is_active: bool = True
+
+class UserCreate(UserBase):
+    password: str = Field(..., min_length=6, max_length=128)
+
+class UserUpdate(BaseModel):
+    email: Optional[str] = None
+    username: Optional[str] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+    password: Optional[str] = None
+
+class UserPasswordChange(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
+class UserResponse(UserBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    last_login: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class LoginRequest(BaseModel):
+    username_or_email: str
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
 
 # ----------------- Author Schemas -----------------
 class AuthorBase(BaseModel):
@@ -224,37 +265,45 @@ class SiteSettingsResponse(SiteSettingsContent):
     class Config:
         from_attributes = True
 
-# ----------------- Activity Log & Dashboard -----------------
+# ----------------- Activity Log & Notification Schemas -----------------
 class ActivityLogResponse(BaseModel):
     id: int
+    user_id: Optional[int] = None
+    user_name: Optional[str] = None
     action_type: str
     entity_type: str
-    entity_id: Optional[int]
-    entity_name: Optional[str]
+    entity_id: Optional[int] = None
+    entity_name: Optional[str] = None
     description: str
+    ip_address: Optional[str] = None
     timestamp: datetime
 
     class Config:
         from_attributes = True
 
-class DashboardStats(BaseModel):
-    total_books: int
-    published_books: int
-    draft_books: int
-    total_authors: int
-    total_categories: int
-    total_publishers: int
-    recently_added_books: List[BookResponse]
-    featured_books: List[BookResponse]
-    recent_activity: List[ActivityLogResponse]
+class NotificationResponse(BaseModel):
+    id: int
+    title: str
+    message: str
+    type: str
+    link: Optional[str] = None
+    is_read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 # ----------------- Order Schemas -----------------
-class OrderItem(BaseModel):
-    book_id: int
+class OrderItemBrief(BaseModel):
+    id: Optional[int] = None
+    book_id: Optional[int] = None
     title: str
     price: float
     quantity: int = 1
     cover_image: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 class OrderCreate(BaseModel):
     customer_name: str = Field(..., min_length=1, max_length=255)
@@ -264,8 +313,8 @@ class OrderCreate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     pincode: Optional[str] = None
-    items: List[OrderItem]
-    total_amount: float
+    items: List[OrderItemBrief]
+    total_amount: Optional[float] = None
     payment_method: str = "Cash on Delivery"
 
 class OrderResponse(BaseModel):
@@ -279,6 +328,7 @@ class OrderResponse(BaseModel):
     state: Optional[str]
     pincode: Optional[str]
     items_json: str
+    items: List[OrderItemBrief] = []
     total_amount: float
     payment_method: str
     status: str
@@ -287,3 +337,49 @@ class OrderResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class PaginatedOrdersResponse(BaseModel):
+    items: List[OrderResponse]
+    total: int
+    page: int
+    limit: int
+    pages: int
+
+# ----------------- Dashboard & Analytics Schemas -----------------
+class MonthlyRevenueItem(BaseModel):
+    month: str
+    revenue: float
+    orders_count: int
+
+class OrderStatusCount(BaseModel):
+    status: str
+    count: int
+
+class TopSellingBook(BaseModel):
+    book_id: int
+    title: str
+    cover_image: Optional[str] = None
+    units_sold: int
+    total_revenue: float
+
+class DashboardStats(BaseModel):
+    total_books: int
+    published_books: int
+    draft_books: int
+    total_authors: int
+    total_categories: int
+    total_publishers: int
+    total_orders: int = 0
+    total_revenue: float = 0.0
+    pending_orders: int = 0
+    processing_orders: int = 0
+    completed_orders: int = 0
+    cancelled_orders: int = 0
+    recently_added_books: List[BookResponse] = []
+    featured_books: List[BookResponse] = []
+    recent_activity: List[ActivityLogResponse] = []
+
+class DashboardAnalytics(BaseModel):
+    monthly_revenue: List[MonthlyRevenueItem] = []
+    order_status_distribution: List[OrderStatusCount] = []
+    top_selling_books: List[TopSellingBook] = []
+    recent_orders: List[OrderResponse] = []

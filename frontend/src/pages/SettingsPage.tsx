@@ -15,7 +15,10 @@ import {
   Upload,
   ShieldCheck,
   AlertTriangle,
-  Coins
+  Coins,
+  KeyRound,
+  Lock,
+  CheckCircle2
 } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
@@ -55,6 +58,42 @@ export const SettingsPage: React.FC = () => {
       toast.error('Failed to load system settings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Password change state
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    if (!oldPassword || !newPassword) {
+      setPasswordError('Please provide both current and new passwords.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError('New password must be at least 8 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      await api.changePassword(oldPassword, newPassword);
+      toast.success('Password Updated', 'Your administrator password has been securely changed.');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordError(err.message || 'Failed to update password.');
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -311,6 +350,70 @@ export const SettingsPage: React.FC = () => {
           </Button>
         </div>
       </form>
+
+      {/* Security & Password Management Form */}
+      <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
+          <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
+            <Lock className="w-4 h-4 text-[#651C32]" />
+            Security & Account Password Management
+          </h3>
+          <span className="text-[10px] font-bold text-[#651C32] bg-[#FFF6D9] px-2.5 py-0.5 rounded-full border border-[#F6E7A8]">
+            Bcrypt Hashed
+          </span>
+        </div>
+
+        <p className="text-xs text-[#82777A]">
+          Ensure your administrator account uses a strong, unique password with at least 8 characters.
+        </p>
+
+        {passwordError && (
+          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700">
+            {passwordError}
+          </div>
+        )}
+
+        <form onSubmit={handlePasswordChange} className="space-y-4 max-w-lg">
+          <Input
+            label="Current Password"
+            type="password"
+            placeholder="Enter your current password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            required
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="New Password"
+              type="password"
+              placeholder="Min. 8 characters"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+            <Input
+              label="Confirm New Password"
+              type="password"
+              placeholder="Re-enter new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="flex justify-start pt-1">
+            <Button
+              type="submit"
+              variant="primary"
+              loading={passwordLoading}
+              icon={<KeyRound className="w-4 h-4" />}
+            >
+              Update Password
+            </Button>
+          </div>
+        </form>
+      </div>
 
       <MediaPickerModal
         isOpen={isMediaPickerOpen}

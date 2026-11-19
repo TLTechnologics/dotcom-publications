@@ -9,6 +9,7 @@ try:
     from backend.app.core.database import engine, Base, SessionLocal
     from backend.app.seed_data import init_database
     from backend.app.api import (
+        auth, users, notifications, search,
         books, authors, categories, publishers, media, landing, settings as site_settings, dashboard, orders
     )
 except ImportError:
@@ -16,12 +17,29 @@ except ImportError:
     from app.core.database import engine, Base, SessionLocal
     from app.seed_data import init_database
     from app.api import (
+        auth, users, notifications, search,
         books, authors, categories, publishers, media, landing, settings as site_settings, dashboard, orders
     )
 
-# Automatically create all relational tables on the target database (Supabase PostgreSQL / SQLite)
+def run_safe_migrations():
+    """Apply non-destructive schema migrations (e.g. adding columns to existing tables)."""
+    with engine.connect() as conn:
+        # Check and add columns to activity_logs
+        for col, ctype in [
+            ("user_id", "INTEGER"),
+            ("user_name", "VARCHAR(255)"),
+            ("ip_address", "VARCHAR(100)")
+        ]:
+            try:
+                conn.execute(text(f"ALTER TABLE activity_logs ADD COLUMN {col} {ctype}"))
+                conn.commit()
+            except Exception:
+                pass
+
+# Automatically create all relational tables and apply migrations
 try:
     Base.metadata.create_all(bind=engine)
+    run_safe_migrations()
     with SessionLocal() as db:
         init_database(db, wipe_dummy=False)
 except Exception as e:
@@ -33,7 +51,7 @@ app = FastAPI(
     description="Dotcom Publications Editorial Publishing Platform Admin API (Developed by TL Technologics)"
 )
 
-# CORS
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -42,15 +60,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ensure upload directory exists and mount it safely
+# Static file uploads mount
 try:
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 except Exception as e:
     print(f"Static upload mount notice: {e}")
 
-# Include Routers under API prefix (e.g. /api/books)
+# Include Routers under standard API prefix (/api)
 api_prefix = settings.API_V1_STR
+app.include_router(auth.router, prefix=api_prefix)
+app.include_router(users.router, prefix=api_prefix)
+app.include_router(notifications.router, prefix=api_prefix)
+app.include_router(search.router, prefix=api_prefix)
 app.include_router(dashboard.router, prefix=api_prefix)
 app.include_router(books.router, prefix=api_prefix)
 app.include_router(authors.router, prefix=api_prefix)
@@ -60,17 +82,6 @@ app.include_router(media.router, prefix=api_prefix)
 app.include_router(landing.router, prefix=api_prefix)
 app.include_router(site_settings.router, prefix=api_prefix)
 app.include_router(orders.router, prefix=api_prefix)
-
-# Also include Routers at root for serverless flexibility (e.g. /books)
-app.include_router(dashboard.router)
-app.include_router(books.router)
-app.include_router(authors.router)
-app.include_router(categories.router)
-app.include_router(publishers.router)
-app.include_router(media.router)
-app.include_router(landing.router)
-app.include_router(site_settings.router)
-app.include_router(orders.router)
 
 @app.get("/")
 @app.get("/api/health")
@@ -109,7 +120,7 @@ def db_status():
         "engine": "PostgreSQL (Supabase)" if is_postgres else "SQLite (Local Fallback)",
         "connection_target": "Supabase Cloud Database" if is_postgres else "Local SQLite File",
         "tables": [],
-        "dummy_data_status": "Clean (Zero Dummy Records)",
+        "counts": {},
         "error": None
     }
     try:
@@ -117,14 +128,16 @@ def db_status():
         status_info["tables"] = inspector.get_table_names()
         with SessionLocal() as db:
             try:
-                from backend.app.models.models import Book, Author, Category, Publisher
+                from backend.app.models.models import Book, Author, Category, Publisher, Order, User
             except ImportError:
-                from app.models.models import Book, Author, Category, Publisher
+                from app.models.models import Book, Author, Category, Publisher, Order, User
             status_info["counts"] = {
                 "books": db.query(Book).count(),
                 "authors": db.query(Author).count(),
                 "categories": db.query(Category).count(),
                 "publishers": db.query(Publisher).count(),
+                "orders": db.query(Order).count(),
+                "users": db.query(User).count(),
             }
         status_info["connected"] = True
     except Exception as e:

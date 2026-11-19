@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 try:
     from backend.app.core.database import get_db
-    from backend.app.models.models import Author, ActivityLog
+    from backend.app.core.deps import require_content_manager, get_current_user
+    from backend.app.models.models import Author, ActivityLog, User
     from backend.app.schemas.schemas import AuthorCreate, AuthorUpdate, AuthorResponse
 except ImportError:
     from app.core.database import get_db
-    from app.models.models import Author, ActivityLog
+    from app.core.deps import require_content_manager, get_current_user
+    from app.models.models import Author, ActivityLog, User
     from app.schemas.schemas import AuthorCreate, AuthorUpdate, AuthorResponse
 
 router = APIRouter(prefix="/authors", tags=["Authors"])
@@ -17,9 +19,10 @@ def get_authors(
     search: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
+    """Public listing of faculty authors and profiles."""
     query = db.query(Author)
     if search:
-        query = query.filter(Author.name.ilike(f"%{search}%"))
+        query = query.filter(Author.name.ilike(f"%{search.strip()}%"))
     authors = query.order_by(Author.name.asc()).all()
 
     results = []
@@ -39,6 +42,7 @@ def get_authors(
 
 @router.get("/{author_id}", response_model=AuthorResponse)
 def get_author(author_id: int, db: Session = Depends(get_db)):
+    """Public author profile view."""
     author = db.query(Author).filter(Author.id == author_id).first()
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
@@ -54,26 +58,26 @@ def get_author(author_id: int, db: Session = Depends(get_db)):
         updated_at=author.updated_at
     )
 
-@router.post("", response_model=AuthorResponse, status_code=201)
-def create_author(author_in: AuthorCreate, db: Session = Depends(get_db)):
-    author = Author(
-        name=author_in.name,
-        profile_picture=author_in.profile_picture,
-        bio=author_in.bio,
-        email=author_in.email,
-        website=author_in.website
-    )
+@router.post("", response_model=AuthorResponse, status_code=status.HTTP_201_CREATED)
+def create_author(
+    author_in: AuthorCreate,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Register faculty author (Content Manager / Super Admin only)."""
+    author = Author(**author_in.dict())
     db.add(author)
     db.commit()
     db.refresh(author)
 
-    # Activity log
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="create",
         entity_type="author",
         entity_id=author.id,
         entity_name=author.name,
-        description=f"Created author profile for '{author.name}'"
+        description=f"Administrator '{current_admin.username}' created author profile '{author.name}'"
     )
     db.add(log)
     db.commit()
@@ -91,22 +95,28 @@ def create_author(author_in: AuthorCreate, db: Session = Depends(get_db)):
     )
 
 @router.put("/{author_id}", response_model=AuthorResponse)
-def update_author(author_id: int, author_in: AuthorUpdate, db: Session = Depends(get_db)):
+def update_author(
+    author_id: int,
+    author_in: AuthorUpdate,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Update author biography and institutional links (Content Manager / Super Admin only)."""
     author = db.query(Author).filter(Author.id == author_id).first()
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
 
-    update_data = author_in.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
+    for field, value in author_in.dict(exclude_unset=True).items():
         setattr(author, field, value)
 
-    # Activity log
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="update",
         entity_type="author",
         entity_id=author.id,
         entity_name=author.name,
-        description=f"Updated details for author '{author.name}'"
+        description=f"Administrator '{current_admin.username}' updated author profile '{author.name}'"
     )
     db.add(log)
     db.commit()
@@ -125,21 +135,34 @@ def update_author(author_id: int, author_in: AuthorUpdate, db: Session = Depends
     )
 
 @router.delete("/{author_id}")
-def delete_author(author_id: int, db: Session = Depends(get_db)):
+def delete_author(
+    author_id: int,
+    current_admin: User = Depends(require_content_manager),
+    db: Session = Depends(get_db)
+):
+    """Delete author profile (Content Manager / Super Admin only)."""
     author = db.query(Author).filter(Author.id == author_id).first()
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
 
-    author_name = author.name
-    # Log deletion
+    if author.books:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete author '{author.name}' because they are assigned to {len(author.books)} book(s). Unlink or reassign those books first."
+        )
+
+    name = author.name
     log = ActivityLog(
+        user_id=current_admin.id,
+        user_name=current_admin.username,
         action_type="delete",
         entity_type="author",
         entity_id=author_id,
-        entity_name=author_name,
-        description=f"Deleted author profile '{author_name}'"
+        entity_name=name,
+        description=f"Administrator '{current_admin.username}' deleted author '{name}'"
     )
     db.add(log)
     db.delete(author)
     db.commit()
-    return {"message": f"Author '{author_name}' successfully deleted", "id": author_id}
+
+    return {"message": f"Author '{name}' deleted successfully", "id": author_id}
