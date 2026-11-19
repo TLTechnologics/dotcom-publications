@@ -9,14 +9,14 @@ try:
     from backend.app.core.database import engine, Base, SessionLocal
     from backend.app.seed_data import init_database
     from backend.app.api import (
-        books, authors, categories, publishers, media, landing, settings as site_settings, dashboard
+        books, authors, categories, publishers, media, landing, settings as site_settings, dashboard, orders
     )
 except ImportError:
     from app.core.config import settings
     from app.core.database import engine, Base, SessionLocal
     from app.seed_data import init_database
     from app.api import (
-        books, authors, categories, publishers, media, landing, settings as site_settings, dashboard
+        books, authors, categories, publishers, media, landing, settings as site_settings, dashboard, orders
     )
 
 # Automatically create all relational tables on the target database (Supabase PostgreSQL / SQLite)
@@ -59,6 +59,7 @@ app.include_router(publishers.router, prefix=api_prefix)
 app.include_router(media.router, prefix=api_prefix)
 app.include_router(landing.router, prefix=api_prefix)
 app.include_router(site_settings.router, prefix=api_prefix)
+app.include_router(orders.router, prefix=api_prefix)
 
 # Also include Routers at root for serverless flexibility (e.g. /books)
 app.include_router(dashboard.router)
@@ -69,6 +70,7 @@ app.include_router(publishers.router)
 app.include_router(media.router)
 app.include_router(landing.router)
 app.include_router(site_settings.router)
+app.include_router(orders.router)
 
 @app.get("/")
 @app.get("/api/health")

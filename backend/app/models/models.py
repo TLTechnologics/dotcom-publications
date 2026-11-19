@@ -167,3 +167,22 @@ class ActivityLog(Base):
     entity_name = Column(String(255), nullable=True)
     description = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=utcnow, index=True)
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_number = Column(String(50), unique=True, index=True, nullable=False)
+    customer_name = Column(String(255), nullable=False)
+    customer_email = Column(String(255), nullable=False)
+    customer_phone = Column(String(50), nullable=False)
+    shipping_address = Column(Text, nullable=False)
+    city = Column(String(100), nullable=True)
+    state = Column(String(100), nullable=True)
+    pincode = Column(String(20), nullable=True)
+    items_json = Column(Text, nullable=False)  # JSON serialized list of books ordered
+    total_amount = Column(Float, nullable=False, default=0.0)
+    payment_method = Column(String(50), default="Cash on Delivery")
+    status = Column(String(50), default="Confirmed")  # Confirmed, Processing, Shipped, Delivered, Cancelled
+    created_at = Column(DateTime, default=utcnow, index=True)
+

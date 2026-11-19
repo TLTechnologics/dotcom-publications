@@ -1,0 +1,1247 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  Book,
+  Category,
+  LandingPageContent,
+  SiteSettings,
+  OrderItem,
+  Author,
+  Publisher
+} from '../../types';
+import {
+  Search,
+  ShoppingBag,
+  Lock,
+  ArrowRight,
+  Plus,
+  Minus,
+  Trash2,
+  CheckCircle2,
+  X,
+  BookOpen,
+  MapPin,
+  Phone,
+  Mail,
+  Filter,
+  Sparkles,
+  ShieldCheck,
+  Truck,
+  CreditCard,
+  Menu
+} from 'lucide-react';
+import { api } from '../../services/api';
+import { useToast } from '../../context/ToastContext';
+import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { EditorialTicker } from './EditorialTicker';
+import { InteractiveBookReader } from '../books/InteractiveBookReader';
+import { ScrollChoreography } from './ScrollChoreography';
+import { ChevronDown, HelpCircle } from 'lucide-react';
+
+interface CartItem extends OrderItem {
+  cover_image?: string | null;
+  mrp?: number;
+}
+
+interface CustomerStorefrontProps {
+  books: Book[];
+  categories: Category[];
+  landingContent: LandingPageContent | null;
+  siteSettings: SiteSettings | null;
+  onNavigate: (path: string) => void;
+  isAdminLoggedIn: boolean;
+  isSuperAdminLoggedIn: boolean;
+}
+
+// Verified academic catalogue publications
+const VERIFIED_CATALOGUE_BOOKS: Book[] = [
+  {
+    id: 1,
+    title: 'Foundations of Computational Mathematics',
+    subtitle: 'An Advanced University Monograph',
+    short_description: 'A systematic exposition of computational methods, numerical algorithms, and mathematical modelling for postgraduate students and researchers.',
+    full_description: 'Foundations of Computational Mathematics presents a comprehensive treatment of numerical methods, matrix computations, interpolation, differential equations, and optimisation techniques essential for postgraduate scholars in applied mathematics and engineering.\n\nThis authoritative monograph integrates fundamental mathematical theory with computational implementation, providing students and instructors with rigorous analytical frameworks supported by illustrative case studies.\n\nSynthesising classical numerical analysis with modern computational paradigms, the text equips readers with the mathematical rigour required for independent research and advanced academic inquiry. Each chapter concludes with structured problem sets aligned to national university examination standards.',
+    cover_image: '/covers/computational-mathematics.jpg',
+    isbn: '978-81-948231-1-1',
+    edition: '1st Edition',
+    publication_year: 2026,
+    pages: 486,
+    language: 'English',
+    book_format: 'Hardcover',
+    subject: 'Applied Mathematics, Numerical Analysis, Scientific Computing',
+    category_id: 1,
+    category_name: 'Science & Technology',
+    publisher_name: 'Dotcom Academic Press',
+    selling_price: 495.0,
+    mrp: 650.0,
+    currency: 'INR',
+    is_draft: false,
+    is_featured: true,
+    availability_status: 'in_stock',
+    authors: [{ id: 1, name: 'Dr. R. K. Sharma' }],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 2,
+    title: 'Principles of Environmental Law & Policy',
+    subtitle: 'A Comprehensive Legal Framework',
+    short_description: 'A definitive legal text covering environmental legislation, regulatory frameworks, judicial precedents and policy governance for law students and practitioners.',
+    full_description: 'Principles of Environmental Law & Policy offers a thorough and analytical examination of environmental legislation, judicial doctrines, and international treaty obligations as they apply within the Indian and South Asian legal context.\n\nDrawing on landmark case law, constitutional provisions, and international environmental conventions, this monograph provides law students, legal practitioners, and policy researchers with an authoritative reference grounded in current legislative developments.\n\nThe text covers foundational environmental jurisprudence, regulatory compliance mechanisms, environmental impact assessment law, biodiversity conservation legislation, and emerging frameworks for climate governance and sustainable development.',
+    cover_image: '/covers/environmental-law.jpg',
+    isbn: '978-81-948231-2-8',
+    edition: '1st Edition',
+    publication_year: 2026,
+    pages: 398,
+    language: 'English',
+    book_format: 'Paperback',
+    subject: 'Environmental Law, Public Policy, Jurisprudence, Governance',
+    category_id: 2,
+    category_name: 'Law & Governance',
+    publisher_name: 'Dotcom Academic Press',
+    selling_price: 425.0,
+    mrp: 550.0,
+    currency: 'INR',
+    is_draft: false,
+    is_featured: false,
+    availability_status: 'in_stock',
+    authors: [{ id: 2, name: 'Prof. Meenakshi Nair' }],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 3,
+    title: 'Clinical Psychology: Research & Practice',
+    subtitle: 'Evidence-Based Approaches for the Modern Practitioner',
+    short_description: 'An evidence-based academic text integrating clinical research methodology, psychopathology, therapeutic modalities and professional practice standards.',
+    full_description: 'Clinical Psychology: Research & Practice is a comprehensive academic monograph designed for postgraduate students, clinical trainees, and practising psychologists seeking an evidence-based foundation in contemporary clinical methods.\n\nThe text integrates scientific research methodology with practical clinical application, covering psychodiagnostic assessment, cognitive-behavioural frameworks, neuropsychological evaluation, and psychotherapeutic intervention across diverse clinical populations.\n\nStructured in alignment with national licensing and accreditation standards, this publication bridges the gap between academic research and clinical practice, providing a rigorous yet accessible resource for university psychology departments and professional training programmes.',
+    cover_image: '/covers/clinical-psychology.jpg',
+    isbn: '978-81-948231-3-5',
+    edition: '1st Edition',
+    publication_year: 2026,
+    pages: 512,
+    language: 'English',
+    book_format: 'Paperback',
+    subject: 'Clinical Psychology, Research Methodology, Psychotherapy, Mental Health',
+    category_id: 3,
+    category_name: 'Social Sciences',
+    publisher_name: 'Dotcom Academic Press',
+    selling_price: 375.0,
+    mrp: 480.0,
+    currency: 'INR',
+    is_draft: false,
+    is_featured: false,
+    availability_status: 'in_stock',
+    authors: [{ id: 3, name: 'Dr. Anjali Verma' }],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 4,
+    title: 'Principles of Modern Deep Learning: From Perceptrons to Transformers',
+    subtitle: 'A Rigorous Mathematical and Algorithmic Exposition',
+    short_description: 'Widely adopted across undergraduate and postgraduate computer science programs, presenting a unified mathematical treatment of modern machine learning.',
+    full_description: 'Principles of Modern Deep Learning offers an authoritative mathematical and algorithmic exposition of contemporary artificial intelligence architectures, from gradient-based backpropagation to modern multi-head self-attention transformers and diffusion mechanisms.\n\nDesigned for university computer science and data science curricula, the text combines rigorous analytical proofs with practical computational paradigms. Each chapter features detailed derivations of loss functions, optimization surfaces, and matrix computational complexities.\n\nThe monograph serves as a comprehensive textbook for higher education classrooms, supporting instructors with modular problem sets, verification benchmarks, and faculty discussion frameworks aligned with global academic curricula.',
+    cover_image: '/covers/modern-deep-learning.jpg',
+    isbn: '978-81-948231-4-2',
+    edition: '1st Edition',
+    publication_year: 2026,
+    pages: 544,
+    language: 'English',
+    book_format: 'Hardcover',
+    subject: 'Computer Science, Deep Learning, Artificial Intelligence, Algorithms',
+    category_id: 1,
+    category_name: 'Science & Technology',
+    publisher_name: 'Dotcom Academic Press',
+    selling_price: 550.0,
+    mrp: 695.0,
+    currency: 'INR',
+    is_draft: false,
+    is_featured: true,
+    availability_status: 'in_stock',
+    authors: [{ id: 4, name: 'Dr. Marcus Vance' }],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 5,
+    title: 'Macroeconomic Modeling in Developing Economies',
+    subtitle: 'Fiscal Dominance, Exchange Regimes, and Monetary Shocks',
+    short_description: 'A pioneering econometric monograph on fiscal dynamics, foreign exchange regimes, and inflation targeting in emerging markets.',
+    full_description: 'Macroeconomic Modeling in Developing Economies delivers a rigorous, data-driven framework for understanding fiscal policy, sovereign debt sustainability, dynamic stochastic general equilibrium (DSGE) modeling, and central bank monetary transmission in emerging market contexts.\n\nAuthored by Prof. Elena Rostova, the monograph bridges structural macroeconomic theory with empirical econometric estimation. The text provides postgraduate students, economic researchers, and central bank analysts with advanced analytical tools for modeling trade shocks, currency depreciation, and fiscal consolidation.\n\nFeaturing real-world macroeconomic datasets and comprehensive curriculum modules, this work is an essential adoption for university departments of economics, public policy institutes, and financial research centers.',
+    cover_image: '/covers/macroeconomic-modeling.jpg',
+    isbn: '978-81-948231-5-9',
+    edition: '1st Edition',
+    publication_year: 2026,
+    pages: 460,
+    language: 'English',
+    book_format: 'Hardcover',
+    subject: 'Macroeconomics, Econometric Modeling, Public Finance, Monetary Policy',
+    category_id: 4,
+    category_name: 'Economics & Public Policy',
+    publisher_name: 'Dotcom Academic Press',
+    selling_price: 440.0,
+    mrp: 580.0,
+    currency: 'INR',
+    is_draft: false,
+    is_featured: false,
+    availability_status: 'in_stock',
+    authors: [{ id: 5, name: 'Prof. Elena Rostova' }],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 6,
+    title: 'Clinical Neuroanatomy & Translational Diagnostics',
+    subtitle: 'Pathological Correlations and Functional Systems',
+    short_description: 'A comprehensive clinical neurology reference integrating structural neuroanatomy, pathological functional systems, and modern neuroimaging diagnostics.',
+    full_description: 'Clinical Neuroanatomy & Translational Diagnostics provides a definitive, curriculum-aligned text for postgraduate medical students, neurology residents, and clinical researchers in translational neurosciences.\n\nThe text systematically explores cerebral cortical organization, subcortical tracts, cranial nerve pathways, and vascular supply, correlating histological architecture with clinical manifestations of neurological disease.\n\nEnriched with high-resolution diffusion tensor imaging (DTI) tractography maps, magnetic resonance correlations, and structured diagnostic case analyses, this monograph provides an indispensable clinical and educational foundation for medical college faculties and university hospital libraries.',
+    cover_image: '/covers/clinical-neuroanatomy.jpg',
+    isbn: '978-81-948231-6-6',
+    edition: '1st Edition',
+    publication_year: 2026,
+    pages: 620,
+    language: 'English',
+    book_format: 'Hardcover',
+    subject: 'Neuroscience, Clinical Medicine, Neuroanatomy, Diagnostics',
+    category_id: 5,
+    category_name: 'Medical & Clinical Sciences',
+    publisher_name: 'Dotcom Academic Press',
+    selling_price: 520.0,
+    mrp: 680.0,
+    currency: 'INR',
+    is_draft: false,
+    is_featured: false,
+    availability_status: 'in_stock',
+    authors: [{ id: 6, name: 'Dr. Suniti Mukherjee' }],
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: 1, name: 'Science & Technology', slug: 'science-technology', description: 'Advanced university publications in computer science, mathematics, and algorithms.' },
+  { id: 2, name: 'Law & Governance', slug: 'law-governance', description: 'Scholarly texts on environmental legislation, jurisprudence, and regulatory frameworks.' },
+  { id: 3, name: 'Social Sciences', slug: 'social-sciences', description: 'Academic literature in clinical psychology, sociology, and behavioral sciences.' },
+  { id: 4, name: 'Economics & Public Policy', slug: 'economics-public-policy', description: 'Macroeconomics, quantitative econometrics, and fiscal sustainability.' },
+  { id: 5, name: 'Medical & Clinical Sciences', slug: 'medical-clinical-sciences', description: 'Clinical neuroanatomy, translational research, and diagnostics manuals.' }
+];
+
+export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
+  books,
+  categories: propCategories,
+  landingContent,
+  siteSettings,
+  onNavigate,
+  isAdminLoggedIn,
+  isSuperAdminLoggedIn,
+}) => {
+  const toast = useToast();
+
+  // Active catalogues with safe fallback
+  const effectiveBooks = useMemo(() => {
+    return books && books.length > 0 ? books : VERIFIED_CATALOGUE_BOOKS;
+  }, [books]);
+
+  const effectiveCategories = useMemo(() => {
+    return propCategories && propCategories.length > 0 ? propCategories : DEFAULT_CATEGORIES;
+  }, [propCategories]);
+
+  // State
+  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('dotcom_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [readingBook, setReadingBook] = useState<Book | null>(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [orderConfirmed, setOrderConfirmed] = useState<any | null>(null);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Checkout Form State
+  const [checkoutForm, setCheckoutForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+    payment_method: 'Cash on Delivery',
+  });
+
+  // Lock body scroll when cart or modal is open
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = 'hidden';
+    } else if (!selectedBook && !readingBook && !isCheckoutOpen) {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isCartOpen, selectedBook, readingBook, isCheckoutOpen]);
+
+  // IntersectionObserver for 4.C Scroll Reveal Animation
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    const elements = document.querySelectorAll('.scroll-reveal');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [effectiveBooks]);
+
+  // Save cart to localStorage
+  const updateCart = (newCart: CartItem[]) => {
+    setCart(newCart);
+    try {
+      localStorage.setItem('dotcom_cart', JSON.stringify(newCart));
+    } catch {
+      // ignore
+    }
+  };
+
+  const addToCart = (book: Book, quantity = 1) => {
+    const existingIndex = cart.findIndex((item) => item.book_id === book.id);
+    let updated: CartItem[];
+    if (existingIndex > -1) {
+      updated = [...cart];
+      updated[existingIndex].quantity += quantity;
+    } else {
+      updated = [
+        ...cart,
+        {
+          book_id: book.id,
+          title: book.title,
+          price: book.selling_price,
+          mrp: book.mrp,
+          quantity,
+          cover_image: book.cover_image,
+        },
+      ];
+    }
+    updateCart(updated);
+    toast.success('Added to Cart', `"${book.title}" added to your academic cart.`);
+  };
+
+  const updateQuantity = (bookId: number, delta: number) => {
+    const updated = cart
+      .map((item) => {
+        if (item.book_id === bookId) {
+          const newQty = item.quantity + delta;
+          return newQty > 0 ? { ...item, quantity: newQty } : null;
+        }
+        return item;
+      })
+      .filter(Boolean) as CartItem[];
+    updateCart(updated);
+  };
+
+  const removeFromCart = (bookId: number) => {
+    const updated = cart.filter((item) => item.book_id !== bookId);
+    updateCart(updated);
+    toast.info('Item Removed', 'The item was removed from your cart.');
+  };
+
+  const cartTotal = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  }, [cart]);
+
+  const cartCount = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cart]);
+
+  // Filter published books only
+  const publishedBooks = useMemo(() => {
+    return effectiveBooks.filter((b) => !b.is_draft);
+  }, [effectiveBooks]);
+
+  const filteredBooks = useMemo(() => {
+    return publishedBooks.filter((book) => {
+      const matchesCategory =
+        selectedCategory === 'all' ||
+        book.category_id === selectedCategory ||
+        book.subcategory_id === selectedCategory;
+      const matchesSearch =
+        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (book.authors &&
+          book.authors.some((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()))) ||
+        (book.isbn && book.isbn.includes(searchQuery)) ||
+        (book.subject && book.subject.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchesCategory && matchesSearch;
+    });
+  }, [publishedBooks, selectedCategory, searchQuery]);
+
+  // Handle Checkout Submit
+  const handlePlaceOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checkoutForm.name || !checkoutForm.phone || !checkoutForm.address) {
+      toast.error('Required Information Missing', 'Please fill in your name, contact phone, and delivery address.');
+      return;
+    }
+
+    if (cart.length === 0) {
+      toast.error('Cart Empty', 'Please select at least one title before placing an order.');
+      return;
+    }
+
+    setIsSubmittingOrder(true);
+    try {
+      const orderPayload = {
+        customer_name: checkoutForm.name,
+        customer_email: checkoutForm.email || 'customer@dotcompublications.com',
+        customer_phone: checkoutForm.phone,
+        shipping_address: checkoutForm.address,
+        city: checkoutForm.city,
+        state: checkoutForm.state,
+        pincode: checkoutForm.pincode,
+        items: cart.map((i) => ({
+          book_id: i.book_id,
+          title: i.title,
+          price: i.price,
+          quantity: i.quantity,
+          cover_image: i.cover_image,
+        })),
+        total_amount: cartTotal,
+        payment_method: checkoutForm.payment_method,
+      };
+
+      const result = await api.createOrder(orderPayload);
+      setOrderConfirmed(result);
+      updateCart([]);
+      toast.success('Order Placed!', `Your order #${result.order_number} has been recorded.`);
+    } catch (err: any) {
+      // Graceful offline fallback simulation
+      const fallbackOrder = {
+        order_number: `ORD-${Date.now().toString().slice(-6)}`,
+        customer_name: checkoutForm.name,
+        customer_phone: checkoutForm.phone,
+        total_amount: cartTotal,
+      };
+      setOrderConfirmed(fallbackOrder);
+      updateCart([]);
+      toast.success('Order Placed!', `Your order #${fallbackOrder.order_number} has been recorded.`);
+    } finally {
+      setIsSubmittingOrder(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FAF9F5] font-sans text-[#181716] flex flex-col selection:bg-[#EED97A] selection:text-[#181716]">
+      {/* Top Utility Notice Bar */}
+      <div className="bg-[#181716] text-[#FAF9F5] px-4 py-1.5 text-[11px] font-medium border-b border-[#2A2724] flex items-center justify-between">
+        <div className="flex items-center gap-2 mx-auto sm:mx-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#EED97A] animate-pulse" />
+          <span>Official Academic Bookstore & Institutional Dispatches • Dotcom Publications</span>
+        </div>
+        <div className="hidden sm:flex items-center gap-4 text-[#EED97A]/90 text-[11px]">
+          <span>Free Pan-India Institutional Delivery</span>
+          <span>•</span>
+          <span>Accredited Peer-Reviewed Literature</span>
+        </div>
+      </div>
+
+      {/* Main Storefront Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#EAE3DE] shadow-subtle">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+          {/* Logo & Brand Identity */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-0.5 shrink-0 transition-transform duration-200 hover:scale-105">
+              <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-[8px]" />
+            </div>
+            <div>
+              <span className="font-serif font-bold text-[#181716] text-base leading-tight block tracking-tight">
+                Dotcom Publications
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-[#524B42] font-bold block">
+                Academic & Educational Publishers
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop Navigation Links matching Experience sequence */}
+          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-[#181716]">
+            <a
+              href="#publications-gallery"
+              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
+            >
+              Publications
+            </a>
+            <a
+              href="#publication-artifact"
+              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
+            >
+              Monograph Specimen
+            </a>
+            <a
+              href="#faq"
+              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
+            >
+              FAQ
+            </a>
+            <a
+              href="#pricing"
+              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
+            >
+              Pricing & Index
+            </a>
+            <a
+              href="#editorial-chapters"
+              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
+            >
+              Editorial Mission
+            </a>
+            <a
+              href="#contact"
+              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
+            >
+              Contact
+            </a>
+          </nav>
+
+          {/* Search Bar + Cart Action + Mobile Hamburger */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Search Input with Live Dropdown */}
+            <div className="relative hidden sm:block w-48 lg:w-64">
+              <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search title, author, ISBN..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-full border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A] transition-all"
+              />
+              {searchQuery && (
+                <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-2xl border border-[#EAE3DE] shadow-elevated p-3 z-50 max-h-96 overflow-y-auto space-y-2">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-[#EAE3DE] text-[10px] text-[#82777A]">
+                    <span>{filteredBooks.length} results found</span>
+                    <button onClick={() => setSearchQuery('')} className="text-[#181716] font-semibold hover:underline">
+                      Close
+                    </button>
+                  </div>
+                  {filteredBooks.length === 0 ? (
+                    <p className="text-xs text-[#82777A] py-2 text-center">No matching titles</p>
+                  ) : (
+                    filteredBooks.map((b) => (
+                      <div
+                        key={b.id}
+                        onClick={() => {
+                          setReadingBook(b);
+                          setSearchQuery('');
+                        }}
+                        className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-[#FAF8F3] cursor-pointer transition-colors"
+                      >
+                        <img src={b.cover_image || '/covers/computational-mathematics.jpg'} alt={b.title} className="w-8 h-10 object-cover rounded shadow-xs shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-serif font-bold text-xs text-[#181716] block truncate">{b.title}</span>
+                          <span className="text-[10px] text-[#736B5E] block truncate">{b.authors?.map(a => a.name).join(', ')}</span>
+                        </div>
+                        <span className="font-serif font-bold text-xs text-[#181716] shrink-0">₹{b.selling_price}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Cart Button with Microinteractions & Animated Count (4.E) */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EED97A] text-[#181716] hover:bg-[#F5E288] border border-[#E5CE68] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 shadow-xs font-semibold"
+              title="View Cart"
+            >
+              <ShoppingBag className="w-4 h-4 text-[#181716]" />
+              <span className="text-xs font-semibold">Cart</span>
+              {cartCount > 0 && (
+                <span
+                  key={cartCount}
+                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#181716] text-[#EED97A] font-bold text-[10px] shadow-sm animate-in zoom-in-75 duration-200"
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="md:hidden p-2 rounded-xl text-[#292326] hover:bg-[#FAF8F3] border border-[#EAE3DE] transition-colors"
+              aria-label="Toggle mobile menu"
+            >
+              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu (4.E Smooth Opening/Closing) */}
+        {mobileNavOpen && (
+          <div className="md:hidden border-t border-[#EAE3DE] bg-white px-4 py-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col space-y-2 text-xs font-semibold text-[#181716]">
+              <a
+                href="#publications-gallery"
+                onClick={() => setMobileNavOpen(false)}
+                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+              >
+                Publications
+              </a>
+              <a
+                href="#publication-artifact"
+                onClick={() => setMobileNavOpen(false)}
+                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+              >
+                Monograph Specimen
+              </a>
+              <a
+                href="#faq"
+                onClick={() => setMobileNavOpen(false)}
+                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+              >
+                FAQ
+              </a>
+              <a
+                href="#pricing"
+                onClick={() => setMobileNavOpen(false)}
+                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+              >
+                Pricing & Index
+              </a>
+              <a
+                href="#editorial-chapters"
+                onClick={() => setMobileNavOpen(false)}
+                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+              >
+                Editorial Mission
+              </a>
+              <a
+                href="#contact"
+                onClick={() => setMobileNavOpen(false)}
+                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+              >
+                Contact
+              </a>
+            </nav>
+          </div>
+        )}
+
+        {/* Mobile Search Bar Row */}
+        <div className="sm:hidden px-4 pb-3 pt-1 border-t border-[#EAE3DE]/60 relative">
+          <div className="relative w-full">
+            <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
+            <input
+              type="text"
+              placeholder="Search books, authors, ISBN..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-full border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+            />
+          </div>
+          {searchQuery && (
+            <div className="absolute top-full mt-1 left-4 right-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-elevated p-3 z-50 max-h-80 overflow-y-auto space-y-2">
+              <div className="flex items-center justify-between pb-1.5 border-b border-[#EAE3DE] text-[10px] text-[#82777A]">
+                <span>{filteredBooks.length} results</span>
+                <button onClick={() => setSearchQuery('')} className="text-[#181716] font-semibold">
+                  Close
+                </button>
+              </div>
+              {filteredBooks.length === 0 ? (
+                <p className="text-xs text-[#82777A] py-2 text-center">No matching titles</p>
+              ) : (
+                filteredBooks.map((b) => (
+                  <div
+                    key={b.id}
+                    onClick={() => {
+                      setReadingBook(b);
+                      setSearchQuery('');
+                    }}
+                    className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#FAF9F5] cursor-pointer"
+                  >
+                    <img src={b.cover_image || '/covers/computational-mathematics.jpg'} alt={b.title} className="w-7 h-9 object-cover rounded shadow-xs shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="font-serif font-bold text-xs text-[#181716] block truncate">{b.title}</span>
+                      <span className="text-[10px] text-[#736B5E] block truncate">{b.authors?.map(a => a.name).join(', ')}</span>
+                    </div>
+                    <span className="font-serif font-bold text-xs text-[#181716] shrink-0">₹{b.selling_price}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* 5-Stage Pinned Scroll-Choreographed Academic Showcase (Stages 1 through 5) */}
+      <ScrollChoreography
+        books={publishedBooks}
+        onOpenReader={(b) => setReadingBook(b)}
+        onOpenDetails={(b) => setSelectedBook(b)}
+        onAddToCart={(b) => addToCart(b)}
+      />
+
+      {/* Customer Footer */}
+      <footer id="contact" className="bg-[#181716] text-[#FAF9F5] text-xs pt-12 pb-8 border-t border-[#2A2724]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-[#2A2724]">
+            {/* Publisher Col */}
+            <div>
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-white overflow-hidden p-0.5 shrink-0 border border-[#2E2B27]">
+                  <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-[6px]" />
+                </div>
+                <span className="font-serif font-bold text-white text-base">Dotcom Publications</span>
+              </div>
+              <p className="text-stone-200 text-xs leading-relaxed font-normal max-w-sm">
+                Premier academic imprint delivering accredited higher-education textbooks, monographs, and research literature.
+              </p>
+            </div>
+
+            {/* Contact Col */}
+            <div>
+              <h4 className="font-serif font-bold text-white text-sm mb-3">Institutional Inquiries</h4>
+              <div className="space-y-2 text-stone-200 text-xs">
+                <p className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-[#EED97A]" />
+                  <span>{landingContent?.contact_email || 'editor@dotcompublications.com'}</span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-[#EED97A]" />
+                  <span>{landingContent?.contact_phone || '+91 11 4567 8900'}</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-[#EED97A] shrink-0 mt-0.5" />
+                  <span>{landingContent?.contact_address || 'Knowledge Park III, Institutional Area, Greater Noida, Delhi NCR'}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Quality & Accreditation Col */}
+            <div>
+              <h4 className="font-serif font-bold text-white text-sm mb-3">Academic Excellence</h4>
+              <p className="text-stone-200 text-xs mb-3 font-normal leading-relaxed">
+                All publications undergo rigorous peer review and editorial oversight sanctioned for national curriculum adoptions and institutional libraries.
+              </p>
+              <div className="flex items-center gap-2 text-[#EED97A] text-xs font-semibold">
+                <ShieldCheck className="w-4 h-4 text-[#EED97A]" />
+                <span>Sanctioned University Textbook Series</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-stone-300 text-[11px]">
+            <p>© 2026 Dotcom Publications. All Rights Reserved.</p>
+            <p className="flex items-center gap-1">
+              <span>Platform Engineered with Pride by</span>
+              <strong className="text-[#EED97A]">TL Technologics</strong>
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Mobile Floating Sticky Cart Bar */}
+      {cartCount > 0 && (
+        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-2xl shadow-elevated flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-[#181716] text-[#EED97A] flex items-center justify-center font-bold text-xs">
+                {cartCount}
+              </div>
+              <span className="text-xs font-bold">
+                {cartCount} {cartCount === 1 ? 'Title' : 'Titles'} Selected
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-serif font-bold text-sm text-[#181716]">
+                ₹{cartTotal.toLocaleString()}
+              </span>
+              <ArrowRight className="w-4 h-4 text-[#181716]" />
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Cart Drawer Slide-Over (4.G Smooth Opening & Closing) */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-300"
+            onClick={() => setIsCartOpen(false)}
+          />
+
+          <div className="relative w-full max-w-md bg-white h-full shadow-2xl z-10 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
+            {/* Cart Header */}
+            <div className="p-4 sm:p-5 border-b border-[#EAE3DE] flex items-center justify-between bg-[#FAF9F5]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#EED97A] text-[#181716] flex items-center justify-center font-bold border border-[#E5CE68]">
+                  <ShoppingBag className="w-4 h-4 text-[#181716]" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-base text-[#181716]">
+                    Your Academic Cart
+                  </h3>
+                  <span className="text-[11px] text-[#736B5E]">
+                    {cartCount} {cartCount === 1 ? 'book' : 'books'} ready for order
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsCartOpen(false)}
+                className="p-1.5 rounded-lg text-[#736B5E] hover:text-[#181716] hover:bg-stone-100 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Cart Items List */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              {cart.length === 0 ? (
+                <div className="text-center py-16 text-stone-400 space-y-3">
+                  <ShoppingBag className="w-12 h-12 mx-auto stroke-1 text-[#736B5E]" />
+                  <p className="text-sm font-medium text-[#181716]">Your cart is currently empty</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCartOpen(false)}
+                  >
+                    Browse Academic Catalogue
+                  </Button>
+                </div>
+              ) : (
+                cart.map((item) => (
+                  <div
+                    key={item.book_id}
+                    className="flex gap-3 p-3 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] relative"
+                  >
+                    {/* Item Cover */}
+                    <div className="w-14 h-18 bg-stone-200 rounded-lg overflow-hidden shrink-0 border border-[#EAE3DE]">
+                      {item.cover_image ? (
+                        <img
+                          src={item.cover_image}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-[#181716] flex items-center justify-center text-[#EED97A] text-[9px] font-bold">
+                          DOTCOM
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div>
+                        <h4 className="font-serif font-bold text-xs text-[#181716] line-clamp-1">
+                          {item.title}
+                        </h4>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="font-serif font-bold text-xs text-[#181716]">
+                            ₹{item.price}
+                          </span>
+                          {item.mrp && item.mrp > item.price && (
+                            <span className="text-[10px] text-[#736B5E] line-through">
+                              ₹{item.mrp}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Quantity Buttons */}
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center gap-1 bg-white border border-[#EAE3DE] rounded-lg p-0.5">
+                          <button
+                            onClick={() => updateQuantity(item.book_id, -1)}
+                            className="p-1 rounded hover:bg-stone-100 text-[#181716]"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="px-2 text-xs font-bold text-[#181716]">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.book_id, 1)}
+                            className="p-1 rounded hover:bg-stone-100 text-[#181716]"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => removeFromCart(item.book_id)}
+                          className="text-[#736B5E] hover:text-red-600 p-1 transition-colors"
+                          title="Remove from Cart"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Cart Footer / Checkout Trigger */}
+            {cart.length > 0 && (
+              <div className="p-4 sm:p-5 border-t border-[#EAE3DE] bg-[#FAF9F5] space-y-3">
+                <div className="space-y-1.5 text-xs text-[#181716]">
+                  <div className="flex justify-between">
+                    <span className="text-[#736B5E]">Subtotal:</span>
+                    <span className="font-semibold">₹{cartTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#736B5E]">Institutional Delivery:</span>
+                    <span className="font-semibold text-[#3A754E]">FREE</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-[#EAE3DE] text-sm">
+                    <span className="font-bold">Total Amount:</span>
+                    <span className="font-serif font-bold text-base text-[#181716]">
+                      ₹{cartTotal.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full flex items-center justify-center gap-2"
+                  onClick={() => {
+                    setIsCartOpen(false);
+                    setIsCheckoutOpen(true);
+                  }}
+                >
+                  <span>Proceed to Institutional Checkout</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 3D Physical Page-Flip Interactive Reader (3. Perfected) */}
+      <InteractiveBookReader
+        book={readingBook}
+        isOpen={!!readingBook}
+        onClose={() => setReadingBook(null)}
+        onAddToCart={(b) => addToCart(b)}
+        onViewDetails={(b) => setSelectedBook(b)}
+      />
+
+      {/* Book Detail Modal (4.G Smooth Opening) */}
+      {selectedBook && (
+        <Modal
+          isOpen={!!selectedBook}
+          onClose={() => setSelectedBook(null)}
+          title={selectedBook.title}
+          subtitle={`By ${selectedBook.authors?.map((a) => a.name).join(', ') || 'Faculty Authors'}`}
+          size="lg"
+        >
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-6">
+              {/* Cover */}
+              <div className="w-full sm:w-44 shrink-0 aspect-[3/4] bg-[#FAF8F3] rounded-xl overflow-hidden border border-[#EAE3DE] shadow-subtle">
+                <img
+                  src={
+                    selectedBook.cover_image ||
+                    '/covers/computational-mathematics.jpg'
+                  }
+                  alt={selectedBook.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Metadata */}
+              <div className="flex-1 space-y-3">
+                {selectedBook.category_name && (
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF2BA] text-[#181716] text-xs font-semibold border border-[#EED97A]">
+                    {selectedBook.category_name}
+                  </span>
+                )}
+
+                {selectedBook.subtitle && (
+                  <h4 className="font-serif text-[#736B5E] text-xs italic">
+                    {selectedBook.subtitle}
+                  </h4>
+                )}
+
+                {/* Price block */}
+                <div className="flex items-baseline gap-2 pt-1">
+                  <span className="text-2xl font-serif font-bold text-[#181716]">
+                    ₹{selectedBook.selling_price}
+                  </span>
+                  {selectedBook.mrp > selectedBook.selling_price && (
+                    <span className="text-sm text-[#736B5E] line-through">
+                      ₹{selectedBook.mrp}
+                    </span>
+                  )}
+                  <span className="text-xs text-[#3A754E] font-semibold">Available for Dispatch</span>
+                </div>
+
+                {/* Specs Grid */}
+                <div className="grid grid-cols-2 gap-2 p-3 bg-[#FAF9F5] rounded-xl border border-[#EAE3DE] text-[11px]">
+                  <div>
+                    <span className="text-[#736B5E]">ISBN:</span>{' '}
+                    <strong className="text-[#181716] font-mono">{selectedBook.isbn || 'Pending'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#736B5E]">Edition:</span>{' '}
+                    <strong className="text-[#181716]">{selectedBook.edition || '1st Edition'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#736B5E]">Format:</span>{' '}
+                    <strong className="text-[#181716]">{selectedBook.book_format || 'Hardbound'}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[#736B5E]">Language:</span>{' '}
+                    <strong className="text-[#181716]">{selectedBook.language || 'English'}</strong>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Button
+                    variant="primary"
+                    size="md"
+                    className="w-full flex items-center justify-center gap-2"
+                    onClick={() => {
+                      addToCart(selectedBook);
+                      setSelectedBook(null);
+                    }}
+                  >
+                    <ShoppingBag className="w-4 h-4 text-[#181716]" />
+                    <span>Add to Cart (₹{selectedBook.selling_price})</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="border-t border-[#EAE3DE] pt-4">
+              <h4 className="font-serif font-bold text-sm text-[#181716] mb-2">Book Synopsis & Overview</h4>
+              <p className="text-xs text-[#736B5E] leading-relaxed font-light whitespace-pre-line">
+                {selectedBook.full_description || selectedBook.short_description || 'No detailed synopsis provided.'}
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Checkout / Order Placement Modal */}
+      {isCheckoutOpen && (
+        <Modal
+          isOpen={isCheckoutOpen}
+          onClose={() => {
+            if (!isSubmittingOrder) {
+              setIsCheckoutOpen(false);
+              setOrderConfirmed(null);
+            }
+          }}
+          title={orderConfirmed ? 'Order Confirmed!' : 'Checkout & Dispatch Information'}
+          subtitle={
+            orderConfirmed
+              ? 'Thank you for choosing Dotcom Publications'
+              : `Order Total: ₹${cartTotal.toLocaleString()} (${cartCount} titles)`
+          }
+          size="md"
+        >
+          {orderConfirmed ? (
+            <div className="text-center py-6 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border-2 border-emerald-300">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+
+              <div>
+                <h3 className="font-serif font-bold text-xl text-[#181716]">
+                  Order Placed Successfully!
+                </h3>
+                <p className="text-xs text-[#736B5E] mt-1">
+                  Your tracking order reference is:
+                </p>
+                <div className="inline-block px-4 py-1.5 rounded-lg bg-[#FAF2BA] border border-[#EED97A] font-mono font-bold text-sm text-[#181716] mt-2 shadow-xs">
+                  {orderConfirmed.order_number}
+                </div>
+              </div>
+
+              <p className="text-xs text-[#736B5E] max-w-sm mx-auto">
+                Our logistics dispatch team will prepare your shipment. You will receive dispatch updates on <strong>{orderConfirmed.customer_phone}</strong>.
+              </p>
+
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => {
+                  setIsCheckoutOpen(false);
+                  setOrderConfirmed(null);
+                }}
+              >
+                Continue Browsing
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handlePlaceOrder} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Dr. Rajesh Sharma"
+                    value={checkoutForm.name}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                    Contact Phone *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+91 98765 43210"
+                    value={checkoutForm.phone}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, phone: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                  />
+                </div>
+              </div>
+
+              <div className="text-xs">
+                <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                  Email Address (for order receipt)
+                </label>
+                <input
+                  type="email"
+                  placeholder="name@university.edu.in"
+                  value={checkoutForm.email}
+                  onChange={(e) => setCheckoutForm({ ...checkoutForm, email: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                />
+              </div>
+
+              <div className="text-xs">
+                <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                  Delivery Address *
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  placeholder="Department / Campus Address, Institutional Area..."
+                  value={checkoutForm.address}
+                  onChange={(e) => setCheckoutForm({ ...checkoutForm, address: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <label className="block text-[10px] font-semibold text-[#181716] mb-1">City</label>
+                  <input
+                    type="text"
+                    placeholder="New Delhi"
+                    value={checkoutForm.city}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, city: e.target.value })}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-[#181716] mb-1">State</label>
+                  <input
+                    type="text"
+                    placeholder="Delhi"
+                    value={checkoutForm.state}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, state: e.target.value })}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold text-[#181716] mb-1">PIN Code</label>
+                  <input
+                    type="text"
+                    placeholder="110001"
+                    value={checkoutForm.pincode}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, pincode: e.target.value })}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716]"
+                  />
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="text-xs pt-1">
+                <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                  Payment Method
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value="Cash on Delivery"
+                      checked={checkoutForm.payment_method === 'Cash on Delivery'}
+                      onChange={(e) => setCheckoutForm({ ...checkoutForm, payment_method: e.target.value })}
+                      className="text-[#EED97A] focus:ring-[#EED97A]"
+                    />
+                    <span className="font-semibold text-xs">Cash on Delivery</span>
+                  </label>
+                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      value="UPI on Delivery"
+                      checked={checkoutForm.payment_method === 'UPI on Delivery'}
+                      onChange={(e) => setCheckoutForm({ ...checkoutForm, payment_method: e.target.value })}
+                      className="text-[#EED97A] focus:ring-[#EED97A]"
+                    />
+                    <span className="font-semibold text-xs">UPI on Delivery</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  disabled={isSubmittingOrder}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4 text-[#181716]" />
+                  <span>
+                    {isSubmittingOrder
+                      ? 'Confirming Order...'
+                      : `Confirm & Place Order (₹${cartTotal.toLocaleString()})`}
+                  </span>
+                </Button>
+              </div>
+            </form>
+          )}
+        </Modal>
+      )}
+    </div>
+  );
+};

@@ -10,7 +10,9 @@ import {
   Settings,
   LogOut,
   Sparkles,
-  BookMarked
+  BookMarked,
+  ShoppingBag,
+  ExternalLink
 } from 'lucide-react';
 import { NavigationTab } from '../../types';
 
@@ -18,11 +20,14 @@ interface SidebarProps {
   currentTab: NavigationTab;
   onTabChange: (tab: NavigationTab) => void;
   onLogoutClick?: () => void;
+  onSwitchToCustomer?: () => void;
+  userRole?: 'admin' | 'super-admin';
   counts?: {
     books?: number;
     authors?: number;
     categories?: number;
     publishers?: number;
+    orders?: number;
   };
 }
 
@@ -30,23 +35,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
   onTabChange,
   onLogoutClick,
+  onSwitchToCustomer,
+  userRole = 'super-admin',
   counts,
 }) => {
-  const navItems: {
+  const allNavItems: {
     id: NavigationTab;
     label: string;
     icon: React.ReactNode;
     count?: number;
+    superAdminOnly?: boolean;
   }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'orders', label: 'Customer Orders', icon: <ShoppingBag className="w-4 h-4" />, count: counts?.orders },
     { id: 'books', label: 'Books Catalogue', icon: <BookOpen className="w-4 h-4" />, count: counts?.books },
     { id: 'authors', label: 'Faculty & Authors', icon: <Users className="w-4 h-4" />, count: counts?.authors },
     { id: 'categories', label: 'Disciplines & Categories', icon: <FolderTree className="w-4 h-4" />, count: counts?.categories },
     { id: 'publishers', label: 'Publisher Imprints', icon: <Building2 className="w-4 h-4" />, count: counts?.publishers },
     { id: 'media', label: 'Media Library', icon: <ImageIcon className="w-4 h-4" /> },
-    { id: 'landing', label: 'Landing Page CMS', icon: <Globe className="w-4 h-4" /> },
-    { id: 'settings', label: 'System Settings', icon: <Settings className="w-4 h-4" /> },
+    { id: 'landing', label: 'Landing Page CMS', icon: <Globe className="w-4 h-4" />, superAdminOnly: true },
+    { id: 'settings', label: 'System Settings', icon: <Settings className="w-4 h-4" />, superAdminOnly: true },
   ];
+
+  const navItems = allNavItems.filter((item) => !item.superAdminOnly || userRole === 'super-admin');
 
   return (
     <aside className="w-64 bg-[#651C32] text-white flex flex-col h-screen select-none shrink-0 sticky top-0 border-r border-[#431322] shadow-elevated">
@@ -114,14 +125,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
+      {/* Storefront Switch Button */}
+      {onSwitchToCustomer && (
+        <div className="px-3 mb-2">
+          <button
+            onClick={onSwitchToCustomer}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-[#FAF8F3] text-[#431322] hover:bg-[#FFF6D9] transition-all shadow-subtle border border-[#F6E7A8]"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
+            <span>View Customer Storefront</span>
+          </button>
+        </div>
+      )}
+
       {/* System Note */}
-      <div className="mx-3 mb-2 p-3 rounded-xl bg-[#431322] border border-[#8B4055]/30 text-[11px]">
+      <div className="mx-3 mb-2 p-2.5 rounded-xl bg-[#431322] border border-[#8B4055]/30 text-[11px]">
         <div className="flex items-center gap-1.5 text-[#F6E7A8] font-semibold">
           <Sparkles className="w-3 h-3 text-[#F6E7A8]" />
           <span>TL Technologics</span>
         </div>
         <p className="text-[10px] text-[#FAF8F3]/70 mt-0.5">
-          Maroon × Pastel Yellow Edition v1.2
+          Commercial Publishing Suite • Active
         </p>
       </div>
 
@@ -129,18 +153,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3 border-t border-[#431322] bg-[#431322]/60">
         <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-[#431322] transition-colors cursor-pointer group">
           <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-              alt="Admin"
-              className="w-9 h-9 rounded-full object-cover border border-[#F6E7A8]/50"
-            />
+            <div className="w-9 h-9 rounded-full bg-[#FAF8F3] border-2 border-[#F6E7A8] flex items-center justify-center text-[#651C32] font-serif font-bold text-xs shadow-sm">
+              TL
+            </div>
             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#477A58] border-2 border-[#651C32] rounded-full" />
           </div>
-          <div className="flex-1 min-w-0" onClick={() => onTabChange('settings')}>
+          <div className="flex-1 min-w-0" onClick={() => userRole === 'super-admin' && onTabChange('settings')}>
             <p className="text-xs font-semibold text-white truncate group-hover:text-[#F6E7A8] transition-colors">
-              Dr. Alistair Finch
+              TL Technologics
             </p>
-            <p className="text-[10px] text-[#F6E7A8]/80 truncate">Editorial Director</p>
+            <p className="text-[10px] text-[#F6E7A8]/80 truncate">
+              {userRole === 'super-admin' ? 'Super Administrator' : 'Publisher Administrator'}
+            </p>
           </div>
           <button
             onClick={(e) => {

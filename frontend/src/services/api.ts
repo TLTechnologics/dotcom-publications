@@ -8,7 +8,8 @@ import {
   DashboardStats,
   ActivityLog,
   LandingPageContent,
-  SiteSettings
+  SiteSettings,
+  Order
 } from '../types';
 
 const API_BASE = '/api';
@@ -261,6 +262,26 @@ export const api = {
     return fetchJSON<SiteSettings>(`${API_BASE}/settings`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    });
+  },
+
+  // --- Orders ---
+  async createOrder(data: any): Promise<Order> {
+    return fetchJSON<Order>(`${API_BASE}/orders`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getOrders(status?: string): Promise<Order[]> {
+    const url = status ? `${API_BASE}/orders?status=${encodeURIComponent(status)}` : `${API_BASE}/orders`;
+    return fetchJSON<Order[]>(url);
+  },
+
+  async updateOrderStatus(id: number, status: string): Promise<Order> {
+    return fetchJSON<Order>(`${API_BASE}/orders/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
     });
   },
 };

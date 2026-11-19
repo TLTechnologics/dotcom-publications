@@ -8,14 +8,14 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'neutral', className = '' }) => {
   const variantStyles = {
-    published: 'bg-[#EAF3ED] text-[#477A58] border-[#477A58]/30',
-    draft: 'bg-[#FFF6D9] text-[#431322] border-[#F6E7A8]',
-    featured: 'bg-[#F5E6EA] text-[#651C32] border-[#8B4055]/30 font-semibold',
-    in_stock: 'bg-[#EAF1F7] text-[#557A9C] border-[#557A9C]/30',
-    out_of_stock: 'bg-[#FCEBEB] text-[#B94B4B] border-[#B94B4B]/30',
+    published: 'bg-[#EAF3ED] text-[#3A754E] border-[#3A754E]/30',
+    draft: 'bg-[#FAF2BA] text-[#181716] border-[#EED97A]',
+    featured: 'bg-[#FAF2BA] text-[#181716] border-[#EED97A] font-semibold',
+    in_stock: 'bg-[#EAF1F7] text-[#4B7396] border-[#4B7396]/30',
+    out_of_stock: 'bg-[#FDF2F2] text-[#D34545] border-[#D34545]/30',
     pre_order: 'bg-[#FAF0E2] text-[#C58B35] border-[#C58B35]/30',
-    category: 'bg-[#FAF8F3] text-[#292326] border-[#EAE3DE]',
-    neutral: 'bg-[#F5F1EE] text-[#82777A] border-[#EAE3DE]',
+    category: 'bg-[#FAF9F5] text-[#181716] border-[#EAE3DE]',
+    neutral: 'bg-[#F5F2EB] text-[#736B5E] border-[#EAE3DE]',
   };
 
   return (

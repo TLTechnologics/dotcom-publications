@@ -182,6 +182,31 @@ export interface SiteSettings {
   updated_at?: string;
 }
 
+export interface OrderItem {
+  book_id: number;
+  title: string;
+  price: number;
+  quantity: number;
+  cover_image?: string | null;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  items_json: string;
+  total_amount: number;
+  payment_method: string;
+  status: string;
+  created_at: string;
+}
+
 export type NavigationTab = 
   | 'dashboard'
   | 'books'
@@ -190,4 +215,5 @@ export type NavigationTab =
   | 'publishers'
   | 'media'
   | 'landing'
-  | 'settings';
+  | 'settings'
+  | 'orders';

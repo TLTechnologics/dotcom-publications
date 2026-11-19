@@ -17,7 +17,11 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const base = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl';
+  const base =
+    'inline-flex items-center justify-center font-medium transition-all duration-200 ' +
+    'hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] ' +
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 ' +
+    'disabled:cursor-not-allowed disabled:transform-none select-none rounded-xl group cursor-pointer';
 
   const sizeStyles = {
     sm: 'text-xs px-3 py-1.5 gap-1.5',
@@ -26,11 +30,16 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const variantStyles = {
-    primary: 'bg-[#651C32] hover:bg-[#431322] text-white shadow-subtle focus:ring-[#651C32]',
-    secondary: 'bg-[#F6E7A8] hover:bg-[#FBEFC4] text-[#431322] border border-[#F6E7A8] font-semibold focus:ring-[#F6E7A8] shadow-subtle',
-    outline: 'border border-[#EAE3DE] bg-white hover:bg-[#FFF6D9]/60 text-[#292326] hover:border-[#651C32] focus:ring-[#651C32]',
-    ghost: 'text-[#651C32] hover:bg-[#FFF6D9] focus:ring-[#651C32]',
-    danger: 'bg-[#B94B4B] hover:bg-[#9A3838] text-white focus:ring-[#B94B4B]',
+    primary:
+      'bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] font-semibold border border-[#E5CE68] shadow-subtle hover:shadow-pastel focus-visible:ring-[#EED97A]',
+    secondary:
+      'bg-[#FAF2BA] hover:bg-[#FFF6D9] text-[#181716] border border-[#EED97A] font-semibold hover:shadow-pastel focus-visible:ring-[#EED97A]',
+    outline:
+      'border border-[#EAE3DE] bg-white hover:bg-[#FAF2BA]/50 text-[#181716] hover:border-[#EED97A] hover:text-[#181716] focus-visible:ring-[#EED97A]',
+    ghost:
+      'text-[#181716] hover:bg-[#FAF2BA]/60 focus-visible:ring-[#EED97A]',
+    danger:
+      'bg-[#D34545] hover:bg-[#BA3838] text-white focus-visible:ring-[#D34545]',
   };
 
   return (
@@ -40,9 +49,11 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading ? (
-        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5" />
+        <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5 shrink-0" />
       ) : icon ? (
-        <span className="shrink-0">{icon}</span>
+        <span className="shrink-0 transition-transform duration-200 group-hover:scale-105">
+          {icon}
+        </span>
       ) : null}
       {children}
     </button>

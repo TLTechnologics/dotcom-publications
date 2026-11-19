@@ -19,7 +19,8 @@ interface TopNavProps {
   onTabChange: (tab: NavigationTab) => void;
   onMobileMenuToggle?: () => void;
   onOpenPreview?: () => void;
-  onOpenLoaderPreview?: () => void;
+  onSwitchToCustomer?: () => void;
+  userRole?: 'admin' | 'super-admin';
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -28,6 +29,10 @@ const TAB_TITLES: Record<NavigationTab, { title: string; subtitle: string }> = {
   dashboard: {
     title: 'Publishing Executive Dashboard',
     subtitle: 'Real-time catalogue statistics, active titles, and recent editorial actions',
+  },
+  orders: {
+    title: 'Customer Book Orders',
+    subtitle: 'Track customer purchases, fulfillment status, and delivery details',
   },
   books: {
     title: 'Books & Monograph Catalogue',
@@ -64,7 +69,8 @@ export const TopNav: React.FC<TopNavProps> = ({
   onTabChange,
   onMobileMenuToggle,
   onOpenPreview,
-  onOpenLoaderPreview,
+  onSwitchToCustomer,
+  userRole = 'super-admin',
   searchQuery,
   onSearchChange,
 }) => {
@@ -125,15 +131,15 @@ export const TopNav: React.FC<TopNavProps> = ({
           <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
         </div>
 
-        {/* Animated Loading Screen Preview Trigger */}
-        {onOpenLoaderPreview && (
+        {/* Switch to Customer Storefront Button */}
+        {onSwitchToCustomer && (
           <button
-            onClick={onOpenLoaderPreview}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#431322] bg-[#F6E7A8] hover:bg-[#FBEFC4] border border-[#F6E7A8] transition-all shadow-subtle"
-            title="Preview Animated Emblem & Loading Screen"
+            onClick={onSwitchToCustomer}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#431322] bg-[#F6E7A8] hover:bg-[#FFF6D9] border border-[#F6E7A8] transition-all shadow-subtle"
+            title="Switch to Customer Storefront"
           >
-            <Sun className="w-3.5 h-3.5 text-[#651C32]" />
-            <span className="hidden sm:inline text-[11px]">Emblem Loader</span>
+            <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
+            <span className="hidden sm:inline text-[11px]">Storefront</span>
           </button>
         )}
 
@@ -178,44 +184,54 @@ export const TopNav: React.FC<TopNavProps> = ({
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors"
           >
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-              alt="Admin"
-              className="w-6 h-6 rounded-full object-cover border border-[#EAE3DE]"
-            />
+            <div className="w-6 h-6 rounded-full bg-[#651C32] text-white flex items-center justify-center text-[10px] font-bold">
+              TL
+            </div>
             <span className="text-xs font-semibold text-[#292326] hidden sm:inline">
-              Dr. Finch
+              TL Technologics
             </span>
             <ChevronDown className="w-3.5 h-3.5 text-[#82777A]" />
           </button>
 
           {showProfileMenu && (
             <div
-              className="absolute right-0 mt-2 w-52 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
+              className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
               onClick={() => setShowProfileMenu(false)}
             >
               <div className="px-3 py-2 border-b border-[#EAE3DE] bg-[#FAF8F3]/60">
-                <p className="font-semibold text-[#292326]">Dr. Alistair Finch</p>
-                <p className="text-[10px] text-[#82777A]">director@dotcompublications.com</p>
+                <p className="font-semibold text-[#292326]">TL Technologics</p>
+                <p className="text-[10px] text-[#82777A]">
+                  {userRole === 'super-admin' ? 'Super Administrator' : 'Publisher Administrator'}
+                </p>
               </div>
+              {onSwitchToCustomer && (
+                <button
+                  onClick={onSwitchToCustomer}
+                  className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors font-medium"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View Storefront
+                </button>
+              )}
+              <button
+                onClick={() => onTabChange('orders')}
+                className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-[#651C32]" /> Customer Orders
+              </button>
               <button
                 onClick={() => onTabChange('settings')}
                 className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
               >
                 <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> Account Settings
               </button>
-              <button
-                onClick={() => onTabChange('landing')}
-                className="w-full text-left px-3 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View Public Preview
-              </button>
               <div className="border-t border-[#EAE3DE] my-1" />
               <button
-                onClick={() => alert('Demo Session Active: To switch administrator account, adjust backend permissions.')}
+                onClick={() => {
+                  if (onSwitchToCustomer) onSwitchToCustomer();
+                }}
                 className="w-full text-left px-3 py-2 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium"
               >
-                <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Logout Session
+                <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Exit Admin Portal
               </button>
             </div>
           )}

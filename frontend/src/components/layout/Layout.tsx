@@ -7,27 +7,30 @@ interface LayoutProps {
   currentTab: NavigationTab;
   onTabChange: (tab: NavigationTab) => void;
   children: React.ReactNode;
+  userRole?: 'admin' | 'super-admin';
   counts?: {
     books?: number;
     authors?: number;
     categories?: number;
     publishers?: number;
+    orders?: number;
   };
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
   onLogoutClick?: () => void;
-  onOpenLoaderPreview?: () => void;
+  onSwitchToCustomer?: () => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({
   currentTab,
   onTabChange,
   children,
+  userRole = 'super-admin',
   counts,
   searchQuery,
   onSearchChange,
   onLogoutClick,
-  onOpenLoaderPreview,
+  onSwitchToCustomer,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -39,6 +42,8 @@ export const Layout: React.FC<LayoutProps> = ({
           currentTab={currentTab}
           onTabChange={onTabChange}
           onLogoutClick={onLogoutClick}
+          onSwitchToCustomer={onSwitchToCustomer}
+          userRole={userRole}
           counts={counts}
         />
       </div>
@@ -58,6 +63,8 @@ export const Layout: React.FC<LayoutProps> = ({
                 setMobileMenuOpen(false);
               }}
               onLogoutClick={onLogoutClick}
+              onSwitchToCustomer={onSwitchToCustomer}
+              userRole={userRole}
               counts={counts}
             />
           </div>
@@ -72,10 +79,11 @@ export const Layout: React.FC<LayoutProps> = ({
           onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           searchQuery={searchQuery}
           onSearchChange={onSearchChange}
-          onOpenLoaderPreview={onOpenLoaderPreview}
+          onSwitchToCustomer={onSwitchToCustomer}
+          userRole={userRole}
         />
 
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>

@@ -247,3 +247,43 @@ class DashboardStats(BaseModel):
     recently_added_books: List[BookResponse]
     featured_books: List[BookResponse]
     recent_activity: List[ActivityLogResponse]
+
+# ----------------- Order Schemas -----------------
+class OrderItem(BaseModel):
+    book_id: int
+    title: str
+    price: float
+    quantity: int = 1
+    cover_image: Optional[str] = None
+
+class OrderCreate(BaseModel):
+    customer_name: str = Field(..., min_length=1, max_length=255)
+    customer_email: str = Field(..., min_length=3, max_length=255)
+    customer_phone: str = Field(..., min_length=5, max_length=50)
+    shipping_address: str = Field(..., min_length=5)
+    city: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
+    items: List[OrderItem]
+    total_amount: float
+    payment_method: str = "Cash on Delivery"
+
+class OrderResponse(BaseModel):
+    id: int
+    order_number: str
+    customer_name: str
+    customer_email: str
+    customer_phone: str
+    shipping_address: str
+    city: Optional[str]
+    state: Optional[str]
+    pincode: Optional[str]
+    items_json: str
+    total_amount: float
+    payment_method: str
+    status: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
