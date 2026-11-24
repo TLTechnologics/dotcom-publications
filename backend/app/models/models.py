@@ -31,8 +31,8 @@ class User(Base):
     username = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
-    # Roles: "super-admin", "content_manager", "order_manager", "viewer"
-    role = Column(String(50), nullable=False, default="viewer", index=True)
+    # Role: "admin"
+    role = Column(String(50), nullable=False, default="admin", index=True)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=utcnow)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
@@ -160,7 +160,7 @@ class LandingPage(Base):
     contact_email = Column(String(255), default="editor@dotcompublications.com")
     contact_phone = Column(String(100), default="+91 11 4567 8900")
     contact_address = Column(Text, default="Knowledge Park III, Institutional Area, Greater Noida, Delhi NCR, India")
-    footer_text = Column(Text, default="© 2026 Dotcom Publications. Developed with pride by TL Technologics. All Rights Reserved.")
+    footer_text = Column(Text, default="© 2026 Dotcom Publications. All Rights Reserved.")
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 class SiteSettings(Base):

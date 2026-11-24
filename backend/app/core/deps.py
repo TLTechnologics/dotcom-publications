@@ -87,38 +87,17 @@ def get_optional_user(
     except Exception:
         return None
 
-def require_super_admin(current_user: User = Depends(get_current_user)) -> User:
-    """Enforce Super Administrator role."""
-    if current_user.role != "super-admin":
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Enforce Administrator role."""
+    if current_user.role not in ["admin", "super-admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access forbidden: Super Administrator privileges required."
+            detail="Access forbidden: Administrator privileges required."
         )
     return current_user
 
-def require_content_manager(current_user: User = Depends(get_current_user)) -> User:
-    """Enforce Content Manager or Super Admin role."""
-    if current_user.role not in ["super-admin", "content_manager"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access forbidden: Content Manager or Super Administrator privileges required."
-        )
-    return current_user
-
-def require_order_manager(current_user: User = Depends(get_current_user)) -> User:
-    """Enforce Order Manager or Super Admin role."""
-    if current_user.role not in ["super-admin", "order_manager"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access forbidden: Order Manager or Super Administrator privileges required."
-        )
-    return current_user
-
-def require_non_viewer(current_user: User = Depends(get_current_user)) -> User:
-    """Prevent read-only viewer accounts from performing mutating operations."""
-    if current_user.role == "viewer":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access forbidden: Viewer accounts have read-only access and cannot modify data."
-        )
-    return current_user
+# Keep aliases for administrative modules ensuring full access to single Admin role
+require_super_admin = require_admin
+require_content_manager = require_admin
+require_order_manager = require_admin
+require_non_viewer = require_admin

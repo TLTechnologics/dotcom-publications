@@ -22,18 +22,30 @@ import { NavigationTab, DashboardStats, Book, Author, Category, Publisher, Landi
 import { api } from './services/api';
 import { ToastProvider, useToast } from './context/ToastContext';
 
+const VALID_ADMIN_TABS: NavigationTab[] = [
+  'dashboard',
+  'orders',
+  'books',
+  'authors',
+  'categories',
+  'publishers',
+  'media',
+  'landing',
+  'users',
+  'settings',
+];
+
 // Helper to normalize current browser URL path
 function getNormalizedPath(): string {
+  if (typeof window === 'undefined') return '/';
   const p = window.location.pathname.toLowerCase().replace(/\/+$/, '');
-  if (p === '/admin') return '/admin';
-  if (p === '/super-admin' || p === '/superadmin') return '/super-admin';
-  return '/';
+  return p || '/';
 }
 
 export function DotcomPlatform() {
   const toast = useToast();
 
-  // 1. Browser URL Routing: '/', '/admin', or '/super-admin'
+  // 1. Browser URL Routing: '/', '/books', '/cart', '/checkout', '/admin', '/admin/dashboard', etc.
   const [currentPath, setCurrentPath] = useState<string>(getNormalizedPath);
 
   // 2. Current Authenticated Admin User
@@ -50,10 +62,11 @@ export function DotcomPlatform() {
   }, []);
 
   const navigate = (path: string) => {
-    if (window.location.pathname !== path) {
-      window.history.pushState({}, '', path);
+    const clean = path.toLowerCase().replace(/\/+$/, '') || '/';
+    if (window.location.pathname.toLowerCase().replace(/\/+$/, '') !== clean) {
+      window.history.pushState({}, '', clean);
     }
-    setCurrentPath(path);
+    setCurrentPath(clean);
   };
 
   // Verify authentication token on mount
@@ -149,20 +162,46 @@ export function DotcomPlatform() {
     loadAllData();
   }, [currentUser]);
 
+  // Determine if path belongs to the Admin Portal namespace
+  const isAdminPath =
+    currentPath === '/admin' ||
+    currentPath.startsWith('/admin/') ||
+    currentPath === '/super-admin' ||
+    currentPath.startsWith('/super-admin/');
+
+  // When authenticated, auto-redirect /admin or /super-admin to /admin/dashboard
+  useEffect(() => {
+    if (currentUser && (currentPath === '/admin' || currentPath === '/super-admin')) {
+      navigate('/admin/dashboard');
+    }
+  }, [currentUser, currentPath]);
+
+  // Extract active tab from URL (/admin/:tab)
+  const pathSegments = currentPath.split('/').filter(Boolean);
+  let activeTab: NavigationTab = 'dashboard';
+  if (pathSegments.length > 1) {
+    const sub = pathSegments[1] as NavigationTab;
+    if (VALID_ADMIN_TABS.includes(sub)) {
+      activeTab = sub;
+    }
+  }
+
+  const handleTabChange = (tab: NavigationTab) => {
+    navigate('/admin/' + tab);
+  };
+
   const handleGlobalSearch = (query: string) => {
     setGlobalSearch(query);
-    if (query && currentTab !== 'books') {
-      setCurrentTab('books');
+    if (query && activeTab !== 'books') {
+      navigate('/admin/books');
     }
   };
 
   // Login handler
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
-    toast.success(
-      'Authenticated Successfully',
-      `Welcome back, ${user.full_name} (${user.role.replace('_', ' ').toUpperCase()}).`
-    );
+    toast.success('Authenticated Successfully', 'Welcome back, Admin.');
+    navigate('/admin/dashboard');
   };
 
   // Logout handler
@@ -172,14 +211,16 @@ export function DotcomPlatform() {
     } catch {
       // Continue client cleanup
     }
+    api.clearAuthToken();
     setCurrentUser(null);
     toast.info('Signed Out', 'Administrator session ended.');
+    navigate('/admin');
   };
 
   // ==========================================
-  // ROUTE: Admin Portal (/admin or /super-admin)
+  // ROUTE: Admin Portal (/admin or /admin/*)
   // ==========================================
-  if (currentPath === '/admin' || currentPath === '/super-admin') {
+  if (isAdminPath) {
     if (authChecking) {
       return (
         <div className="min-h-screen bg-[#FAF8F3] flex items-center justify-center">
@@ -194,21 +235,17 @@ export function DotcomPlatform() {
     if (!currentUser) {
       return (
         <PortalLoginPage
-          initialRole={currentPath === '/super-admin' ? 'super-admin' : 'admin'}
           onSuccess={handleLoginSuccess}
           onNavigate={navigate}
         />
       );
     }
 
-    const role = currentUser.role || (currentPath === '/super-admin' ? 'super-admin' : 'admin');
-
     return (
       <Layout
         currentUser={currentUser}
-        userRole={role}
-        currentTab={currentTab}
-        onTabChange={setCurrentTab}
+        currentTab={activeTab}
+        onTabChange={handleTabChange}
         counts={{
           books: stats?.total_books ?? booksList.length,
           authors: stats?.total_authors ?? authors.length,
@@ -222,11 +259,11 @@ export function DotcomPlatform() {
         onLogoutClick={handleLogout}
         onSwitchToCustomer={() => navigate('/')}
       >
-        {currentTab === 'dashboard' && (
+        {activeTab === 'dashboard' && (
           <DashboardPage
             stats={stats}
             loading={loading}
-            onNavigate={setCurrentTab}
+            onNavigate={handleTabChange}
             onAddBook={() => setIsAddBookOpen(true)}
             onAddAuthor={() => setIsAddAuthorOpen(true)}
             onAddCategory={() => setIsAddCategoryOpen(true)}
@@ -234,9 +271,9 @@ export function DotcomPlatform() {
           />
         )}
 
-        {currentTab === 'orders' && <OrdersPage />}
+        {activeTab === 'orders' && <OrdersPage />}
 
-        {currentTab === 'books' && (
+        {activeTab === 'books' && (
           <BooksPage
             authors={authors}
             categories={categories}
@@ -248,35 +285,35 @@ export function DotcomPlatform() {
           />
         )}
 
-        {currentTab === 'authors' && (
+        {activeTab === 'authors' && (
           <AuthorsPage
             onRefreshStats={loadAllData}
             onViewBook={(book) => setPreviewBook(book)}
           />
         )}
 
-        {currentTab === 'categories' && (
+        {activeTab === 'categories' && (
           <CategoriesPage onRefreshStats={loadAllData} />
         )}
 
-        {currentTab === 'publishers' && (
+        {activeTab === 'publishers' && (
           <PublishersPage onRefreshStats={loadAllData} />
         )}
 
-        {currentTab === 'media' && <MediaLibraryPage />}
+        {activeTab === 'media' && <MediaLibraryPage />}
 
-        {currentTab === 'landing' && (
+        {activeTab === 'landing' && (
           <LandingPageManager books={booksList} categories={categories} />
         )}
 
-        {currentTab === 'users' && (
+        {activeTab === 'users' && (
           <UsersPage
             currentUser={currentUser}
             onRefreshCounts={loadAllData}
           />
         )}
 
-        {currentTab === 'settings' && <SettingsPage />}
+        {activeTab === 'settings' && <SettingsPage />}
 
         {/* Global Quick Modals */}
         <BookFormModal
@@ -323,7 +360,7 @@ export function DotcomPlatform() {
   }
 
   // ==========================================
-  // ROUTE: / (Default Customer Storefront Landing Page)
+  // ROUTE: Customer Storefront (Default at '/')
   // ==========================================
   return (
     <CustomerStorefront
@@ -333,7 +370,7 @@ export function DotcomPlatform() {
       siteSettings={siteSettings}
       onNavigate={navigate}
       isAdminLoggedIn={!!currentUser}
-      isSuperAdminLoggedIn={currentUser?.role === 'super-admin'}
+      currentPath={currentPath}
     />
   );
 }

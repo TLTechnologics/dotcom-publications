@@ -25,7 +25,6 @@ interface TopNavProps {
   onSwitchToCustomer?: () => void;
   onLogoutClick?: () => void;
   currentUser?: User | null;
-  userRole?: string;
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -81,7 +80,6 @@ export const TopNav: React.FC<TopNavProps> = ({
   onSwitchToCustomer,
   onLogoutClick,
   currentUser,
-  userRole = 'super-admin',
   searchQuery,
   onSearchChange,
 }) => {
@@ -141,20 +139,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     subtitle: 'Dotcom Publications',
   };
 
-  const roleDisplayName = (role?: string) => {
-    switch (role) {
-      case 'super-admin':
-        return 'Super Administrator';
-      case 'content_manager':
-        return 'Content Manager';
-      case 'order_manager':
-        return 'Order Manager';
-      case 'viewer':
-        return 'Auditor (Viewer)';
-      default:
-        return 'Administrator';
-    }
-  };
+  const roleDisplayName = () => 'Admin';
 
   const userInitials = currentUser?.full_name
     ? currentUser.full_name
@@ -163,16 +148,16 @@ export const TopNav: React.FC<TopNavProps> = ({
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : 'DP';
+    : 'AD';
 
   return (
-    <header className="bg-white/95 backdrop-blur-md border-b border-[#EAE3DE] sticky top-0 z-30 px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-subtle">
+    <header className="bg-white/95 backdrop-blur-md border-b border-[#EAE3DE] sticky top-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between shadow-subtle">
       {/* Left: Mobile Toggle & Title / Breadcrumbs */}
-      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         {onMobileMenuToggle && (
           <button
             onClick={onMobileMenuToggle}
-            className="md:hidden p-2 rounded-xl text-[#292326] hover:bg-[#FFF6D9] border border-[#EAE3DE] transition-colors shrink-0"
+            className="md:hidden touch-target p-2 rounded-xl text-[#292326] hover:bg-[#FFF6D9] border border-[#EAE3DE] transition-colors shrink-0 active:scale-95"
             aria-label="Toggle Navigation Drawer"
           >
             <Menu className="w-5 h-5" />
@@ -181,22 +166,22 @@ export const TopNav: React.FC<TopNavProps> = ({
 
         <div className="min-w-0">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#82777A]">
-            <span>Dotcom Publishing</span>
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-[#82777A]">
+            <span className="truncate">Dotcom Publications</span>
             <span>/</span>
             <span className="text-[#651C32] font-semibold capitalize truncate">
               {currentTab}
             </span>
           </div>
 
-          <h2 className="text-sm sm:text-base font-serif font-bold text-[#292326] tracking-tight leading-tight mt-0.5 truncate">
+          <h2 className="text-xs sm:text-base font-serif font-bold text-[#292326] tracking-tight leading-tight mt-0.5 truncate max-w-[180px] sm:max-w-md">
             {currentInfo.title}
           </h2>
         </div>
       </div>
 
       {/* Right: Search + Storefront link + Notifications + Profile */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         {/* Search */}
         <div className="relative hidden lg:block w-64">
           <input
@@ -213,7 +198,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         {onSwitchToCustomer && (
           <button
             onClick={onSwitchToCustomer}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#431322] bg-[#F6E7A8] hover:bg-[#FFF6D9] border border-[#F6E7A8] transition-all shadow-subtle"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold text-[#431322] bg-[#F6E7A8] hover:bg-[#FFF6D9] border border-[#F6E7A8] transition-all shadow-subtle min-h-[36px] sm:min-h-0"
             title="Open Public Storefront"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
@@ -225,18 +210,19 @@ export const TopNav: React.FC<TopNavProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-full text-[#292326] hover:bg-[#FFF6D9] relative transition-colors border border-transparent hover:border-[#EAE3DE]"
+            className="touch-target p-2 rounded-full text-[#292326] hover:bg-[#FFF6D9] relative transition-colors border border-transparent hover:border-[#EAE3DE]"
             title="System Notifications"
+            aria-label="System Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-[#651C32] rounded-full ring-2 ring-white animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#651C32] rounded-full ring-2 ring-white animate-pulse" />
             )}
           </button>
 
           {showNotifications && (
             <div
-              className="absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated p-3 z-50 text-left animate-in fade-in"
+              className="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-2rem)] rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated p-3 z-50 text-left animate-in fade-in"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between border-b border-[#EAE3DE] pb-2 px-1">
@@ -290,28 +276,29 @@ export const TopNav: React.FC<TopNavProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 pr-1.5 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors min-h-[36px]"
+            aria-label="Admin Profile Menu"
           >
-            <div className="w-6 h-6 rounded-full bg-[#651C32] text-white flex items-center justify-center text-[10px] font-bold">
+            <div className="w-6 h-6 rounded-full bg-[#651C32] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
               {userInitials}
             </div>
             <span className="text-xs font-semibold text-[#292326] hidden sm:inline max-w-[100px] truncate">
-              {currentUser?.full_name || 'Administrator'}
+              {currentUser?.full_name || 'Admin'}
             </span>
             <ChevronDown className="w-3.5 h-3.5 text-[#82777A]" />
           </button>
 
           {showProfileMenu && (
             <div
-              className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
+              className="absolute right-0 mt-2 w-56 sm:w-60 max-w-[calc(100vw-2rem)] rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
               onClick={() => setShowProfileMenu(false)}
             >
               <div className="px-3.5 py-2.5 border-b border-[#EAE3DE] bg-[#FAF8F3]/60">
                 <p className="font-semibold text-[#292326] text-xs truncate">
-                  {currentUser?.full_name || 'Dotcom Administrator'}
+                  {currentUser?.full_name || 'Admin'}
                 </p>
                 <p className="text-[10px] font-medium text-[#651C32] mt-0.5">
-                  {roleDisplayName(currentUser?.role || userRole)}
+                  Admin
                 </p>
                 <p className="text-[9px] text-[#82777A] truncate">
                   {currentUser?.email || 'admin@dotcompublications.com'}
@@ -321,36 +308,32 @@ export const TopNav: React.FC<TopNavProps> = ({
               {onSwitchToCustomer && (
                 <button
                   onClick={onSwitchToCustomer}
-                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors font-medium"
+                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors font-medium min-h-[40px]"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View Storefront
                 </button>
               )}
 
-              {(currentUser?.role === 'super-admin' || userRole === 'super-admin') && (
-                <button
-                  onClick={() => onTabChange('users')}
-                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
-                >
-                  <Users className="w-3.5 h-3.5 text-[#651C32]" /> Admin Accounts
-                </button>
-              )}
+              <button
+                onClick={() => onTabChange('users')}
+                className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors min-h-[40px]"
+              >
+                <Users className="w-3.5 h-3.5 text-[#651C32]" /> Admin Accounts
+              </button>
 
               <button
                 onClick={() => onTabChange('orders')}
-                className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
+                className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors min-h-[40px]"
               >
                 <BookOpen className="w-3.5 h-3.5 text-[#651C32]" /> Customer Orders
               </button>
 
-              {(currentUser?.role === 'super-admin' || userRole === 'super-admin') && (
-                <button
-                  onClick={() => onTabChange('settings')}
-                  className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors"
-                >
-                  <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> System Settings
-                </button>
-              )}
+              <button
+                onClick={() => onTabChange('settings')}
+                className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors min-h-[40px]"
+              >
+                <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> System Settings
+              </button>
 
               <div className="border-t border-[#EAE3DE] my-1" />
 
@@ -361,7 +344,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                     onLogoutClick();
                   }
                 }}
-                className="w-full text-left px-3.5 py-2 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium transition-colors"
+                className="w-full text-left px-3.5 py-2.5 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium transition-colors min-h-[40px]"
               >
                 <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Exit Admin Portal
               </button>

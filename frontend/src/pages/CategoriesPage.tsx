@@ -87,6 +87,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
             setCategoryToEdit(null);
             setIsFormOpen(true);
           }}
+          className="w-full sm:w-auto min-h-[44px]"
           icon={<Plus className="w-4 h-4" />}
         >
           Create Discipline / Category
@@ -173,17 +174,19 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                         setCategoryToEdit(parent);
                         setIsFormOpen(true);
                       }}
-                      className="p-1.5 rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
+                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
                       title="Edit Category"
+                      aria-label="Edit category"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setCategoryToDelete(parent)}
-                      className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                       title="Delete Category"
+                      aria-label="Delete category"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -219,15 +222,19 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                               setCategoryToEdit(sub);
                               setIsFormOpen(true);
                             }}
-                            className="p-1 rounded-md text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9]"
+                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9]"
+                            title="Edit Subcategory"
+                            aria-label="Edit subcategory"
                           >
-                            <Edit2 className="w-3 h-3" />
+                            <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setCategoryToDelete(sub)}
-                            className="p-1 rounded-md text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50"
+                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50"
+                            title="Delete Subcategory"
+                            aria-label="Delete subcategory"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>

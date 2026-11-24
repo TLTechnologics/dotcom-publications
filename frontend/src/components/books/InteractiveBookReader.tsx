@@ -175,15 +175,15 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
         </div>
 
         {/* Page / Spread Indicator */}
-        <div className="flex items-center gap-2 bg-[#181716]/90 border border-[#EED97A]/40 px-3.5 py-1.5 rounded-full shadow-lg text-xs backdrop-blur-sm">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#181716]/90 border border-[#EED97A]/40 px-3 sm:px-3.5 py-1.5 rounded-full shadow-lg text-[11px] sm:text-xs backdrop-blur-sm">
           <span className="text-[#EED97A] font-bold">
             {currentPage === 0
-              ? 'Front Cover'
+              ? 'Cover'
               : currentPage >= totalPages - 1
-              ? 'Complete Edition Preview'
-              : `Pages ${currentPage}–${currentPage + 1} of ${totalPages}`}
+              ? 'Complete Edition'
+              : `p. ${currentPage}–${currentPage + 1} of ${totalPages}`}
           </span>
-          <span className="text-stone-400">•</span>
+          <span className="text-stone-400 hidden sm:inline">•</span>
           <span className="text-stone-300 font-mono text-[11px] hidden sm:inline">
             Drag corners or swipe to turn
           </span>
@@ -192,8 +192,9 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="p-2 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 transition-all shadow-md group hover:scale-105 active:scale-95"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 transition-all shadow-md group hover:scale-105 active:scale-95"
           title="Close Reader (Esc)"
+          aria-label="Close reader"
         >
           <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
         </button>
@@ -204,19 +205,21 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
         {/* Previous Page Arrow */}
         <button
           onClick={() => pageFlipRef.current?.flipPrev('bottom')}
-          className="absolute left-1 sm:-left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40 hover:scale-110 active:scale-95"
+          className="absolute left-1 sm:-left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40 hover:scale-110 active:scale-95"
           title="Previous Page (←)"
+          aria-label="Previous page"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* Next Page Arrow */}
         <button
           onClick={() => pageFlipRef.current?.flipNext('bottom')}
-          className="absolute right-1 sm:-right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40 hover:scale-110 active:scale-95"
+          className="absolute right-1 sm:-right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40 hover:scale-110 active:scale-95"
           title="Next Page (→)"
+          aria-label="Next page"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
         {/* StPageFlip Interactive HTML5 Canvas Container */}

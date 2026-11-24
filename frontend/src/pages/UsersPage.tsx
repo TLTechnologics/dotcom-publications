@@ -33,7 +33,6 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedRole, setSelectedRole] = useState('all');
 
   // Create / Edit Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +41,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
     username: '',
     email: '',
     full_name: '',
-    role: 'content_manager',
+    role: 'admin',
     password: '',
     is_active: true,
   });
@@ -55,12 +54,12 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
 
   useEffect(() => {
     loadUsers();
-  }, [search, selectedRole]);
+  }, [search]);
 
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const data = await api.getUsers(search.trim() || undefined, selectedRole !== 'all' ? selectedRole : undefined);
+      const data = await api.getUsers(search.trim() || undefined);
       setUsers(data);
       onRefreshCounts?.();
     } catch (err: any) {
@@ -76,7 +75,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
       username: '',
       email: '',
       full_name: '',
-      role: 'content_manager',
+      role: 'admin',
       password: '',
       is_active: true,
     });
@@ -90,7 +89,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
       username: user.username,
       email: user.email,
       full_name: user.full_name,
-      role: user.role,
+      role: 'admin',
       password: '', // Blank unless changing
       is_active: user.is_active,
     });
@@ -159,19 +158,12 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
     }
   };
 
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'super-admin':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#431322] text-[#F6E7A8] border border-[#F6E7A8]/40">Super Admin</span>;
-      case 'content_manager':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF1F7] text-[#557A9C] border border-[#C8DCF0]">Content Manager</span>;
-      case 'order_manager':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF3ED] text-[#477A58] border border-[#C5E3D0]">Order Manager</span>;
-      case 'viewer':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300">Auditor (Viewer)</span>;
-      default:
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-700">Administrator</span>;
-    }
+  const getRoleBadge = () => {
+    return (
+      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#651C32] text-[#F6E7A8] border border-[#F6E7A8]/40">
+        Admin
+      </span>
+    );
   };
 
   return (
@@ -195,35 +187,23 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
         </Button>
       </div>
 
-      {/* Filter Bar */}
+      {/* Search Bar */}
       <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-center gap-3">
         <div className="flex-1 w-full">
           <Input
-            placeholder="Search by username, full name, or email..."
+            placeholder="Search administrators by username, full name, or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             icon={<Search className="w-4 h-4" />}
           />
         </div>
-        <div className="w-full sm:w-56 shrink-0">
-          <Select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            options={[
-              { value: 'all', label: 'All Roles' },
-              { value: 'super-admin', label: 'Super Admin' },
-              { value: 'content_manager', label: 'Content Manager' },
-              { value: 'order_manager', label: 'Order Manager' },
-              { value: 'viewer', label: 'Auditor (Viewer)' },
-            ]}
-          />
-        </div>
       </div>
 
-      {/* Table */}
+      {/* Table (Desktop) & Cards (Mobile) */}
       <div className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-[#FAF8F3] border-b border-[#EAE3DE] text-[#82777A] font-semibold uppercase tracking-wider text-[10px]">
                 <th className="py-3.5 px-4">Administrator</th>
@@ -279,7 +259,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4">{getRoleBadge(u.role)}</td>
+                      <td className="py-3.5 px-4">{getRoleBadge()}</td>
                       <td className="py-3.5 px-4">
                         {u.is_active ? (
                           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#477A58]">
@@ -335,6 +315,90 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card List View (<md) */}
+        <div className="block md:hidden divide-y divide-[#EAE3DE]">
+          {loading ? (
+            <div className="p-8 text-center text-xs text-[#82777A]">
+              Loading administrator accounts...
+            </div>
+          ) : users.length === 0 ? (
+            <div className="p-8 text-center text-xs text-[#82777A]">
+              No administrators found matching your query.
+            </div>
+          ) : (
+            users.map((u) => {
+              const isCurrent = currentUser?.id === u.id;
+              return (
+                <div key={u.id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#651C32] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        {u.full_name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join('')
+                          .toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-sm text-[#292326]">
+                            {u.full_name}
+                          </span>
+                          {isCurrent && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#FFF6D9] text-[#651C32] font-bold">
+                              You
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-[#82777A] block">
+                          @{u.username} • {u.email}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleOpenEdit(u)}
+                        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                        title="Edit Administrator"
+                        aria-label="Edit administrator"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      {!isCurrent && (
+                        <button
+                          onClick={() => setUserToDelete(u)}
+                          className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Delete Administrator"
+                          aria-label="Delete administrator"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1 text-xs">
+                    <div>{getRoleBadge()}</div>
+                    <div>
+                      {u.is_active ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#477A58]">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600">
+                          <XCircle className="w-3.5 h-3.5" /> Suspended
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* Create / Edit Modal */}
@@ -383,33 +447,17 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-[#292326] mb-1">
-                {editingUser ? 'Password (Leave blank to keep current)' : 'Password *'}
-              </label>
-              <Input
-                type="password"
-                required={!editingUser}
-                placeholder={editingUser ? '••••••••' : 'Minimum 6 characters'}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-[#292326] mb-1">Role & Permissions *</label>
-              <Select
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                options={[
-                  { value: 'super-admin', label: 'Super Admin (Full Access)' },
-                  { value: 'content_manager', label: 'Content Manager (Books, CMS, Media)' },
-                  { value: 'order_manager', label: 'Order Manager (Orders & Invoices)' },
-                  { value: 'viewer', label: 'Auditor (Viewer - Read Only)' },
-                ]}
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-semibold text-[#292326] mb-1">
+              {editingUser ? 'Password (Leave blank to keep current)' : 'Password *'}
+            </label>
+            <Input
+              type="password"
+              required={!editingUser}
+              placeholder={editingUser ? '••••••••' : 'Minimum 6 characters'}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
           </div>
 
           <div className="pt-2">

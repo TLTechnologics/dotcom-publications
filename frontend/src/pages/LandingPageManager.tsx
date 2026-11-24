@@ -138,10 +138,11 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
           <Button
             variant="outline"
             onClick={() => setIsPreviewOpen(true)}
+            className="w-full sm:w-auto min-h-[44px]"
             icon={<Eye className="w-4 h-4" />}
           >
             Live Website Preview
@@ -150,6 +151,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
             variant="primary"
             loading={saving}
             onClick={handleSave}
+            className="w-full sm:w-auto min-h-[44px]"
             icon={<Save className="w-4 h-4" />}
           >
             Save & Publish Homepage

@@ -332,12 +332,12 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Agency Attribution */}
+        {/* Institutional System Status */}
         <div className="p-4 rounded-xl bg-[#FFF6D9]/40 border border-[#F6E7A8] text-xs text-[#292326] flex items-center justify-between">
           <div>
-            <span className="font-semibold text-[#651C32]">Developed by TL Technologics</span>
+            <span className="font-semibold text-[#651C32]">Dotcom Publications Operations</span>
             <p className="text-[11px] text-[#82777A] mt-0.5">
-              Client: Dotcom Publications • Phase 01: Admin Panel & Catalogue CMS
+              Dotcom Publications • Secure Admin Workspace & Catalogue CMS
             </p>
           </div>
           <ShieldCheck className="w-5 h-5 text-[#651C32]" />
@@ -345,7 +345,13 @@ export const SettingsPage: React.FC = () => {
 
         {/* Save Button */}
         <div className="flex justify-end pt-2">
-          <Button type="submit" variant="primary" loading={saving} icon={<Save className="w-4 h-4" />}>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={saving}
+            className="w-full sm:w-auto min-h-[44px]"
+            icon={<Save className="w-4 h-4" />}
+          >
             Save All Settings
           </Button>
         </div>
@@ -407,6 +413,7 @@ export const SettingsPage: React.FC = () => {
               type="submit"
               variant="primary"
               loading={passwordLoading}
+              className="w-full sm:w-auto min-h-[44px]"
               icon={<KeyRound className="w-4 h-4" />}
             >
               Update Password

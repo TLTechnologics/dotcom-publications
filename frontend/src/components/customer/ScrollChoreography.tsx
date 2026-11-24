@@ -295,105 +295,110 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
         // 4. EXPERIENCE B: DARK PUBLICATION ARTIFACT
         // ====================================================================
         if (artifactRef.current && artifactCardRef.current) {
-          const artifactTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: artifactRef.current,
-              start: 'top top',
-              end: () => `+=${window.innerHeight * 2.8}`,
-              pin: true,
-              scrub: 1.5,
-              anticipatePin: 1,
-              onUpdate: (st) => {
-                const p = st.progress;
-                // Balanced, generous distribution across 4 verification phases:
-                // p: 0.00 - 0.24 -> Phase 0: Curriculum Syllabus Specified
-                // p: 0.24 - 0.50 -> Phase 1: Peer-Review Citation Indices Verified
-                // p: 0.50 - 0.76 -> Phase 2: Archival Smyth-Sewn Binding Inspected
-                // p: 0.76 - 1.00 -> Phase 3: Archival Specimen Authenticated
-                let phase = 0;
-                if (p >= 0.76) phase = 3;
-                else if (p >= 0.50) phase = 2;
-                else if (p >= 0.24) phase = 1;
-                setArtifactPhase(phase);
+          if (isDesktop) {
+            const artifactTl = gsap.timeline({
+              scrollTrigger: {
+                trigger: artifactRef.current,
+                start: 'top top',
+                end: () => `+=${window.innerHeight * 2.8}`,
+                pin: true,
+                scrub: 1.5,
+                anticipatePin: 1,
+                onUpdate: (st) => {
+                  const p = st.progress;
+                  // Balanced, generous distribution across 4 verification phases:
+                  // p: 0.00 - 0.24 -> Phase 0: Curriculum Syllabus Specified
+                  // p: 0.24 - 0.50 -> Phase 1: Peer-Review Citation Indices Verified
+                  // p: 0.50 - 0.76 -> Phase 2: Archival Smyth-Sewn Binding Inspected
+                  // p: 0.76 - 1.00 -> Phase 3: Archival Specimen Authenticated
+                  let phase = 0;
+                  if (p >= 0.76) phase = 3;
+                  else if (p >= 0.50) phase = 2;
+                  else if (p >= 0.24) phase = 1;
+                  setArtifactPhase(phase);
+                },
               },
-            },
-          });
+            });
 
-          // 1. Cinematic entrance sequence (0 to 2.2s):
-          // Left editorial headline and copy float into crystal-clear focus
-          if (artifactCopyRef.current) {
+            // 1. Cinematic entrance sequence (0 to 2.2s):
+            // Left editorial headline and copy float into crystal-clear focus
+            if (artifactCopyRef.current) {
+              artifactTl.fromTo(
+                artifactCopyRef.current,
+                { opacity: 0, y: 45 },
+                { opacity: 1, y: 0, ease: 'power2.out', duration: 2.2 },
+                0
+              );
+            }
+
+            // Artifact card elevates with tactile physical presence
             artifactTl.fromTo(
-              artifactCopyRef.current,
-              { opacity: 0, y: 45 },
-              { opacity: 1, y: 0, ease: 'power2.out', duration: 2.2 },
+              artifactCardRef.current,
+              { scale: 0.90, y: 55, opacity: 0 },
+              { scale: 1.0, y: 0, opacity: 1, ease: 'power2.out', duration: 2.2 },
               0
             );
+
+            // 2. Perforation tear line animates smoothly across the specimen proof (2.2 to 8.4s)
+            if (perforationRef.current) {
+              artifactTl.fromTo(
+                perforationRef.current,
+                { scaleX: 0 },
+                { scaleX: 1, ease: 'none', transformOrigin: 'left center', duration: 6.2 },
+                2.2
+              );
+            }
+
+            // 3. Status progress meter fills steadily across inspection phases
+            if (artifactMeterRef.current) {
+              artifactTl.fromTo(
+                artifactMeterRef.current,
+                { scaleX: 0 },
+                { scaleX: 1, ease: 'none', transformOrigin: 'left center', duration: 6.2 },
+                2.2
+              );
+            }
+
+            // 4. Sequential verification cue highlights with deliberate pacing
+            if (cue1Ref.current) {
+              artifactTl.fromTo(
+                cue1Ref.current,
+                { opacity: 0.4, x: 0 },
+                { opacity: 1.0, x: 6, ease: 'power2.out', duration: 0.8 },
+                2.4
+              );
+            }
+
+            if (cue2Ref.current) {
+              artifactTl.fromTo(
+                cue2Ref.current,
+                { opacity: 0.4, x: 0 },
+                { opacity: 1.0, x: 6, ease: 'power2.out', duration: 0.8 },
+                4.8
+              );
+            }
+
+            if (cue3Ref.current) {
+              artifactTl.fromTo(
+                cue3Ref.current,
+                { opacity: 0.4, x: 0 },
+                { opacity: 1.0, x: 6, ease: 'power2.out', duration: 0.8 },
+                7.2
+              );
+              // Highlight scale on authentication completion
+              artifactTl.to(
+                artifactCardRef.current,
+                { scale: 1.025, ease: 'power2.out', duration: 0.8 },
+                7.2
+              );
+            }
+
+            // 5. Settling hold at fully authenticated specimen (8.4 to 10.0s)
+            artifactTl.to({}, { duration: 1.6 }, 8.4);
+          } else {
+            // On mobile devices: Show all verified cues clearly without pin locking
+            setArtifactPhase(3);
           }
-
-          // Artifact card elevates with tactile physical presence
-          artifactTl.fromTo(
-            artifactCardRef.current,
-            { scale: 0.90, y: 55, opacity: 0 },
-            { scale: 1.0, y: 0, opacity: 1, ease: 'power2.out', duration: 2.2 },
-            0
-          );
-
-          // 2. Perforation tear line animates smoothly across the specimen proof (2.2 to 8.4s)
-          if (perforationRef.current) {
-            artifactTl.fromTo(
-              perforationRef.current,
-              { scaleX: 0 },
-              { scaleX: 1, ease: 'none', transformOrigin: 'left center', duration: 6.2 },
-              2.2
-            );
-          }
-
-          // 3. Status progress meter fills steadily across inspection phases
-          if (artifactMeterRef.current) {
-            artifactTl.fromTo(
-              artifactMeterRef.current,
-              { scaleX: 0 },
-              { scaleX: 1, ease: 'none', transformOrigin: 'left center', duration: 6.2 },
-              2.2
-            );
-          }
-
-          // 4. Sequential verification cue highlights with deliberate pacing
-          if (cue1Ref.current) {
-            artifactTl.fromTo(
-              cue1Ref.current,
-              { opacity: 0.4, x: 0 },
-              { opacity: 1.0, x: 6, ease: 'power2.out', duration: 0.8 },
-              2.4
-            );
-          }
-
-          if (cue2Ref.current) {
-            artifactTl.fromTo(
-              cue2Ref.current,
-              { opacity: 0.4, x: 0 },
-              { opacity: 1.0, x: 6, ease: 'power2.out', duration: 0.8 },
-              4.8
-            );
-          }
-
-          if (cue3Ref.current) {
-            artifactTl.fromTo(
-              cue3Ref.current,
-              { opacity: 0.4, x: 0 },
-              { opacity: 1.0, x: 6, ease: 'power2.out', duration: 0.8 },
-              7.2
-            );
-            // Highlight scale on authentication completion
-            artifactTl.to(
-              artifactCardRef.current,
-              { scale: 1.025, ease: 'power2.out', duration: 0.8 },
-              7.2
-            );
-          }
-
-          // 5. Settling hold at fully authenticated specimen (8.4 to 10.0s)
-          artifactTl.to({}, { duration: 1.6 }, 8.4);
         }
 
         // ====================================================================
@@ -507,20 +512,20 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             <span>Accredited Higher Education Literature</span>
           </div>
 
-          <h1 className="font-serif font-bold tracking-tight text-[#FAF9F5] leading-none whitespace-nowrap text-[12vw] sm:text-[10vw] md:text-[8.5vw] uppercase drop-shadow-sm select-none">
+          <h1 className="font-serif font-bold tracking-tight text-[#FAF9F5] leading-tight sm:leading-none text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl break-words uppercase drop-shadow-sm select-none max-w-full">
             {splitWords(heroWord1, 0, 42)}
           </h1>
-          <h2 className="font-serif font-bold tracking-tight text-[#EED97A] leading-none whitespace-nowrap text-[12vw] sm:text-[10vw] md:text-[8.5vw] uppercase mt-2 sm:mt-4 select-none">
+          <h2 className="font-serif font-bold tracking-tight text-[#EED97A] leading-tight sm:leading-none text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl break-words uppercase mt-2 sm:mt-4 select-none max-w-full">
             {splitWords(heroWord2, 220, 42)}
           </h2>
 
-          <p className="mt-6 sm:mt-8 max-w-xl mx-auto text-xs sm:text-sm text-[#E0DCD4] font-normal leading-relaxed px-4">
+          <p className="mt-4 sm:mt-8 max-w-xl mx-auto text-xs sm:text-sm text-[#E0DCD4] font-normal leading-relaxed px-3 sm:px-4">
             {landingContent?.hero_description || 'Dotcom Publications authors and publishes authoritative pedagogical literature, university textbooks, and scholarly monographs trusted by educational faculties across disciplines.'}
           </p>
         </div>
 
         {/* Hero Bottom Metadata & Scroll Prompt */}
-        <div className="relative z-20 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] uppercase tracking-widest text-[#EED97A] border-t border-[#2A2724] pt-4 font-mono">
+        <div className="relative z-20 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 text-[10px] uppercase tracking-widest text-[#EED97A] border-t border-[#2A2724] pt-4 font-mono text-center sm:text-left">
           <span>Institutional Area • Greater Noida • Delhi NCR</span>
           <div className="flex items-center gap-2 text-stone-200 animate-bounce">
             <span>Scroll to Explore Publications</span>
@@ -606,11 +611,17 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             </div>
           </div>
 
+          {/* Mobile Swipe Hint */}
+          <div className="px-6 sm:hidden text-[11px] font-mono font-bold text-[#524B42] flex items-center gap-1.5 mt-2">
+            <span>SWIPE TO BROWSE COLLECTION</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#181716]" />
+          </div>
+
           {/* Horizontal Card Track */}
-          <div className="w-full overflow-hidden my-auto py-4">
+          <div className="w-full md:overflow-hidden overflow-x-auto touch-scroll-x my-auto py-4 scrollbar-none">
             <div
               ref={galleryTrackRef}
-              className="flex items-center gap-6 sm:gap-8 px-6 sm:px-12 w-max"
+              className="flex items-center gap-5 sm:gap-8 px-6 sm:px-12 w-max"
             >
               {books.map((book) => {
                 const authorsText = book.authors?.map((a) => a.name).join(', ') || 'Faculty Authors';
@@ -618,7 +629,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                   <div
                     key={book.id}
                     onClick={() => onOpenReader(book)}
-                    className="w-[280px] sm:w-[320px] md:w-[340px] shrink-0 bg-white rounded-2xl border border-[#EAE3DE] overflow-hidden shadow-subtle hover:shadow-card hover:border-[#EED97A] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col"
+                    className="w-[260px] xs:w-[280px] sm:w-[320px] md:w-[340px] shrink-0 bg-white rounded-2xl border border-[#EAE3DE] overflow-hidden shadow-subtle hover:shadow-card hover:border-[#EED97A] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col"
                   >
                     {/* Book Cover Frame */}
                     <div className="aspect-[3/4] bg-[#F7F5EE] relative overflow-hidden">
@@ -674,7 +685,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                               e.stopPropagation();
                               onOpenDetails(book);
                             }}
-                            className="px-2.5 py-1 rounded-lg border border-[#EAE3DE] text-[11px] font-semibold text-[#181716] hover:bg-[#FAF9F5] transition-colors"
+                            className="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg border border-[#EAE3DE] text-[11px] font-semibold text-[#181716] hover:bg-[#FAF9F5] transition-colors"
                           >
                             Details
                           </button>
@@ -684,7 +695,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                               e.stopPropagation();
                               onAddToCart(book);
                             }}
-                            className="px-3 py-1 rounded-lg bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] text-[11px] font-semibold flex items-center gap-1 border border-[#E5CE68] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                            className="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] text-[11px] font-semibold flex items-center gap-1 border border-[#E5CE68] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all"
                           >
                             <ShoppingBag className="w-3 h-3 text-[#181716]" />
                             <span>Add</span>
@@ -1124,7 +1135,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                 className={`p-6 rounded-2xl border transition-all duration-700 ease-out flex flex-col justify-between ${
                   isActive
                     ? 'bg-white border-2 border-[#EED97A] shadow-card opacity-100 -translate-y-2'
-                    : 'bg-white/40 border-[#EAE3DE] opacity-35 translate-y-0'
+                    : 'bg-white md:bg-white/40 border-[#EAE3DE] opacity-100 md:opacity-35 translate-y-0'
                 }`}
               >
                 <div>

@@ -86,6 +86,7 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
             setPublisherToEdit(null);
             setIsFormOpen(true);
           }}
+          className="w-full sm:w-auto min-h-[44px]"
           icon={<Plus className="w-4 h-4" />}
         >
           Add Publisher Imprint
@@ -199,17 +200,19 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
                     setPublisherToEdit(pub);
                     setIsFormOpen(true);
                   }}
-                  className="p-1.5 rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
+                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
                   title="Edit Publisher"
+                  aria-label="Edit publisher"
                 >
-                  <Edit2 className="w-3.5 h-3.5" />
+                  <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setPublisherToDelete(pub)}
-                  className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                   title="Delete Publisher"
+                  aria-label="Delete publisher"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

@@ -3,16 +3,42 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
   body {
     background-color: #FAF9F5;
     color: #181716;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4, h5, h6, .font-serif {
     font-family: 'Playfair Display', Georgia, Cambria, serif;
     letter-spacing: -0.015em;
   }
+}
+
+/* Touch-friendly interactive targets (WCAG 2.5.5 minimum 44x44px touch targets) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Touch momentum scrolling */
+.touch-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.touch-snap-start {
+  scroll-snap-align: start;
 }
 
 /* Custom subtle scrollbar */
@@ -253,13 +279,11 @@
    ADVANCED SCROLL-CHOREOGRAPHED LANDING ARCHITECTURE (GSAP & SCROLLTRIGGER)
    ============================================================================== */
 
-/* Pinned Viewport Container */
+/* Pinned Viewport Container - Mobile-First: natural auto-height on mobile, pinned 100vh on desktop */
 .pinned-stage-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -267,7 +291,10 @@
 
 @media (min-width: 768px) {
   .pinned-stage-container {
+    min-height: 100vh;
     height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
   }
 }
 

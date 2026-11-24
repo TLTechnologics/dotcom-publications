@@ -56,7 +56,7 @@ def global_search(
 
     # 4. Orders (Only for Super Admin or Order Manager)
     orders = []
-    if current_user.role in ["super-admin", "order_manager"]:
+    if current_user.role in ["admin", "super-admin"]:
         orders_db = db.query(Order).filter(
             or_(
                 Order.order_number.ilike(term),

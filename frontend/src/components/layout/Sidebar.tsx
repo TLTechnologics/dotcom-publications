@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   ShoppingBag,
   ExternalLink,
-  UserCheck
+  UserCheck,
+  X
 } from 'lucide-react';
 import { NavigationTab, User } from '../../types';
 
@@ -22,8 +23,9 @@ interface SidebarProps {
   onTabChange: (tab: NavigationTab) => void;
   onLogoutClick?: () => void;
   onSwitchToCustomer?: () => void;
+  onClose?: () => void;
+  isMobile?: boolean;
   currentUser?: User | null;
-  userRole?: string;
   counts?: {
     books?: number;
     authors?: number;
@@ -39,105 +41,74 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange,
   onLogoutClick,
   onSwitchToCustomer,
+  onClose,
+  isMobile = false,
   currentUser,
-  userRole = 'super-admin',
   counts,
 }) => {
-  const role = currentUser?.role || userRole;
-
-  const allNavItems: {
+  const navItems: {
     id: NavigationTab;
     label: string;
     icon: React.ReactNode;
     count?: number;
-    allowedRoles?: string[];
   }[] = [
     {
       id: 'dashboard',
       label: 'Dashboard',
       icon: <LayoutDashboard className="w-4 h-4" />,
-      allowedRoles: ['super-admin', 'content_manager', 'order_manager', 'viewer'],
     },
     {
       id: 'orders',
       label: 'Customer Orders',
       icon: <ShoppingBag className="w-4 h-4" />,
       count: counts?.orders,
-      allowedRoles: ['super-admin', 'order_manager', 'viewer'],
     },
     {
       id: 'books',
       label: 'Books Catalogue',
       icon: <BookOpen className="w-4 h-4" />,
       count: counts?.books,
-      allowedRoles: ['super-admin', 'content_manager', 'viewer'],
     },
     {
       id: 'authors',
       label: 'Faculty & Authors',
       icon: <Users className="w-4 h-4" />,
       count: counts?.authors,
-      allowedRoles: ['super-admin', 'content_manager', 'viewer'],
     },
     {
       id: 'categories',
       label: 'Disciplines & Categories',
       icon: <FolderTree className="w-4 h-4" />,
       count: counts?.categories,
-      allowedRoles: ['super-admin', 'content_manager', 'viewer'],
     },
     {
       id: 'publishers',
       label: 'Publisher Imprints',
       icon: <Building2 className="w-4 h-4" />,
       count: counts?.publishers,
-      allowedRoles: ['super-admin', 'content_manager', 'viewer'],
     },
     {
       id: 'media',
       label: 'Media Library',
       icon: <ImageIcon className="w-4 h-4" />,
-      allowedRoles: ['super-admin', 'content_manager', 'viewer'],
     },
     {
       id: 'landing',
       label: 'Landing Page CMS',
       icon: <Globe className="w-4 h-4" />,
-      allowedRoles: ['super-admin', 'content_manager'],
     },
     {
       id: 'users',
       label: 'Admin Accounts',
       icon: <UserCheck className="w-4 h-4" />,
       count: counts?.users,
-      allowedRoles: ['super-admin'],
     },
     {
       id: 'settings',
       label: 'System Settings',
       icon: <Settings className="w-4 h-4" />,
-      allowedRoles: ['super-admin'],
     },
   ];
-
-  const navItems = allNavItems.filter((item) =>
-    !item.allowedRoles || item.allowedRoles.includes(role)
-  );
-
-  const roleLabel = (r: string) => {
-    switch (r) {
-      case 'super-admin':
-        return 'Super Administrator';
-      case 'content_manager':
-        return 'Content Manager';
-      case 'order_manager':
-        return 'Order Manager';
-      case 'viewer':
-        return 'Auditor (Viewer)';
-      default:
-        return 'Administrator';
-    }
-  };
 
   const userInitials = currentUser?.full_name
     ? currentUser.full_name
@@ -146,27 +117,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : 'DP';
+    : 'AD';
 
   return (
-    <aside className="w-64 bg-[#651C32] text-white flex flex-col h-screen select-none shrink-0 sticky top-0 border-r border-[#431322] shadow-elevated">
+    <aside
+      className={`${
+        isMobile ? 'w-full h-full' : 'w-64 h-screen sticky top-0 shrink-0'
+      } bg-[#651C32] text-white flex flex-col select-none border-r border-[#431322] shadow-elevated`}
+    >
       {/* Brand Header */}
-      <div className="p-5 border-b border-[#431322]/80 flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl bg-white border border-[#F6E7A8]/60 overflow-hidden shadow-md shrink-0 p-0.5">
-          <img
-            src="/logo.jpg"
-            alt="Dotcom Publications"
-            className="w-full h-full object-cover rounded-[9px]"
-          />
+      <div className="p-4 sm:p-5 border-b border-[#431322]/80 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-[#F6E7A8]/60 overflow-hidden shadow-md shrink-0 p-0.5">
+            <img
+              src="/logo.jpg"
+              alt="Dotcom Publications"
+              className="w-full h-full object-cover rounded-[9px]"
+            />
+          </div>
+          <div className="min-w-0">
+            <h1 className="font-serif font-bold text-white text-base leading-tight truncate tracking-tight">
+              Dotcom Publications
+            </h1>
+            <p className="text-[10px] uppercase font-semibold text-[#F6E7A8] tracking-widest mt-0.5">
+              Admin Portal
+            </p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <h1 className="font-serif font-bold text-white text-base leading-tight truncate tracking-tight">
-            Dotcom Publications
-          </h1>
-          <p className="text-[10px] uppercase font-semibold text-[#F6E7A8] tracking-widest mt-0.5">
-            Admin Management
-          </p>
-        </div>
+
+        {/* Mobile Drawer Close Button */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="md:hidden touch-target rounded-xl text-white/80 hover:text-white hover:bg-[#431322] transition-colors p-2"
+            aria-label="Close Navigation Drawer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -179,8 +167,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           return (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group ${
+              onClick={() => {
+                onTabChange(item.id);
+                onClose?.();
+              }}
+              className={`w-full min-h-[44px] flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group active:scale-[0.98] ${
                 isActive
                   ? 'bg-[#F6E7A8] text-[#431322] font-semibold shadow-pastel'
                   : 'text-white/85 hover:bg-[#431322]/80 hover:text-white'
@@ -188,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-2.5 min-w-0 truncate">
                 <span
-                  className={`transition-colors ${
+                  className={`transition-colors shrink-0 ${
                     isActive
                       ? 'text-[#431322]'
                       : 'text-[#F6E7A8]/80 group-hover:text-[#F6E7A8]'
@@ -200,7 +191,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               {item.count !== undefined && item.count > 0 && (
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-md font-semibold transition-colors ${
+                  className={`text-[10px] px-2 py-0.5 rounded-md font-semibold transition-colors shrink-0 ${
                     isActive
                       ? 'bg-[#651C32] text-white'
                       : 'bg-[#431322] text-[#F6E7A8]'
@@ -218,8 +209,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {onSwitchToCustomer && (
         <div className="px-3 mb-2">
           <button
-            onClick={onSwitchToCustomer}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-[#FAF8F3] text-[#431322] hover:bg-[#FFF6D9] transition-all shadow-subtle border border-[#F6E7A8]"
+            onClick={() => {
+              onSwitchToCustomer();
+              onClose?.();
+            }}
+            className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#FAF8F3] text-[#431322] hover:bg-[#FFF6D9] active:scale-[0.98] transition-all shadow-subtle border border-[#F6E7A8]"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
             <span>Customer Storefront</span>
@@ -238,22 +232,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div
             className="flex-1 min-w-0 cursor-pointer"
-            onClick={() => role === 'super-admin' && onTabChange('users')}
+            onClick={() => {
+              onTabChange('settings');
+              onClose?.();
+            }}
           >
             <p className="text-xs font-semibold text-white truncate group-hover:text-[#F6E7A8] transition-colors">
-              {currentUser?.full_name || 'Administrator'}
+              {currentUser?.full_name || 'Admin'}
             </p>
             <p className="text-[10px] text-[#F6E7A8]/80 truncate">
-              {roleLabel(role)}
+              Admin
             </p>
           </div>
           <button
             onClick={(e) => {
               e.stopPropagation();
               onLogoutClick?.();
+              onClose?.();
             }}
             title="Sign Out of Portal"
-            className="p-1.5 rounded-lg text-white/70 hover:text-[#B94B4B] hover:bg-[#300D18] transition-colors"
+            className="touch-target p-2 rounded-lg text-white/70 hover:text-[#B94B4B] hover:bg-[#300D18] transition-colors"
           >
             <LogOut className="w-4 h-4" />
           </button>

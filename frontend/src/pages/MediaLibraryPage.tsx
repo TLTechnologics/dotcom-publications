@@ -114,6 +114,7 @@ export const MediaLibraryPage: React.FC = () => {
         <Button
           variant="primary"
           onClick={() => setIsUploadModalOpen(true)}
+          className="w-full sm:w-auto min-h-[44px]"
           icon={<Upload className="w-4 h-4" />}
         >
           Upload Media Asset
@@ -121,7 +122,7 @@ export const MediaLibraryPage: React.FC = () => {
       </div>
 
       {/* Search and Category Filter Bar */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="w-full sm:w-80">
           <Input
             placeholder="Search assets by file name..."
@@ -131,12 +132,12 @@ export const MediaLibraryPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
           {['all', 'covers', 'authors', 'banners', 'general'].map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+              className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                 category === cat
                   ? 'bg-[#651C32] text-white shadow-subtle'
                   : 'bg-[#FAF8F3] text-[#82777A] border border-[#EAE3DE] hover:bg-[#FFF6D9] hover:text-[#292326]'
@@ -199,15 +200,16 @@ export const MediaLibraryPage: React.FC = () => {
                 <div className="mt-2 pt-2 border-t border-[#EAE3DE] flex items-center justify-between gap-1">
                   <button
                     onClick={() => handleCopyUrl(item.url)}
-                    className="flex-1 py-1 px-1.5 rounded text-[10px] font-semibold text-[#651C32] hover:bg-[#FFF6D9] transition-colors flex items-center justify-center gap-1"
+                    className="flex-1 min-h-[36px] py-1 px-1.5 rounded-lg text-[10px] font-semibold text-[#651C32] hover:bg-[#FFF6D9] transition-colors flex items-center justify-center gap-1"
                     title="Copy URL"
                   >
                     <Copy className="w-3 h-3" /> Copy URL
                   </button>
                   <button
                     onClick={() => setItemToDelete(item)}
-                    className="p-1 rounded text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                    className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                     title="Delete Asset"
+                    aria-label="Delete asset"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

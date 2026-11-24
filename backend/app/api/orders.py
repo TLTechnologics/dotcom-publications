@@ -253,7 +253,7 @@ def update_order_status(
 
     # Validate transition
     allowed = ALLOWED_TRANSITIONS.get(order.status, set())
-    if new_status != order.status and new_status not in allowed and current_admin.role != "super-admin":
+    if new_status != order.status and new_status not in allowed and current_admin.role not in ["admin", "super-admin"]:
         raise HTTPException(
             status_code=400,
             detail=f"Cannot transition order from '{order.status}' to '{new_status}'. Allowed transitions: {', '.join(allowed) or 'None'}"

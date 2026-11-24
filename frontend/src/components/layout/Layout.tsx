@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopNav } from './TopNav';
 import { NavigationTab, User } from '../../types';
@@ -8,7 +8,6 @@ interface LayoutProps {
   onTabChange: (tab: NavigationTab) => void;
   children: React.ReactNode;
   currentUser?: User | null;
-  userRole?: string;
   counts?: {
     books?: number;
     authors?: number;
@@ -28,7 +27,6 @@ export const Layout: React.FC<LayoutProps> = ({
   onTabChange,
   children,
   currentUser,
-  userRole = 'super-admin',
   counts,
   searchQuery,
   onSearchChange,
@@ -36,6 +34,23 @@ export const Layout: React.FC<LayoutProps> = ({
   onSwitchToCustomer,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Lock background scrolling and handle Escape key when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setMobileMenuOpen(false);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [mobileMenuOpen]);
 
   return (
     <div className="flex min-h-screen bg-[#FAF8F3] font-sans text-[#292326] w-full max-w-full overflow-x-hidden">
@@ -47,29 +62,39 @@ export const Layout: React.FC<LayoutProps> = ({
           onLogoutClick={onLogoutClick}
           onSwitchToCustomer={onSwitchToCustomer}
           currentUser={currentUser}
-          userRole={userRole}
           counts={counts}
         />
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Slide-Out Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
+        <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Admin Navigation">
+          {/* Backdrop with Blur and Fade Animation */}
           <div
-            className="fixed inset-0 bg-[#431322]/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-[#431322]/65 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
             onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#651C32] z-10 shadow-elevated">
+
+          {/* Drawer Slide-In Panel */}
+          <div className="relative flex-1 flex flex-col max-w-[280px] sm:max-w-xs w-full bg-[#651C32] z-10 shadow-2xl animate-in slide-in-from-left duration-300 ease-out h-full">
             <Sidebar
+              isMobile={true}
               currentTab={currentTab}
               onTabChange={(tab) => {
                 onTabChange(tab);
                 setMobileMenuOpen(false);
               }}
-              onLogoutClick={onLogoutClick}
-              onSwitchToCustomer={onSwitchToCustomer}
+              onClose={() => setMobileMenuOpen(false)}
+              onLogoutClick={() => {
+                setMobileMenuOpen(false);
+                onLogoutClick?.();
+              }}
+              onSwitchToCustomer={() => {
+                setMobileMenuOpen(false);
+                onSwitchToCustomer?.();
+              }}
               currentUser={currentUser}
-              userRole={userRole}
               counts={counts}
             />
           </div>
@@ -87,10 +112,9 @@ export const Layout: React.FC<LayoutProps> = ({
           onSwitchToCustomer={onSwitchToCustomer}
           onLogoutClick={onLogoutClick}
           currentUser={currentUser}
-          userRole={userRole}
         />
 
-        <main className="flex-1 p-3 sm:p-6 md:p-8 max-w-7xl w-full mx-auto min-w-0">
+        <main className="flex-1 p-3 sm:p-5 md:p-8 max-w-7xl w-full mx-auto min-w-0">
           {children}
         </main>
       </div>

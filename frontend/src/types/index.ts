@@ -150,7 +150,7 @@ export interface User {
   username: string;
   email: string;
   full_name: string;
-  role: 'super-admin' | 'content_manager' | 'order_manager' | 'viewer';
+  role: 'admin' | 'super-admin' | string;
   is_active: boolean;
   created_at: string;
   updated_at?: string;

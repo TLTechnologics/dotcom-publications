@@ -49,8 +49,8 @@ interface CustomerStorefrontProps {
   landingContent: LandingPageContent | null;
   siteSettings: SiteSettings | null;
   onNavigate: (path: string) => void;
-  isAdminLoggedIn: boolean;
-  isSuperAdminLoggedIn: boolean;
+  isAdminLoggedIn?: boolean;
+  currentPath?: string;
 }
 
 // Verified academic catalogue publications
@@ -233,8 +233,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   landingContent,
   siteSettings,
   onNavigate,
-  isAdminLoggedIn,
-  isSuperAdminLoggedIn,
+  isAdminLoggedIn = false,
+  currentPath,
 }) => {
   const toast = useToast();
 
@@ -267,6 +267,25 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Synchronize route paths like /cart, /checkout, /books, /authors
+  useEffect(() => {
+    const raw = currentPath || (typeof window !== 'undefined' ? window.location.pathname : '/');
+    const path = raw.toLowerCase().replace(/\/+$/, '');
+    if (path === '/cart') {
+      setIsCartOpen(true);
+      setIsCheckoutOpen(false);
+    } else if (path === '/checkout') {
+      setIsCheckoutOpen(true);
+      setIsCartOpen(false);
+    } else if (path === '/books') {
+      const el = document.getElementById('publications-gallery');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else if (path === '/authors') {
+      const el = document.getElementById('editorial-chapters');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [currentPath]);
 
   // Checkout Form State
   const [checkoutForm, setCheckoutForm] = useState({
@@ -449,7 +468,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   };
 
   // Maintenance Mode Guard
-  if (siteSettings?.maintenance_mode && !isAdminLoggedIn && !isSuperAdminLoggedIn) {
+  if (siteSettings?.maintenance_mode && !isAdminLoggedIn) {
     return (
       <div className="min-h-screen bg-[#FAF9F5] flex flex-col items-center justify-center p-6 text-center text-[#181716] font-sans selection:bg-[#EED97A]">
         <div className="w-16 h-16 rounded-2xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mb-6">
@@ -617,7 +636,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-xl text-[#292326] hover:bg-[#FAF8F3] border border-[#EAE3DE] transition-colors"
+              className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[#292326] hover:bg-[#FAF8F3] border border-[#EAE3DE] transition-colors"
               aria-label="Toggle mobile menu"
             >
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -627,47 +646,47 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
         {/* Mobile Dropdown Menu (4.E Smooth Opening/Closing) */}
         {mobileNavOpen && (
-          <div className="md:hidden border-t border-[#EAE3DE] bg-white px-4 py-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
-            <nav className="flex flex-col space-y-2 text-xs font-semibold text-[#181716]">
+          <div className="md:hidden border-t border-[#EAE3DE] bg-white px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col space-y-1 text-sm font-semibold text-[#181716]">
               <a
                 href="#publications-gallery"
                 onClick={() => setMobileNavOpen(false)}
-                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Publications
               </a>
               <a
                 href="#publication-artifact"
                 onClick={() => setMobileNavOpen(false)}
-                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Monograph Specimen
               </a>
               <a
                 href="#faq"
                 onClick={() => setMobileNavOpen(false)}
-                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 FAQ
               </a>
               <a
                 href="#pricing"
                 onClick={() => setMobileNavOpen(false)}
-                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Pricing & Index
               </a>
               <a
                 href="#editorial-chapters"
                 onClick={() => setMobileNavOpen(false)}
-                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Editorial Mission
               </a>
               <a
                 href="#contact"
                 onClick={() => setMobileNavOpen(false)}
-                className="py-1.5 px-2 rounded-lg hover:bg-[#FAF9F5] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Contact
               </a>
@@ -678,13 +697,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
         {/* Mobile Search Bar Row */}
         <div className="sm:hidden px-4 pb-3 pt-1 border-t border-[#EAE3DE]/60 relative">
           <div className="relative w-full">
-            <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3.5 top-3.5" />
             <input
               type="text"
               placeholder="Search books, authors, ISBN..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-full border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+              className="w-full h-11 pl-10 pr-3 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
             />
           </div>
           {searchQuery && (
@@ -783,8 +802,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-stone-300 text-[11px]">
             <p>© 2026 Dotcom Publications. All Rights Reserved.</p>
             <p className="flex items-center gap-1">
-              <span>Platform Engineered with Pride by</span>
-              <strong className="text-[#EED97A]">TL Technologics</strong>
+              <span>Official Academic Bookstore & Institutional Press</span>
             </p>
           </div>
         </div>
@@ -841,7 +859,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               </div>
               <button
                 onClick={() => setIsCartOpen(false)}
-                className="p-1.5 rounded-lg text-[#736B5E] hover:text-[#181716] hover:bg-stone-100 transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[#736B5E] hover:text-[#181716] hover:bg-stone-100 transition-colors"
+                aria-label="Close cart"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -905,27 +924,30 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                         <div className="flex items-center gap-1 bg-white border border-[#EAE3DE] rounded-lg p-0.5">
                           <button
                             onClick={() => updateQuantity(item.book_id, -1)}
-                            className="p-1 rounded hover:bg-stone-100 text-[#181716]"
+                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md hover:bg-stone-100 text-[#181716]"
+                            aria-label="Decrease quantity"
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus className="w-3.5 h-3.5" />
                           </button>
-                          <span className="px-2 text-xs font-bold text-[#181716]">
+                          <span className="px-2.5 text-xs font-bold text-[#181716]">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.book_id, 1)}
-                            className="p-1 rounded hover:bg-stone-100 text-[#181716]"
+                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md hover:bg-stone-100 text-[#181716]"
+                            aria-label="Increase quantity"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-3.5 h-3.5" />
                           </button>
                         </div>
 
                         <button
                           onClick={() => removeFromCart(item.book_id)}
-                          className="text-[#736B5E] hover:text-red-600 p-1 transition-colors"
+                          className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#736B5E] hover:text-red-600 hover:bg-rose-50 transition-colors"
                           title="Remove from Cart"
+                          aria-label="Remove item"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -957,7 +979,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full flex items-center justify-center gap-2"
+                  className="w-full min-h-[48px] flex items-center justify-center gap-2"
                   onClick={() => {
                     setIsCartOpen(false);
                     setIsCheckoutOpen(true);
@@ -1143,7 +1165,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="e.g. Dr. Rajesh Sharma"
                     value={checkoutForm.name}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                   />
                 </div>
 
@@ -1157,7 +1179,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="+91 98765 43210"
                     value={checkoutForm.phone}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                   />
                 </div>
               </div>
@@ -1171,7 +1193,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   placeholder="name@university.edu.in"
                   value={checkoutForm.email}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, email: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                 />
               </div>
 
@@ -1185,7 +1207,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   placeholder="Department / Campus Address, Institutional Area..."
                   value={checkoutForm.address}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, address: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                 />
               </div>
 
@@ -1197,7 +1219,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="New Delhi"
                     value={checkoutForm.city}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, city: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716]"
+                    className="w-full min-h-[42px] px-2.5 py-2 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
                   />
                 </div>
                 <div>
@@ -1207,7 +1229,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="Delhi"
                     value={checkoutForm.state}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, state: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716]"
+                    className="w-full min-h-[42px] px-2.5 py-2 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
                   />
                 </div>
                 <div>
@@ -1217,7 +1239,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="110001"
                     value={checkoutForm.pincode}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, pincode: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716]"
+                    className="w-full min-h-[42px] px-2.5 py-2 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
                   />
                 </div>
               </div>
@@ -1228,7 +1250,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   Payment Method
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
+                  <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
                     <input
                       type="radio"
                       name="payment_method"
@@ -1239,7 +1261,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     />
                     <span className="font-semibold text-xs">Cash on Delivery</span>
                   </label>
-                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
+                  <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
                     <input
                       type="radio"
                       name="payment_method"
@@ -1260,7 +1282,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   variant="primary"
                   size="lg"
                   disabled={isSubmittingOrder}
-                  className="w-full flex items-center justify-center gap-2"
+                  className="w-full min-h-[48px] flex items-center justify-center gap-2 font-bold"
                 >
                   <CheckCircle2 className="w-4 h-4 text-[#181716]" />
                   <span>

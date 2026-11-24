@@ -397,7 +397,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         size="full"
       >
         {/* Section Navigation Tabs */}
-        <div className="flex border-b border-[#EAE3DE] overflow-x-auto gap-2 pb-2.5 mb-6">
+        <div className="flex border-b border-[#EAE3DE] overflow-x-auto touch-scroll-x gap-2 pb-2.5 mb-6 scrollbar-none">
           {[
             { id: 'A', label: 'Section A — Basic Information', icon: <FileText className="w-3.5 h-3.5" /> },
             { id: 'B', label: 'Section B — Author Information', icon: <UserCheck className="w-3.5 h-3.5" /> },
@@ -408,7 +408,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id as any)}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`min-h-[42px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 activeSection === tab.id
                   ? 'bg-[#651C32] text-white shadow-subtle'
                   : 'text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322]'
@@ -1193,18 +1193,25 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         </div>
 
         {/* Action Buttons: Save as Draft, Preview, Publish Book */}
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#EAE3DE] bg-[#FAF8F3] p-3 rounded-2xl">
+        <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#EAE3DE] bg-[#FAF8F3] p-3 sm:p-4 rounded-2xl">
           <Button
             type="button"
             variant="ghost"
             onClick={() => setIsPreviewOpen(true)}
+            className="w-full sm:w-auto min-h-[44px]"
             icon={<Eye className="w-4 h-4" />}
           >
             Preview Presentation
           </Button>
 
-          <div className="flex items-center gap-3">
-            <Button type="button" variant="secondary" onClick={handleRequestClose} disabled={loading}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleRequestClose}
+              disabled={loading}
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               Cancel
             </Button>
             <Button
@@ -1212,6 +1219,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
               variant="outline"
               loading={loading}
               onClick={() => handleSave(true)}
+              className="w-full sm:w-auto min-h-[44px]"
             >
               Save as Draft
             </Button>
@@ -1220,6 +1228,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
               variant="primary"
               loading={loading}
               onClick={() => handleSave(false)}
+              className="w-full sm:w-auto min-h-[44px]"
             >
               Publish Book
             </Button>

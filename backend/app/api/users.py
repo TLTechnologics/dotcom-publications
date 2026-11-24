@@ -19,7 +19,7 @@ except ImportError:
 
 router = APIRouter(prefix="/users", tags=["User Management"])
 
-VALID_ROLES = {"super-admin", "content_manager", "order_manager", "viewer"}
+VALID_ROLES = {"admin", "super-admin"}
 
 @router.get("", response_model=List[UserResponse])
 def get_users(
@@ -51,12 +51,8 @@ def create_user(
     db: Session = Depends(get_db)
 ):
     """Create a new administrator account (Super Admin only)."""
-    # Validate role
-    if payload.role not in VALID_ROLES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid role '{payload.role}'. Must be one of: {', '.join(sorted(VALID_ROLES))}"
-        )
+    # Single Administrator role
+    user_role = "admin"
 
     # Check email / username uniqueness
     existing_user = db.query(User).filter(
@@ -75,7 +71,7 @@ def create_user(
         username=payload.username.strip(),
         email=payload.email.strip().lower(),
         full_name=payload.full_name.strip(),
-        role=payload.role,
+        role=user_role,
         is_active=payload.is_active,
         hashed_password=hash_password(payload.password),
         created_at=datetime.now(timezone.utc)
@@ -123,13 +119,13 @@ def update_user(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    # Prevent deactivating the last active super-admin
-    if payload.is_active is False and user.role == "super-admin":
-        active_super_admins = db.query(User).filter(User.role == "super-admin", User.is_active == True).count()
-        if active_super_admins <= 1:
+    # Prevent deactivating the last active administrator
+    if payload.is_active is False and user.role in ["admin", "super-admin"]:
+        active_admins = db.query(User).filter(User.role.in_(["admin", "super-admin"]), User.is_active == True).count()
+        if active_admins <= 1:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot deactivate the only remaining active Super Administrator."
+                detail="Cannot deactivate the only remaining active Administrator."
             )
 
     if payload.email:
@@ -142,9 +138,9 @@ def update_user(
         if payload.role not in VALID_ROLES:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid role. Must be one of: {', '.join(sorted(VALID_ROLES))}"
+                detail=f"Invalid role. Must be 'admin'"
             )
-        user.role = payload.role
+        user.role = "admin"
     if payload.is_active is not None:
         user.is_active = payload.is_active
     if payload.password:

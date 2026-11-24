@@ -239,12 +239,12 @@ export const BooksPage: React.FC<BooksPageProps> = ({
         </div>
 
         {/* Sort Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EAE3DE] text-xs text-[#82777A]">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#EAE3DE] text-xs text-[#82777A]">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <span className="font-semibold text-[#292326] flex items-center gap-1.5 shrink-0">
               <ArrowUpDown className="w-3.5 h-3.5 text-[#651C32]" /> Sort catalogue by:
             </span>
-            <div className="w-64">
+            <div className="w-full sm:w-64">
               <Select
                 size="sm"
                 value={`${sortBy}-${sortOrder}`}
@@ -270,7 +270,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
           {(search || selectedCategory || selectedAuthor || selectedStatus !== 'all') && (
             <button
               onClick={resetFilters}
-              className="text-[#651C32] hover:text-[#431322] hover:underline font-semibold"
+              className="touch-target text-[#651C32] hover:text-[#431322] hover:underline font-semibold self-start sm:self-auto py-1"
             >
               Reset All Filters
             </button>
@@ -278,7 +278,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
         </div>
       </div>
 
-      {/* Professional Books Data Table */}
+      {/* Professional Books Data: Responsive Cards on Mobile (<md) & Table on Desktop (>=md) */}
       <div className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-xs text-[#82777A]">Loading catalogue data...</div>
@@ -294,166 +294,267 @@ export const BooksPage: React.FC<BooksPageProps> = ({
             }}
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#FAF8F3] border-b border-[#EAE3DE] text-[#82777A] uppercase font-semibold text-[10px] tracking-wider">
-                <tr>
-                  <th className="py-3.5 px-4 w-16">Cover</th>
-                  <th className="py-3.5 px-4">Title & Details</th>
-                  <th className="py-3.5 px-4">Author(s)</th>
-                  <th className="py-3.5 px-4">Category</th>
-                  <th className="py-3.5 px-4">ISBN</th>
-                  <th className="py-3.5 px-4">Price (INR)</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4">Last Updated</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#EAE3DE]/60">
-                {books.map((book) => {
-                  const discountPercent =
-                    book.mrp && book.mrp > book.selling_price
-                      ? Math.round(((book.mrp - book.selling_price) / book.mrp) * 100)
-                      : 0;
+          <>
+            {/* Mobile Card-Based View (<md) */}
+            <div className="block md:hidden divide-y divide-[#EAE3DE]/60">
+              {books.map((book) => {
+                const discountPercent =
+                  book.mrp && book.mrp > book.selling_price
+                    ? Math.round(((book.mrp - book.selling_price) / book.mrp) * 100)
+                    : 0;
 
-                  return (
-                    <tr
-                      key={book.id}
-                      className="hover:bg-[#FFF6D9]/25 transition-colors group"
-                    >
-                      {/* Cover Thumbnail */}
-                      <td className="py-3 px-4">
-                        <img
-                          src={
-                            book.cover_image ||
-                            'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'
-                          }
-                          alt={book.title}
-                          className="w-10 h-14 object-cover rounded shadow-subtle border border-[#EAE3DE] shrink-0"
-                        />
-                      </td>
-
-                      {/* Title & Subtitle */}
-                      <td className="py-3 px-4 max-w-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            onClick={() => setBookToPreview(book)}
-                            className="font-serif font-bold text-[#292326] group-hover:text-[#651C32] cursor-pointer line-clamp-1 text-xs"
-                          >
-                            {book.title}
+                return (
+                  <div key={book.id} className="p-4 space-y-3 hover:bg-[#FAF8F3] transition-colors">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={book.cover_image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'}
+                        alt={book.title}
+                        className="w-16 h-22 object-cover rounded-xl shadow-subtle border border-[#EAE3DE] shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[9px] uppercase font-bold text-[#651C32] bg-[#F5E6EA] px-2 py-0.5 rounded tracking-wider">
+                            {book.category_name || 'Academic'}
                           </span>
-                          {book.is_featured && (
-                            <span className="shrink-0 text-[9px] bg-[#F5E6EA] text-[#651C32] font-bold px-1.5 py-0.5 rounded border border-[#8B4055]/30">
-                              Featured
+                          {book.is_featured && <Badge variant="featured">Featured</Badge>}
+                        </div>
+                        <h3
+                          onClick={() => setBookToPreview(book)}
+                          className="font-serif font-bold text-sm text-[#292326] mt-1 cursor-pointer line-clamp-2 hover:text-[#651C32]"
+                        >
+                          {book.title}
+                        </h3>
+                        <p className="text-[11px] text-[#82777A] mt-0.5 truncate">
+                          By {book.authors?.map((a) => a.name).join(', ') || 'Unassigned'}
+                        </p>
+                        <p className="text-[10px] text-[#82777A] mt-0.5 font-mono">
+                          ISBN: {book.isbn || 'Pending'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-[#EAE3DE]/50">
+                      <div>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="font-serif font-bold text-base text-[#651C32]">
+                            ₹{book.selling_price.toLocaleString('en-IN')}
+                          </span>
+                          {book.mrp > book.selling_price && (
+                            <span className="text-xs text-[#82777A] line-through">
+                              ₹{book.mrp.toLocaleString('en-IN')}
+                            </span>
+                          )}
+                          {discountPercent > 0 && (
+                            <span className="text-[10px] text-[#477A58] font-bold">
+                              ({discountPercent}% off)
                             </span>
                           )}
                         </div>
-                        {book.subtitle && (
-                          <p className="text-[11px] text-[#82777A] italic line-clamp-1 mt-0.5 font-serif">
-                            {book.subtitle}
-                          </p>
-                        )}
-                        <span className="text-[10px] text-[#82777A]/80 mt-1 block">
-                          Format: {book.book_format} • {book.edition || '1st Ed.'}
-                        </span>
-                      </td>
-
-                      {/* Author */}
-                      <td className="py-3 px-4 text-[#292326] max-w-[150px]">
-                        <span className="line-clamp-2">
-                          {book.authors?.map((a) => a.name).join(', ') || 'Unassigned'}
-                        </span>
-                      </td>
-
-                      {/* Category */}
-                      <td className="py-3 px-4 text-[#82777A]">
-                        <Badge variant="category">{book.category_name || 'General'}</Badge>
-                        {book.subcategory_name && (
-                          <span className="text-[10px] text-[#82777A] block mt-1">
-                            {book.subcategory_name}
-                          </span>
-                        )}
-                      </td>
-
-                      {/* ISBN */}
-                      <td className="py-3 px-4 font-mono text-[11px] text-[#292326]">
-                        {book.isbn || 'Pending'}
-                      </td>
-
-                      {/* Price */}
-                      <td className="py-3 px-4">
-                        <div className="font-serif font-bold text-[#651C32] text-xs">
-                          ₹{book.selling_price.toLocaleString('en-IN')}
-                        </div>
-                        {book.mrp > book.selling_price && (
-                          <div className="flex items-center gap-1 mt-0.5 text-[10px]">
-                            <span className="text-[#82777A] line-through">
-                              ₹{book.mrp.toLocaleString('en-IN')}
-                            </span>
-                            <span className="text-[#477A58] font-semibold">
-                              {discountPercent}%
-                            </span>
-                          </div>
-                        )}
-                      </td>
-
-                      {/* Publication Status */}
-                      <td className="py-3 px-4">
                         <button
                           onClick={() => handleTogglePublish(book)}
-                          title="Click to toggle publish status"
-                          className="text-left"
+                          className="mt-1 block text-left"
                         >
                           <Badge variant={book.is_draft ? 'draft' : 'published'}>
                             {book.is_draft ? 'Draft' : 'Published'}
                           </Badge>
                         </button>
-                      </td>
+                      </div>
 
-                      {/* Last Updated */}
-                      <td className="py-3 px-4 text-[#82777A] text-[11px]">
-                        {new Date(book.updated_at).toLocaleDateString('en-GB', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </td>
+                      {/* Touch-Friendly Action Buttons */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setBookToPreview(book)}
+                          title="Preview Book Presentation"
+                          className="touch-target p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setBookToEdit(book);
+                            setIsFormOpen(true);
+                          }}
+                          title="Edit Book Details"
+                          className="touch-target p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setBookToDelete(book)}
+                          title="Delete Book"
+                          className="touch-target p-2.5 rounded-xl border border-rose-200 bg-rose-50/50 text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-100 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
-                      {/* Actions */}
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
+            {/* Desktop Table-Based View (>=md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs min-w-[760px]">
+                <thead className="bg-[#FAF8F3] border-b border-[#EAE3DE] text-[#82777A] uppercase font-semibold text-[10px] tracking-wider">
+                  <tr>
+                    <th className="py-3.5 px-4 w-16">Cover</th>
+                    <th className="py-3.5 px-4">Title & Details</th>
+                    <th className="py-3.5 px-4">Author(s)</th>
+                    <th className="py-3.5 px-4">Category</th>
+                    <th className="py-3.5 px-4">ISBN</th>
+                    <th className="py-3.5 px-4">Price (INR)</th>
+                    <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-4">Last Updated</th>
+                    <th className="py-3.5 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EAE3DE]/60">
+                  {books.map((book) => {
+                    const discountPercent =
+                      book.mrp && book.mrp > book.selling_price
+                        ? Math.round(((book.mrp - book.selling_price) / book.mrp) * 100)
+                        : 0;
+
+                    return (
+                      <tr
+                        key={book.id}
+                        className="hover:bg-[#FFF6D9]/25 transition-colors group"
+                      >
+                        {/* Cover Thumbnail */}
+                        <td className="py-3 px-4">
+                          <img
+                            src={
+                              book.cover_image ||
+                              'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'
+                            }
+                            alt={book.title}
+                            className="w-10 h-14 object-cover rounded shadow-subtle border border-[#EAE3DE] shrink-0"
+                          />
+                        </td>
+
+                        {/* Title & Subtitle */}
+                        <td className="py-3 px-4 max-w-xs">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              onClick={() => setBookToPreview(book)}
+                              className="font-serif font-bold text-[#292326] group-hover:text-[#651C32] cursor-pointer line-clamp-1 text-xs"
+                            >
+                              {book.title}
+                            </span>
+                            {book.is_featured && (
+                              <span className="shrink-0 text-[9px] bg-[#F5E6EA] text-[#651C32] font-bold px-1.5 py-0.5 rounded border border-[#8B4055]/30">
+                                Featured
+                              </span>
+                            )}
+                          </div>
+                          {book.subtitle && (
+                            <p className="text-[11px] text-[#82777A] italic line-clamp-1 mt-0.5 font-serif">
+                              {book.subtitle}
+                            </p>
+                          )}
+                          <span className="text-[10px] text-[#82777A]/80 mt-1 block">
+                            Format: {book.book_format} • {book.edition || '1st Ed.'}
+                          </span>
+                        </td>
+
+                        {/* Author */}
+                        <td className="py-3 px-4 text-[#292326] max-w-[150px]">
+                          <span className="line-clamp-2">
+                            {book.authors?.map((a) => a.name).join(', ') || 'Unassigned'}
+                          </span>
+                        </td>
+
+                        {/* Category */}
+                        <td className="py-3 px-4 text-[#82777A]">
+                          <Badge variant="category">{book.category_name || 'General'}</Badge>
+                          {book.subcategory_name && (
+                            <span className="text-[10px] text-[#82777A] block mt-1">
+                              {book.subcategory_name}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* ISBN */}
+                        <td className="py-3 px-4 font-mono text-[11px] text-[#292326]">
+                          {book.isbn || 'Pending'}
+                        </td>
+
+                        {/* Price */}
+                        <td className="py-3 px-4">
+                          <div className="font-serif font-bold text-[#651C32] text-xs">
+                            ₹{book.selling_price.toLocaleString('en-IN')}
+                          </div>
+                          {book.mrp > book.selling_price && (
+                            <div className="flex items-center gap-1 mt-0.5 text-[10px]">
+                              <span className="text-[#82777A] line-through">
+                                ₹{book.mrp.toLocaleString('en-IN')}
+                              </span>
+                              <span className="text-[#477A58] font-semibold">
+                                {discountPercent}%
+                              </span>
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Publication Status */}
+                        <td className="py-3 px-4">
                           <button
-                            onClick={() => setBookToPreview(book)}
-                            title="Preview Book Presentation"
-                            className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                            onClick={() => handleTogglePublish(book)}
+                            title="Click to toggle publish status"
+                            className="text-left"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Badge variant={book.is_draft ? 'draft' : 'published'}>
+                              {book.is_draft ? 'Draft' : 'Published'}
+                            </Badge>
                           </button>
-                          <button
-                            onClick={() => {
-                              setBookToEdit(book);
-                              setIsFormOpen(true);
-                            }}
-                            title="Edit Book Details"
-                            className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setBookToDelete(book)}
-                            title="Delete Book"
-                            className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </td>
+
+                        {/* Last Updated */}
+                        <td className="py-3 px-4 text-[#82777A] text-[11px]">
+                          {new Date(book.updated_at).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => setBookToPreview(book)}
+                              title="Preview Book Presentation"
+                              className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setBookToEdit(book);
+                                setIsFormOpen(true);
+                              }}
+                              title="Edit Book Details"
+                              className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setBookToDelete(book)}
+                              title="Delete Book"
+                              className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {/* Pagination */}

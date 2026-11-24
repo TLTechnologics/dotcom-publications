@@ -48,7 +48,7 @@ except Exception as e:
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Dotcom Publications Editorial Publishing Platform Admin API (Developed by TL Technologics)"
+    description="Dotcom Publications Editorial Publishing Platform Admin API"
 )
 
 # CORS configuration
@@ -104,7 +104,7 @@ def root():
         "connected": connected,
         "platform": "Dotcom Publications Admin API",
         "client": "Dotcom Publications",
-        "vendor": "TL Technologics",
+        "vendor": "Dotcom Publications",
         "version": settings.VERSION,
         "database_type": db_type,
         "tables": tables,

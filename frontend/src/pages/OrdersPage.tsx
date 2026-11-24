@@ -186,7 +186,7 @@ export const OrdersPage: React.FC = () => {
       </div>
 
       {/* Filter and Action Bar */}
-      <div className="p-4 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-[#82777A] absolute left-3.5 top-3" />
           <input
@@ -194,15 +194,15 @@ export const OrdersPage: React.FC = () => {
             placeholder="Search order #, customer, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+            className="w-full h-10 pl-10 pr-4 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
           />
         </form>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+            className="flex-1 sm:flex-initial h-10 px-3 py-2 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
           >
             <option value="all">All Statuses</option>
             <option value="Confirmed">Confirmed</option>
@@ -217,12 +217,13 @@ export const OrdersPage: React.FC = () => {
             size="sm"
             onClick={handleExportCsv}
             disabled={exporting || orders.length === 0}
+            className="h-10 px-3.5"
             icon={<Download className="w-3.5 h-3.5" />}
           >
             {exporting ? 'Exporting...' : 'Export CSV'}
           </Button>
 
-          <Button variant="secondary" size="sm" onClick={fetchOrders} disabled={loading}>
+          <Button variant="secondary" size="sm" onClick={fetchOrders} disabled={loading} className="h-10 px-3">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
@@ -280,7 +281,7 @@ export const OrdersPage: React.FC = () => {
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <button
                       onClick={() => setSelectedInvoiceOrder(order)}
-                      className="px-3 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-white text-xs font-semibold text-[#651C32] hover:border-[#651C32] flex items-center gap-1.5 transition-all shadow-xs"
+                      className="min-h-[40px] px-3.5 py-1.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-white text-xs font-semibold text-[#651C32] hover:border-[#651C32] flex items-center gap-1.5 transition-all shadow-xs"
                       title="Generate and print official invoice receipt"
                     >
                       <FileText className="w-3.5 h-3.5" />
@@ -293,7 +294,7 @@ export const OrdersPage: React.FC = () => {
                         value={order.status}
                         disabled={updatingId === order.id}
                         onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#EAE3DE] bg-[#FAF8F3] text-[#431322] focus:ring-2 focus:ring-[#651C32] focus:outline-none"
+                        className="min-h-[40px] text-xs font-semibold px-3 py-1.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#431322] focus:ring-2 focus:ring-[#651C32] focus:outline-none"
                       >
                         <option value="Confirmed">Confirmed</option>
                         <option value="Processing">Processing</option>
@@ -375,10 +376,10 @@ export const OrdersPage: React.FC = () => {
 
       {/* Printable Invoice Modal */}
       {selectedInvoiceOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#431322]/60 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-3xl border border-[#EAE3DE] shadow-elevated overflow-hidden my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-[#431322]/60 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl border border-[#EAE3DE] shadow-elevated overflow-hidden my-6">
             {/* Modal Actions Header */}
-            <div className="px-6 py-4 border-b border-[#EAE3DE] bg-[#FAF8F3] flex items-center justify-between print:hidden">
+            <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-[#EAE3DE] bg-[#FAF8F3] flex items-center justify-between print:hidden">
               <span className="text-xs font-semibold text-[#651C32] uppercase tracking-wider">
                 Official Tax Invoice Preview
               </span>
@@ -387,13 +388,15 @@ export const OrdersPage: React.FC = () => {
                   variant="primary"
                   size="sm"
                   onClick={() => window.print()}
+                  className="min-h-[38px]"
                   icon={<Printer className="w-3.5 h-3.5" />}
                 >
                   Print Invoice
                 </Button>
                 <button
                   onClick={() => setSelectedInvoiceOrder(null)}
-                  className="p-1.5 rounded-lg text-[#82777A] hover:bg-[#EAE3DE]/60 transition-colors"
+                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:bg-[#EAE3DE]/60 transition-colors"
+                  aria-label="Close invoice preview"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -401,9 +404,9 @@ export const OrdersPage: React.FC = () => {
             </div>
 
             {/* Printable Invoice Document Body */}
-            <div id="invoice-printable" className="p-8 space-y-6 text-[#292326] font-sans">
+            <div id="invoice-printable" className="p-4 sm:p-8 space-y-5 sm:space-y-6 text-[#292326] font-sans">
               {/* Invoice Top Header */}
-              <div className="flex justify-between items-start border-b border-[#EAE3DE] pb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-[#EAE3DE] pb-4 sm:pb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <img src="/logo.jpg" alt="Dotcom Publications" className="w-8 h-8 rounded-lg object-cover" />
@@ -413,7 +416,7 @@ export const OrdersPage: React.FC = () => {
                   <p className="text-xs text-[#82777A]">Institutional Area, Delhi NCR, India</p>
                   <p className="text-xs text-[#82777A]">Email: support@dotcompublications.com</p>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]">
                     Tax Invoice
                   </span>
@@ -434,7 +437,7 @@ export const OrdersPage: React.FC = () => {
               </div>
 
               {/* Bill To & Ship To */}
-              <div className="grid grid-cols-2 gap-6 text-xs border-b border-[#EAE3DE] pb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-xs border-b border-[#EAE3DE] pb-4 sm:pb-6">
                 <div>
                   <h4 className="font-bold text-[#82777A] uppercase text-[10px] tracking-wider mb-1">Customer & Bill To:</h4>
                   <p className="font-bold text-sm text-[#292326]">{selectedInvoiceOrder.customer_name}</p>
@@ -456,8 +459,8 @@ export const OrdersPage: React.FC = () => {
               </div>
 
               {/* Line Items Table */}
-              <div className="space-y-2">
-                <table className="w-full text-xs">
+              <div className="space-y-2 overflow-x-auto">
+                <table className="w-full text-xs min-w-[360px]">
                   <thead>
                     <tr className="border-b border-[#EAE3DE] text-[#82777A] uppercase text-[10px] font-semibold text-left">
                       <th className="py-2">Item Description</th>

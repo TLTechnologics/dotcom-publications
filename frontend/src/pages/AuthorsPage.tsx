@@ -87,6 +87,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
             setAuthorToEdit(null);
             setIsFormOpen(true);
           }}
+          className="w-full sm:w-auto min-h-[44px]"
           icon={<Plus className="w-4 h-4" />}
         >
           Add New Author
@@ -187,7 +188,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
               <div className="mt-4 pt-3 border-t border-[#EAE3DE] flex items-center justify-between">
                 <button
                   onClick={() => setAuthorToView(author)}
-                  className="text-xs font-semibold text-[#651C32] hover:text-[#431322] flex items-center gap-1"
+                  className="min-h-[40px] text-xs font-semibold text-[#651C32] hover:text-[#431322] flex items-center gap-1"
                 >
                   View Associated Works ({author.books_count || 0}) →
                 </button>
@@ -197,17 +198,19 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                       setAuthorToEdit(author);
                       setIsFormOpen(true);
                     }}
-                    className="p-1.5 rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
+                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
                     title="Edit Profile"
+                    aria-label="Edit author"
                   >
-                    <Edit2 className="w-3.5 h-3.5" />
+                    <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setAuthorToDelete(author)}
-                    className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                     title="Delete Author"
+                    aria-label="Delete author"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

@@ -39,14 +39,15 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-[#EAE3DE]">
-        <Button variant="outline" onClick={onClose} disabled={loading}>
+      <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 pt-4 border-t border-[#EAE3DE]">
+        <Button variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto min-h-[44px]">
           {cancelText}
         </Button>
         <Button
           variant={isDestructive ? 'danger' : 'primary'}
           onClick={onConfirm}
           loading={loading}
+          className="w-full sm:w-auto min-h-[44px]"
         >
           {confirmText}
         </Button>

@@ -46,43 +46,16 @@ def init_database(db: Session, wipe_dummy: bool = False):
             User(
                 username="admin",
                 email="admin@dotcompublications.com",
-                full_name="Master Administrator",
-                role="super-admin",
+                full_name="Admin",
+                role="admin",
                 hashed_password=hash_password("DotcomAdmin@2026"),
                 is_active=True,
                 created_at=datetime.now(timezone.utc)
-            ),
-            User(
-                username="editor",
-                email="editor@dotcompublications.com",
-                full_name="Senior Content Editor",
-                role="content_manager",
-                hashed_password=hash_password("DotcomEditor@2026"),
-                is_active=True,
-                created_at=datetime.now(timezone.utc)
-            ),
-            User(
-                username="fulfillment",
-                email="fulfillment@dotcompublications.com",
-                full_name="Order Fulfillment Officer",
-                role="order_manager",
-                hashed_password=hash_password("DotcomOrders@2026"),
-                is_active=True,
-                created_at=datetime.now(timezone.utc)
-            ),
-            User(
-                username="viewer",
-                email="viewer@dotcompublications.com",
-                full_name="Institutional Auditor",
-                role="viewer",
-                hashed_password=hash_password("DotcomViewer@2026"),
-                is_active=True,
-                created_at=datetime.now(timezone.utc)
-            ),
+            )
         ]
         db.add_all(initial_users)
         db.commit()
-        print("[OK] Initialized administrative accounts (admin, editor, fulfillment, viewer).")
+        print("[OK] Initialized single administrative account (admin).")
 
     # 2. Ensure Default Site Settings Exist
     settings = db.query(SiteSettings).filter(SiteSettings.id == 1).first()
@@ -133,7 +106,7 @@ def init_database(db: Session, wipe_dummy: bool = False):
             contact_email="editor@dotcompublications.com",
             contact_phone="+91 11 4567 8900",
             contact_address="Knowledge Park III, Institutional Area, Greater Noida, Delhi NCR, India",
-            footer_text="© 2026 Dotcom Publications. Developed with pride by TL Technologics. All Rights Reserved."
+            footer_text="© 2026 Dotcom Publications. All Rights Reserved."
         )
         db.add(landing)
         db.commit()

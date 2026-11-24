@@ -7,7 +7,7 @@ class UserBase(BaseModel):
     email: str = Field(..., min_length=3, max_length=255)
     username: str = Field(..., min_length=2, max_length=100)
     full_name: str = Field(..., min_length=1, max_length=255)
-    role: str = Field("viewer", description="Role: super-admin, content_manager, order_manager, viewer")
+    role: str = Field("admin", description="Role: admin")
     is_active: bool = True
 
 class UserCreate(UserBase):

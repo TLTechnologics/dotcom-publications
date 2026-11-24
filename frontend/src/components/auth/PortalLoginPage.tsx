@@ -7,16 +7,14 @@ import { User } from '../../types';
 interface PortalLoginPageProps {
   onSuccess: (user: User) => void;
   onNavigate: (path: string) => void;
-  initialRole?: 'admin' | 'super-admin';
 }
 
 export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
   onSuccess,
   onNavigate,
-  initialRole = 'super-admin',
 }) => {
-  const [identifier, setIdentifier] = useState('admin');
-  const [password, setPassword] = useState('DotcomAdmin@2026');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,35 +38,29 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
     }
   };
 
-  const setPreset = (user: string, pass: string) => {
-    setIdentifier(user);
-    setPassword(pass);
-    setError('');
-  };
-
   return (
     <div className="min-h-screen bg-[#FAF8F3] flex flex-col justify-between font-sans text-[#292326]">
       {/* Top Header Bar */}
-      <header className="px-6 py-4 border-b border-[#EAE3DE] bg-white/90 backdrop-blur-md flex items-center justify-between">
+      <header className="px-4 sm:px-6 py-3.5 border-b border-[#EAE3DE] bg-white/90 backdrop-blur-md flex items-center justify-between">
         <button
           onClick={() => onNavigate('/')}
-          className="flex items-center gap-2 text-xs font-semibold text-[#651C32] hover:text-[#431322] transition-colors"
+          className="touch-target flex items-center gap-2 text-xs font-semibold text-[#651C32] hover:text-[#431322] transition-colors p-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Return to Customer Storefront</span>
+          <span>Customer Storefront</span>
         </button>
 
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md bg-[#651C32] text-white flex items-center justify-center font-bold text-[10px]">
-            TL
+            DP
           </div>
-          <span className="text-xs font-semibold text-[#292326]">Dotcom Publishing Management</span>
+          <span className="text-xs font-semibold text-[#292326] hidden sm:inline">Dotcom Publications</span>
         </div>
       </header>
 
       {/* Main Login Card */}
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white rounded-3xl border border-[#EAE3DE] shadow-card p-8 sm:p-10 space-y-6">
+      <main className="flex-1 flex items-center justify-center p-3 sm:p-6">
+        <div className="w-full max-w-md bg-white rounded-3xl border border-[#EAE3DE] shadow-card p-6 sm:p-10 space-y-6">
           {/* Brand Logo & Heading */}
           <div className="text-center space-y-3">
             <div className="w-16 h-16 rounded-2xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mx-auto">
@@ -112,9 +104,9 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                     setIdentifier(e.target.value);
                     setError('');
                   }}
-                  className="w-full pl-9 pr-4 py-2.5 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+                  className="w-full pl-9 pr-4 py-2.5 min-h-[44px] text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
                 />
-                <UserIcon className="w-4 h-4 text-[#82777A] absolute left-3 top-3" />
+                <UserIcon className="w-4 h-4 text-[#82777A] absolute left-3 top-3.5" />
               </div>
             </div>
 
@@ -135,13 +127,13 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                     setPassword(e.target.value);
                     setError('');
                   }}
-                  className="w-full pl-9 pr-16 py-2.5 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+                  className="w-full pl-9 pr-16 py-2.5 min-h-[44px] text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
                 />
-                <Lock className="w-4 h-4 text-[#82777A] absolute left-3 top-3" />
+                <Lock className="w-4 h-4 text-[#82777A] absolute left-3 top-3.5" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-[10px] font-semibold text-[#82777A] hover:text-[#292326]"
+                  className="touch-target absolute right-2 top-1 text-xs font-semibold text-[#82777A] hover:text-[#292326] px-2"
                 >
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
@@ -158,7 +150,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
               variant="primary"
               size="lg"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2"
+              className="w-full min-h-[44px] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -174,52 +166,18 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
             </Button>
           </form>
 
-          {/* Quick Demo Role Switcher */}
-          <div className="pt-4 border-t border-[#EAE3DE] space-y-2">
-            <p className="text-[10px] font-semibold text-[#82777A] uppercase tracking-wider text-center">
-              Quick Test Profiles (Pre-configured)
+          {/* Secure Admin Access Notice */}
+          <div className="pt-4 border-t border-[#EAE3DE] text-center">
+            <p className="text-[11px] text-[#82777A]">
+              Authorized personnel only. All access attempts are logged and monitored.
             </p>
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <button
-                type="button"
-                onClick={() => setPreset('admin', 'DotcomAdmin@2026')}
-                className="p-2 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/50 transition-colors text-left font-medium text-[#431322]"
-              >
-                <span className="block font-bold">Super Admin</span>
-                <span className="text-[9px] text-[#82777A]">Full access</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPreset('editor', 'DotcomEditor@2026')}
-                className="p-2 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/50 transition-colors text-left font-medium text-[#431322]"
-              >
-                <span className="block font-bold">Content Editor</span>
-                <span className="text-[9px] text-[#82777A]">Books, CMS, Media</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPreset('fulfillment', 'DotcomOrders@2026')}
-                className="p-2 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/50 transition-colors text-left font-medium text-[#431322]"
-              >
-                <span className="block font-bold">Order Manager</span>
-                <span className="text-[9px] text-[#82777A]">Orders & Invoices</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPreset('viewer', 'DotcomViewer@2026')}
-                className="p-2 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/50 transition-colors text-left font-medium text-[#431322]"
-              >
-                <span className="block font-bold">Auditor</span>
-                <span className="text-[9px] text-[#82777A]">Read-only</span>
-              </button>
-            </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="py-4 text-center text-xs text-[#82777A] border-t border-[#EAE3DE] bg-white/60">
-        <p>© 2026 Dotcom Publications • Developed with pride by <strong className="text-[#651C32]">TL Technologics</strong></p>
+        <p>© 2026 Dotcom Publications • All Rights Reserved</p>
       </footer>
     </div>
   );
