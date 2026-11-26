@@ -1,0 +1,425 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: #F7F7F5;
+    color: #222321;
+    font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 650;
+  }
+}
+
+@layer utilities {
+  .bg-\[\#FAF8F3\], .bg-\[\#FAF9F5\] { background-color: #F7F7F5 !important; }
+  .bg-\[\#FFF6D9\], .bg-\[\#FAF2BA\], .bg-\[\#F6E7A8\], .bg-\[\#EED97A\] { background-color: #EEECE7 !important; }
+  .bg-\[\#651C32\], .bg-\[\#2457C5\] { background-color: #252624 !important; }
+  .bg-\[\#431322\], .bg-\[\#173B87\] { background-color: #111210 !important; }
+  .text-\[\#651C32\], .text-\[\#2457C5\] { color: #252624 !important; }
+  .text-\[\#431322\], .text-\[\#173B87\] { color: #111210 !important; }
+  .text-\[\#292326\], .text-\[\#181716\], .text-\[\#172033\] { color: #222321 !important; }
+  .text-\[\#82777A\], .text-\[\#524B42\], .text-\[\#736B5E\], .text-\[\#65728A\] { color: #6F706C !important; }
+  .border-\[\#EAE3DE\], .border-\[\#EED97A\], .border-\[\#F6E7A8\], .border-\[\#DCE4EF\], .border-\[\#2457C5\] { border-color: #E3E2DD !important; }
+  [class~="hover:bg-[#FAF8F3]"]:hover, [class~="hover:bg-[#FAF9F5]"]:hover { background-color: #F1F0EC !important; }
+  [class~="hover:bg-[#FFF6D9]"]:hover, [class~="hover:bg-[#FAF2BA]"]:hover, [class~="hover:bg-[#F5E288]"]:hover { background-color: #E8E6E0 !important; }
+  [class~="hover:bg-[#173B87]"]:hover, [class~="hover:bg-[#431322]"]:hover { background-color: #111210 !important; }
+  [class~="hover:text-[#651C32]"]:hover, [class~="hover:text-[#431322]"]:hover { color: #111210 !important; }
+  [class~="hover:border-[#EED97A]"]:hover, [class~="hover:border-[#651C32]/40"]:hover { border-color: #B8B6AF !important; }
+  [class~="focus:ring-[#EED97A]"]:focus, [class~="focus:ring-[#651C32]"]:focus { --tw-ring-color: #777871 !important; }
+  .font-serif { font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif !important; }
+}
+
+/* Touch-friendly interactive targets (WCAG 2.5.5 minimum 44x44px touch targets) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Touch momentum scrolling */
+.touch-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.touch-snap-start {
+  scroll-snap-align: start;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DCE4EF;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #AAB8CE;
+}
+
+/* ==============================================================================
+   LATEST DISPATCHES TICKER — CONTINUOUS SMOOTH INFINITE SCROLL
+   ============================================================================== */
+@keyframes infiniteTicker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-infinite-ticker {
+  display: flex !important;
+  width: max-content !important;
+  flex-shrink: 0 !important;
+  animation: infiniteTicker 40s linear infinite !important;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ==============================================================================
+   HERO SECTION — AMBIENT BACKGROUND ANIMATION
+   ============================================================================== */
+@keyframes heroOrbMotion1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.12;
+  }
+  50% {
+    transform: translate3d(-24px, 16px, 0) scale(1.08);
+    opacity: 0.18;
+  }
+  100% {
+    transform: translate3d(16px, -12px, 0) scale(0.96);
+    opacity: 0.14;
+  }
+}
+
+@keyframes heroOrbMotion2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.50;
+  }
+  50% {
+    transform: translate3d(20px, -18px, 0) scale(1.12);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate3d(-14px, 10px, 0) scale(0.95);
+    opacity: 0.45;
+  }
+}
+
+.animate-hero-orb-1 {
+  animation: heroOrbMotion1 22s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.animate-hero-orb-2 {
+  animation: heroOrbMotion2 28s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ==============================================================================
+   STPAGEFLIP ENGINE & 3D PHYSICAL BOOK PAGE CURL PHYSICS
+   ============================================================================== */
+.stf__parent {
+  position: relative !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  touch-action: pan-y !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.stf__wrapper {
+  position: relative !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.stf__block {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  perspective: 2400px !important;
+  -webkit-perspective: 2400px !important;
+}
+
+.stf__item {
+  display: none;
+  position: absolute !important;
+  transform-style: preserve-3d !important;
+  -webkit-transform-style: preserve-3d !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  contain: paint !important;
+  will-change: transform, clip-path !important;
+}
+
+/* Dynamic Page Shadow layers */
+.stf__outerShadow,
+.stf__innerShadow,
+.stf__hardShadow,
+.stf__hardInnerShadow {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  pointer-events: none !important;
+  will-change: transform, opacity !important;
+}
+
+.stf__innerShadow {
+  mix-blend-mode: multiply !important;
+}
+
+/* Authentic Paper Surface & Lighting */
+.st-page {
+  box-sizing: border-box !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  background-color: #FAF7F2;
+  box-shadow: inset 0 0 40px rgba(238, 217, 122, 0.05);
+}
+
+/* Physical Gutter & Spine Depth */
+.st-page.--left {
+  border-right: 1px solid rgba(41, 35, 38, 0.12);
+  box-shadow: inset -22px 0 28px -12px rgba(41, 35, 38, 0.18);
+}
+
+.st-page.--right {
+  border-left: 1px solid rgba(41, 35, 38, 0.12);
+  box-shadow: inset 22px 0 28px -12px rgba(41, 35, 38, 0.18);
+}
+
+/* Paper Thickness Subtle Edge Highlight */
+.st-page::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  pointer-events: none;
+  z-index: 10;
+}
+.st-page.--left::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,0.08), transparent);
+}
+.st-page.--right::after {
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+}
+
+/* Realistic Paper Micro-Texture & Curvature Gradient */
+.book-paper-texture {
+  background-color: #FAF7F2;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.02) 100%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    radial-gradient(rgba(101, 28, 50, 0.015) 0.5px, transparent 0.5px);
+  background-size: 100% 100%, 100% 100%, 6px 6px;
+}
+
+.page-spine-shadow-left {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.08) 20px, rgba(0, 0, 0, 0.02) 45px, transparent 75px);
+}
+
+.page-spine-shadow-right {
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.08) 20px, rgba(0, 0, 0, 0.02) 45px, transparent 75px);
+}
+
+/* Subtle Corner Curl Cue */
+@keyframes cornerHintPulse {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-3px, -3px, 0);
+  }
+}
+
+.animate-corner-hint {
+  animation: cornerHintPulse 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* ==============================================================================
+   SCROLL REVEAL UTILITIES (RESPECTS PREFERS-REDUCED-MOTION)
+   ============================================================================== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ==============================================================================
+   ADVANCED SCROLL-CHOREOGRAPHED LANDING ARCHITECTURE (GSAP & SCROLLTRIGGER)
+   ============================================================================== */
+
+/* Pinned Viewport Container - Mobile-First: natural auto-height on mobile, pinned 100vh on desktop */
+.pinned-stage-container {
+  position: relative;
+  width: 100%;
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .pinned-stage-container {
+    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+}
+
+/* Subtle Editorial Paper Texture */
+.book-paper-texture {
+  background-color: #FAF9F5;
+  background-image: radial-gradient(#EED97A 0.45px, transparent 0.45px), radial-gradient(#181716 0.35px, #FAF9F5 0.35px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* Reduced Motion Fallback */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==============================================================================
+   8. PER-ATOM ANIMATION SYSTEM
+   ============================================================================== */
+@keyframes wordAtomEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.word-atom {
+  display: inline-block;
+  opacity: 0;
+  animation: wordAtomEntrance 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+
+.word-atom.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-rev] {
+  opacity: 0;
+  transform: translateY(0.35em);
+  transition: opacity 0.75s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-rev].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==============================================================================
+   ACCESSIBILITY & PREFERS-REDUCED-MOTION
+   ============================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .word-atom,
+  [data-rev] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .animate-infinite-ticker {
+    animation-duration: 90s !important;
+  }
+  .animate-hero-orb-1,
+  .animate-hero-orb-2,
+  .animate-corner-hint {
+    animation: none !important;
+  }
+  .stage-sticky-viewport {
+    position: relative !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+  .hero-typographic-stage,
+  .manifesto-stage,
+  .gallery-stage,
+  .artifact-stage,
+  .journey-stage {
+    height: auto !important;
+    min-height: auto !important;
+  }
+  .hero-type-composition,
+  .manifesto-scale-box,
+  .gallery-track-container,
+  .artifact-card-transform,
+  .artifact-left-copy,
+  .journey-canvas-transform {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .manifesto-wipe-overlay {
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+  }
+}

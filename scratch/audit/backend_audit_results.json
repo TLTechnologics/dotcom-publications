@@ -1,0 +1,201 @@
+{
+  "passed": [
+    {
+      "test": "API health check responds 200",
+      "passed": true,
+      "details": "Status: 200, DB: PostgreSQL (Supabase)"
+    },
+    {
+      "test": "Database connected and reports tables",
+      "passed": true,
+      "details": "Tables: 10"
+    },
+    {
+      "test": "Total books matches books list count",
+      "passed": true,
+      "details": "Reported: 6, Actual: 6"
+    },
+    {
+      "test": "Published books count accuracy",
+      "passed": true,
+      "details": "Reported: 6, Actual: 6"
+    },
+    {
+      "test": "Draft books count accuracy",
+      "passed": true,
+      "details": "Reported: 0, Actual: 0"
+    },
+    {
+      "test": "Rejects selling_price > mrp",
+      "passed": true,
+      "details": "Status: 400, Body: {\"detail\":\"Selling price (\u20b9999.0) cannot exceed MRP (\u20b9500.0)\"}"
+    },
+    {
+      "test": "Rejects empty title",
+      "passed": true,
+      "details": "Status: 422"
+    },
+    {
+      "test": "Create valid book",
+      "passed": true,
+      "details": "ID: 7, Status: 201"
+    },
+    {
+      "test": "Rejects duplicate ISBN",
+      "passed": true,
+      "details": "Status: 400, Detail: {\"detail\":\"A book with ISBN '978-81-c392712-X' already exists: 'QA Automated Audit Test Monograph'\"}"
+    },
+    {
+      "test": "Update book details",
+      "passed": true,
+      "details": "Status: 200, Updated price: 480.0"
+    },
+    {
+      "test": "Toggle publish status",
+      "passed": true,
+      "details": "Status: 200, Res: {\"id\":7,\"is_draft\":false,\"status\":\"published\"}"
+    },
+    {
+      "test": "Toggle featured status",
+      "passed": true,
+      "details": "Status: 200, Res: {\"id\":7,\"is_featured\":true}"
+    },
+    {
+      "test": "Delete book (clean up)",
+      "passed": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Create author",
+      "passed": true,
+      "details": "ID: 7"
+    },
+    {
+      "test": "Update author",
+      "passed": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Delete author (clean up)",
+      "passed": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "Create root category",
+      "passed": true,
+      "details": "ID: 6"
+    },
+    {
+      "test": "Rejects duplicate category slug",
+      "passed": true,
+      "details": "Status: 400"
+    },
+    {
+      "test": "Delete category (clean up)",
+      "passed": true,
+      "details": "Cleaned"
+    },
+    {
+      "test": "Create publisher",
+      "passed": true,
+      "details": "ID: 2"
+    },
+    {
+      "test": "Delete publisher (clean up)",
+      "passed": true,
+      "details": "Cleaned"
+    },
+    {
+      "test": "Rejects empty cart order",
+      "passed": true,
+      "details": "Status: 400"
+    },
+    {
+      "test": "Create valid customer order",
+      "passed": true,
+      "details": "Order #: DCP-2026-7B0254"
+    },
+    {
+      "test": "Patch order status to 'Shipped'",
+      "passed": true,
+      "details": "Status: 200, Res: {\"id\":1,\"order_number\":\"DCP-2026-7B0254\",\"customer_name\":\"QA Audit Scholar\",\"customer_email\":\"scholar.qa@dotcompublications.com\",\"customer_phone\":\"+91 98765 00000\",\"shipping_address\":\"QA Lab, Campus North\",\"city\":\"Greater Noida\",\"state\":\"Uttar Pradesh\",\"pincode\":\"201310\",\"items_json\":\"[{\\\"book_id\\\": 1, \\\"title\\\": \\\"Foundations of Computational Mathematics\\\", \\\"price\\\": 495.0, \\\"quantity\\\": 1, \\\"cover_image\\\": null}]\",\"total_amount\":495.0,\"payment_method\":\"Cash on Delivery\",\"status\":\"Shipped\",\"created_at\":\"2026-11-19T16:46:56.968602\"}"
+    },
+    {
+      "test": "Filter orders by status ('Shipped')",
+      "passed": true,
+      "details": "Found in list: True"
+    },
+    {
+      "test": "Blocks dangerous file extension (.exe)",
+      "passed": true,
+      "details": "Status: 400"
+    },
+    {
+      "test": "Uploads valid PNG image",
+      "passed": true,
+      "details": "Media ID: 1, URL: /uploads/72169df50cd9_audit_test_pixel.png"
+    },
+    {
+      "test": "Delete uploaded media (clean up)",
+      "passed": true,
+      "details": "Status: 200"
+    },
+    {
+      "test": "SQL Injection resistance in search",
+      "passed": true,
+      "details": "Status: 200"
+    }
+  ],
+  "failed": [
+    {
+      "test": "Dashboard stats tracks orders/revenue",
+      "passed": false,
+      "details": "Stats keys: ['total_books', 'published_books', 'draft_books', 'total_authors', 'total_categories', 'total_publishers', 'recently_added_books', 'featured_books', 'recent_activity']"
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "issue": "Unauthenticated API Endpoint",
+      "endpoint": "GET http://127.0.0.1:8000/api/dashboard/stats",
+      "status_code": 200,
+      "severity": "Critical",
+      "detail": "Endpoint returned 200 without requiring an Authorization header or session token."
+    },
+    {
+      "issue": "Unauthenticated API Endpoint",
+      "endpoint": "GET http://127.0.0.1:8000/api/orders",
+      "status_code": 200,
+      "severity": "Critical",
+      "detail": "Endpoint returned 200 without requiring an Authorization header or session token."
+    },
+    {
+      "issue": "Unauthenticated API Endpoint",
+      "endpoint": "POST http://127.0.0.1:8000/api/books",
+      "status_code": 422,
+      "severity": "Critical",
+      "detail": "Endpoint returned 422 without requiring an Authorization header or session token."
+    },
+    {
+      "issue": "Unauthenticated API Endpoint",
+      "endpoint": "PUT http://127.0.0.1:8000/api/settings",
+      "status_code": 422,
+      "severity": "Critical",
+      "detail": "Endpoint returned 422 without requiring an Authorization header or session token."
+    },
+    {
+      "issue": "Unauthenticated API Endpoint",
+      "endpoint": "DELETE http://127.0.0.1:8000/api/books/999999",
+      "status_code": 404,
+      "severity": "Critical",
+      "detail": "Endpoint returned 404 without requiring an Authorization header or session token."
+    },
+    {
+      "issue": "Stored XSS Risk / Unsanitized HTML",
+      "endpoint": "POST /api/books",
+      "detail": "HTML script tags accepted verbatim without server-side HTML escaping/sanitization.",
+      "severity": "Medium"
+    }
+  ],
+  "performance": [],
+  "edge_cases": []
+}

@@ -1,0 +1,14 @@
+.git
+.github
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+backend/dotcom_publications.db
+backend/__pycache__
+frontend/node_modules
+*.log
