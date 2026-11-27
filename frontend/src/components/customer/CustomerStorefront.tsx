@@ -502,7 +502,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   return (
     <div className="min-h-screen bg-[#FAF9F5] font-sans text-[#181716] flex flex-col selection:bg-[#E5DDCF] selection:text-[#29382C] storefront">
       {/* Main Storefront Header */}
-      <header className={`storefront-header z-40 ${navScrolled || currentPath === '/books' ? 'storefront-header-solid' : 'storefront-header-over-hero'}`}>
+      <header
+        className={`storefront-header z-40 ${navScrolled || currentPath === '/books' ? 'storefront-header-solid' : 'storefront-header-over-hero'}`}
+        style={!navScrolled && currentPath !== '/books' ? { backdropFilter: 'blur(14px) saturate(145%)' } : undefined}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
           {/* Logo & Brand Identity */}
           <div className="flex items-center gap-3">
