@@ -40,6 +40,15 @@
 .storefront-header .storefront-cart-action > span:last-child { background: #541522; color: #fff8e8; }
 .storefront-header .storefront-menu-toggle { color: #fff3c3 !important; background: rgba(245, 220, 135, .16); border-color: rgba(255, 232, 161, .74); box-shadow: inset 0 1px 0 rgba(255,255,255,.28); }
 .storefront-search { border: 1px solid var(--editorial-rule); border-radius: 2px; background: rgba(247,244,236,.92); }
+.magnification-dock-wrap { position: fixed; z-index: 38; right: 0; bottom: 12px; left: 0; display: flex; align-items: flex-end; justify-content: center; padding: 0 12px; pointer-events: none; }
+.magnification-dock-panel { display: flex; align-items: flex-end; gap: 9px; width: max-content; max-width: 100%; padding: 7px 10px; border: 1px solid rgba(255,225,133,.7); border-radius: 19px; background: rgba(83,18,37,.78); -webkit-backdrop-filter: blur(22px) saturate(175%); backdrop-filter: blur(22px) saturate(175%); box-shadow: 0 12px 34px rgba(38,8,19,.28), inset 0 1px 0 rgba(255,255,255,.34); pointer-events: auto; }
+.magnification-dock-item { position: relative; display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; padding: 0; border: 1px solid rgba(255,255,255,.22); border-radius: 14px; color: #fff2bf; background: rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.25); cursor: pointer; outline: none; }
+.magnification-dock-item:hover, .magnification-dock-item:focus-visible { color: #541522; border-color: rgba(255,245,195,.9); background: rgba(240,216,117,.92); box-shadow: 0 0 18px rgba(240,216,117,.28), inset 0 1px 0 rgba(255,255,255,.72); }
+.magnification-dock-item:focus-visible { outline: 2px solid #fff3c3; outline-offset: 3px; }
+.magnification-dock-icon { display: flex; align-items: center; justify-content: center; }
+.magnification-dock-icon svg { width: 21px; height: 21px; stroke-width: 1.8; }
+.magnification-dock-badge { position: absolute; top: -5px; right: -5px; display: grid; min-width: 18px; height: 18px; place-items: center; padding: 0 4px; border: 1px solid rgba(255,245,195,.85); border-radius: 999px; color: #fff9e8; background: #6b1d2a; font: 700 10px/1 'Inter', sans-serif; }
+.magnification-dock-label { position: absolute; bottom: calc(100% + 10px); left: 50%; z-index: 2; width: max-content; padding: 6px 9px; transform: translateX(-50%); border: 1px solid rgba(255,225,133,.58); border-radius: 6px; color: #fff9e8; background: rgba(83,18,37,.94); box-shadow: 0 6px 16px rgba(38,8,19,.2); font: 600 11px/1.2 'Inter', sans-serif; pointer-events: none; }
 .storefront .editorial-storefront { color: var(--editorial-ink); }
 .editorial-hero { min-height: min(82svh, 880px); position: relative; display: flex; align-items: center; overflow: hidden; background-size: cover; background-position: center 48%; color: var(--editorial-paper); }
 .editorial-hero-content { width: min(780px, 100%); padding: clamp(142px, 19vh, 204px) clamp(28px, 8vw, 120px) clamp(82px, 12vh, 130px); }
@@ -122,6 +131,7 @@
 .bookstore-result-count { padding: 18px 0; color: var(--editorial-muted); font: 12px 'Inter', sans-serif; }
 @media (max-width: 900px) { .bookshop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .editorial-about { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) {
+  .magnification-dock-panel { gap: 7px; padding-right: 8px; padding-left: 8px; }
   .storefront-header-over-hero { top: 0; }
   .editorial-hero { min-height: 76svh; background-position: 58% center; }
   .editorial-hero-content { padding: 138px 22px 80px; }
@@ -154,6 +164,10 @@
 .storefront .storefront-header input[type="text"] { border-radius: 2px !important; }
 .storefront .rounded-lg, .storefront .rounded-xl, .storefront .rounded-2xl { border-radius: 3px !important; }
 .storefront .shadow-elevated { box-shadow: none !important; }
+.storefront-header .storefront-cart-action { background: #f0d875 !important; border-color: rgba(255,241,184,.9) !important; color: #541522 !important; }
+.storefront-header .storefront-cart-action:hover { background: #f6e5a0 !important; border-color: #fff3c3 !important; }
+.storefront-header .storefront-cart-action svg { color: #541522 !important; }
+.storefront-header .storefront-cart-action > span:last-child { background: #541522 !important; color: #fff8e8 !important; }
 .storefront-cart-action { background: var(--editorial-forest) !important; border-color: var(--editorial-forest) !important; }
 .storefront-cart-action:hover { background: #4D1627 !important; border-color: #4D1627 !important; }
 .storefront-cart-action svg { color: #fff !important; }

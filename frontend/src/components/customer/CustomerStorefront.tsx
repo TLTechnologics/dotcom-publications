@@ -27,7 +27,8 @@ import {
   ShieldCheck,
   Truck,
   CreditCard,
-  Menu
+  Menu,
+  Home,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -35,6 +36,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { InteractiveBookReader } from '../books/InteractiveBookReader';
 import { EditorialStorefront } from './EditorialStorefront';
+import { MagnificationDock, type DockItemData } from './MagnificationDock';
 import './editorial-storefront.css';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 
@@ -415,6 +417,39 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
     });
   }, [publishedBooks, selectedCategory, searchQuery]);
 
+  const dockItems = useMemo<DockItemData[]>(() => [
+    {
+      icon: <Home size={21} />,
+      label: 'Home',
+      onClick: () => {
+        onNavigate('/');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+    },
+    {
+      icon: <BookOpen size={21} />,
+      label: 'Bookstore',
+      onClick: () => onNavigate('/books'),
+    },
+    {
+      icon: <Search size={21} />,
+      label: 'Search books',
+      onClick: () => {
+        const searchId = window.matchMedia('(min-width: 640px)').matches
+          ? 'storefront-search-desktop'
+          : 'storefront-search-mobile';
+        const input = document.getElementById(searchId) as HTMLInputElement | null;
+        input?.focus({ preventScroll: true });
+      },
+    },
+    {
+      icon: <ShoppingBag size={21} />,
+      label: 'Your cart',
+      badge: cartCount,
+      onClick: () => setIsCartOpen(true),
+    },
+  ], [cartCount, onNavigate]);
+
   // Handle Checkout Submit
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -567,6 +602,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
             <div className="relative hidden sm:block w-48 lg:w-64">
               <Search className="storefront-search-icon w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
               <input
+                id="storefront-search-desktop"
                 type="text"
                 placeholder="Search title, author, ISBN..."
                 value={searchQuery}
@@ -690,6 +726,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
           <div className="relative w-full">
             <Search className="storefront-search-icon w-3.5 h-3.5 text-[#82777A] absolute left-3.5 top-3.5" />
             <input
+              id="storefront-search-mobile"
               type="text"
               placeholder="Search books, authors, ISBN..."
               value={searchQuery}
@@ -743,9 +780,11 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
         onAddToCart={addToCart}
       />
 
+      <MagnificationDock items={dockItems} />
+
       {/* Mobile Floating Sticky Cart Bar */}
       {cartCount > 0 && (
-        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
+        <div className="md:hidden fixed bottom-[88px] left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
           <button
             onClick={() => setIsCartOpen(true)}
             className="storefront-mobile-cart w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-sm shadow-sm flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
