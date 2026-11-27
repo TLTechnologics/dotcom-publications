@@ -80,14 +80,18 @@ export const EditorialStorefront: React.FC<Props> = ({
       return;
     }
 
+    let previousScrollY = window.scrollY;
     const observer = new IntersectionObserver((entries) => {
+      const currentScrollY = window.scrollY;
+      const direction = currentScrollY < previousScrollY ? 'up' : 'down';
+      previousScrollY = currentScrollY;
+
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
+        const element = entry.target as HTMLElement;
+        element.style.setProperty('--reveal-offset', direction === 'up' ? '-40px' : '40px');
+        element.classList.toggle('is-visible', entry.isIntersecting);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+    }, { threshold: 0.18, rootMargin: '-48px 0px -48px 0px' });
 
     elements.forEach((element) => observer.observe(element));
     return () => observer.disconnect();

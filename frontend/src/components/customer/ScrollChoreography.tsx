@@ -485,10 +485,6 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
         {/* Generative Editorial Print Canvas */}
         <HeroPrintCanvas />
 
-        {/* Ambient Glow Orbs */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#B9B7AF]/10 rounded-full blur-3xl pointer-events-none animate-hero-orb-1" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#B9B7AF]/10 rounded-full blur-3xl pointer-events-none animate-hero-orb-2" />
-
         {/* Hero Top Notice */}
         <div className="relative z-20 flex items-center justify-between text-xs font-semibold text-[#565752]">
           <div className="flex items-center gap-2">
@@ -507,7 +503,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
           ref={heroInnerRef}
           className="relative z-20 my-auto text-center flex flex-col items-center justify-center pointer-events-none py-10"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/70 border border-[#D8D6CF] text-xs font-semibold text-[#565752] mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-sm bg-white border border-[#D8D6CF] text-xs font-semibold text-[#565752] mb-6">
             <Sparkles className="w-3.5 h-3.5 text-[#777871]" />
             <span>Accredited Higher Education Literature</span>
           </div>
@@ -629,7 +625,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                   <div
                     key={book.id}
                     onClick={() => onOpenReader(book)}
-                    className="w-[260px] xs:w-[280px] sm:w-[320px] md:w-[340px] shrink-0 bg-white rounded-2xl border border-[#EAE3DE] overflow-hidden shadow-subtle hover:shadow-card hover:border-[#EED97A] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col"
+                    className="w-[260px] xs:w-[280px] sm:w-[320px] md:w-[340px] shrink-0 bg-white rounded-sm border border-[#EAE3DE] overflow-hidden shadow-sm hover:shadow-sm hover:border-[#EED97A] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col"
                   >
                     {/* Book Cover Frame */}
                     <div className="aspect-[3/4] bg-[#F7F5EE] relative overflow-hidden">
@@ -643,7 +639,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                         {book.category_name || 'Academic Monograph'}
                       </div>
                       <div className="absolute inset-0 bg-[#181716]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-4">
-                        <span className="px-3.5 py-1.5 rounded-full bg-[#FAF9F5] text-[#181716] border border-[#EED97A] text-xs font-bold shadow-elevated flex items-center gap-1.5">
+                        <span className="px-3.5 py-1.5 rounded-full bg-[#FAF9F5] text-[#181716] border border-[#EED97A] text-xs font-bold shadow-sm flex items-center gap-1.5">
                           <BookOpen className="w-3.5 h-3.5 text-[#181716]" />
                           <span>Interactive 3D Preview</span>
                         </span>
@@ -685,7 +681,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                               e.stopPropagation();
                               onOpenDetails(book);
                             }}
-                            className="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg border border-[#EAE3DE] text-[11px] font-semibold text-[#181716] hover:bg-[#FAF9F5] transition-colors"
+                            className="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-sm border border-[#EAE3DE] text-[11px] font-semibold text-[#181716] hover:bg-[#FAF9F5] transition-colors"
                           >
                             Details
                           </button>
@@ -695,7 +691,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                               e.stopPropagation();
                               onAddToCart(book);
                             }}
-                            className="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] text-[11px] font-semibold flex items-center gap-1 border border-[#E5CE68] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                            className="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-sm bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] text-[11px] font-semibold flex items-center gap-1 border border-[#E5CE68] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all"
                           >
                             <ShoppingBag className="w-3 h-3 text-[#181716]" />
                             <span>Add</span>
@@ -754,10 +750,10 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             <div className="space-y-2.5 text-xs">
               <div
                 ref={cue0Ref}
-                className={`p-3.5 rounded-xl border border-l-4 transition-all duration-300 ${
+                className={`p-3.5 rounded-sm border border-l-4 transition-all duration-300 ${
                   artifactPhase >= 0
-                    ? 'bg-white/10 border-white/20 border-l-[#EED97A] text-white'
-                    : 'bg-white/5 border-white/10 border-l-white/20 text-stone-300 opacity-40'
+                    ? 'bg-[#40383A] border-[#605256] border-l-[#EED97A] text-white'
+                    : 'bg-[#2F292B] border-[#493D41] border-l-[#493D41] text-stone-300 opacity-40'
                 }`}
               >
                 <span className="font-serif font-bold block text-sm">
@@ -770,10 +766,10 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
 
               <div
                 ref={cue1Ref}
-                className={`p-3.5 rounded-xl border border-l-4 transition-all duration-300 ${
+                className={`p-3.5 rounded-sm border border-l-4 transition-all duration-300 ${
                   artifactPhase >= 1
-                    ? 'bg-white/10 border-white/20 border-l-[#EED97A] text-white'
-                    : 'bg-white/5 border-white/10 border-l-white/20 text-stone-300 opacity-40'
+                    ? 'bg-[#40383A] border-[#605256] border-l-[#EED97A] text-white'
+                    : 'bg-[#2F292B] border-[#493D41] border-l-[#493D41] text-stone-300 opacity-40'
                 }`}
               >
                 <span className="font-serif font-bold block text-sm">
@@ -786,10 +782,10 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
 
               <div
                 ref={cue2Ref}
-                className={`p-3.5 rounded-xl border border-l-4 transition-all duration-300 ${
+                className={`p-3.5 rounded-sm border border-l-4 transition-all duration-300 ${
                   artifactPhase >= 2
-                    ? 'bg-white/10 border-white/20 border-l-[#EED97A] text-white'
-                    : 'bg-white/5 border-white/10 border-l-white/20 text-stone-300 opacity-40'
+                    ? 'bg-[#40383A] border-[#605256] border-l-[#EED97A] text-white'
+                    : 'bg-[#2F292B] border-[#493D41] border-l-[#493D41] text-stone-300 opacity-40'
                 }`}
               >
                 <span className="font-serif font-bold block text-sm">
@@ -802,10 +798,10 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
 
               <div
                 ref={cue3Ref}
-                className={`p-3.5 rounded-xl border border-l-4 transition-all duration-300 ${
+                className={`p-3.5 rounded-sm border border-l-4 transition-all duration-300 ${
                   artifactPhase >= 3
-                    ? 'bg-white/10 border-white/20 border-l-[#EED97A] text-white'
-                    : 'bg-white/5 border-white/10 border-l-white/20 text-stone-300 opacity-40'
+                    ? 'bg-[#40383A] border-[#605256] border-l-[#EED97A] text-white'
+                    : 'bg-[#2F292B] border-[#493D41] border-l-[#493D41] text-stone-300 opacity-40'
                 }`}
               >
                 <span className="font-serif font-bold block text-sm">
@@ -826,7 +822,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                 </span>
                 <span className="text-stone-300">PHASE 0{artifactPhase + 1} / 04</span>
               </div>
-              <div className="w-full h-1 bg-white/15 rounded-full overflow-hidden">
+              <div className="w-full h-1 bg-[#564B4D] rounded-full overflow-hidden">
                 <div
                   ref={artifactMeterRef}
                   className="h-full bg-[#EED97A] w-full"
@@ -840,7 +836,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
           <div className="flex justify-center">
             <div
               ref={artifactCardRef}
-              className="w-full max-w-md bg-[#FAF9F5] text-[#181716] rounded-2xl border-2 border-[#EED97A]/50 p-6 shadow-2xl relative overflow-hidden book-paper-texture"
+              className="w-full max-w-md bg-[#FAF9F5] text-[#181716] rounded-sm border-2 border-[#EED97A]/50 p-6 shadow-lg relative overflow-hidden book-paper-texture"
             >
               {/* Perforation Line across Top matching Reference */}
               <div className="relative border-b-2 border-dashed border-[#82777A]/50 pb-3 mb-4 flex items-center justify-between text-[10px] font-mono text-[#524B42]">
@@ -867,13 +863,13 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
                   </p>
                 </div>
 
-                <div className="w-10 h-10 rounded-xl bg-[#181716] text-[#EED97A] flex items-center justify-center shrink-0 p-1.5 shadow-sm border border-[#2E2B27]">
-                  <img src="/logo.jpg" alt="Dotcom Logo" className="w-full h-full object-cover rounded-lg" />
+                <div className="w-10 h-10 rounded-sm bg-[#181716] text-[#EED97A] flex items-center justify-center shrink-0 p-1.5 shadow-sm border border-[#2E2B27]">
+                  <img src="/logo.jpg" alt="Dotcom Logo" className="w-full h-full object-cover rounded-sm" />
                 </div>
               </div>
 
               {/* Book Cover Specimen Frame */}
-              <div className="my-4 aspect-[16/9] rounded-xl overflow-hidden bg-[#FAF9F5] border border-[#EAE3DE] shadow-inner relative">
+              <div className="my-4 aspect-[16/9] rounded-sm overflow-hidden bg-[#FAF9F5] border border-[#EAE3DE] shadow-inner relative">
                 <img
                   src={featuredBook?.cover_image || '/covers/computational-mathematics.jpg'}
                   alt="Specimen Artwork"
@@ -1012,7 +1008,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             {books.slice(0, 6).map((book) => (
               <div
                 key={book.id}
-                className="pricing-row py-4 border-b border-[#EAE3DE] flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-[#FFF6D9]/40 px-2 rounded-lg transition-colors"
+                className="pricing-row py-4 border-b border-[#EAE3DE] flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-[#FFF6D9]/40 px-2 rounded-sm transition-colors"
               >
                 <div className="sm:w-1/2">
                   <span className="font-serif font-bold text-sm sm:text-base text-[#292326] block">
@@ -1034,7 +1030,7 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             ))}
 
             {/* Complete Series Summary Row */}
-            <div className="pricing-row py-5 border-b-2 border-[#EED97A] flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#FAF2BA]/40 px-3 rounded-xl mt-2 font-semibold">
+            <div className="pricing-row py-5 border-b-2 border-[#EED97A] flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#FAF2BA]/40 px-3 rounded-sm mt-2 font-semibold">
               <div className="sm:w-1/2">
                 <span className="font-serif font-bold text-base text-[#181716] block">
                   COMPLETE ACADEMIC SERIES (ALL VOLUMES)
@@ -1056,14 +1052,14 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href="#catalogue"
-              className="px-6 py-3 rounded-xl bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] border border-[#E5CE68] text-xs font-bold shadow-subtle flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
+              className="px-6 py-3 rounded-sm bg-[#EED97A] hover:bg-[#F5E288] text-[#181716] border border-[#E5CE68] text-xs font-bold shadow-sm flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
             >
               <span>EXPLORE COMPLETE CATALOGUE</span>
               <ArrowRight className="w-4 h-4 text-[#181716]" />
             </a>
             <a
               href="#contact"
-              className="px-6 py-3 rounded-xl bg-white border border-[#EAE3DE] hover:border-[#EED97A] text-[#181716] text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5"
+              className="px-6 py-3 rounded-sm bg-white border border-[#EAE3DE] hover:border-[#EED97A] text-[#181716] text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5"
             >
               INSTITUTIONAL BULK PURCHASE
             </a>
@@ -1132,10 +1128,10 @@ export const ScrollChoreography: React.FC<ScrollChoreographyProps> = ({
             return (
               <div
                 key={item.id}
-                className={`p-6 rounded-2xl border transition-all duration-700 ease-out flex flex-col justify-between ${
+                className={`p-6 rounded-sm border transition-all duration-700 ease-out flex flex-col justify-between ${
                   isActive
-                    ? 'bg-white border-2 border-[#EED97A] shadow-card opacity-100 -translate-y-2'
-                    : 'bg-white md:bg-white/40 border-[#EAE3DE] opacity-100 md:opacity-35 translate-y-0'
+                    ? 'bg-white border-2 border-[#EED97A] shadow-sm opacity-100 -translate-y-2'
+                    : 'bg-white border-[#EAE3DE] opacity-100 md:opacity-35 translate-y-0'
                 }`}
               >
                 <div>

@@ -33,7 +33,6 @@ import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { EditorialTicker } from './EditorialTicker';
 import { InteractiveBookReader } from '../books/InteractiveBookReader';
 import { EditorialStorefront } from './EditorialStorefront';
 import './editorial-storefront.css';
@@ -474,15 +473,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   if (siteSettings?.maintenance_mode && !isAdminLoggedIn) {
     return (
       <div className="min-h-screen bg-[#FAF9F5] flex flex-col items-center justify-center p-6 text-center text-[#181716] font-sans selection:bg-[#EED97A]">
-        <div className="w-16 h-16 rounded-2xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mb-6">
-          <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-xl" />
+        <div className="w-16 h-16 rounded-sm bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mb-6">
+          <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-sm" />
         </div>
         <div className="max-w-md space-y-4">
-          <span className="inline-block px-3 py-1 rounded-full bg-[#FAF2BA] text-[#181716] text-xs font-bold uppercase tracking-wider border border-[#EED97A]">
-            Scheduled Maintenance
+          <span className="inline-block px-3 py-1 rounded-sm bg-[#FAF2BA] text-[#181716] text-xs font-bold tracking-wide border border-[#EED97A]">
+            Scheduled maintenance
           </span>
           <h1 className="font-serif font-bold text-3xl text-[#181716]">
-            Catalogue Temporarily Offline
+            Catalogue temporarily offline
           </h1>
           <p className="text-xs text-[#524B42] leading-relaxed">
             Dotcom Publications is currently performing scheduled infrastructure maintenance. Our bookstore, catalog, and reader will return shortly.
@@ -492,7 +491,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               onClick={() => onNavigate('/admin')}
               className="text-xs font-semibold text-[#651C32] hover:underline"
             >
-              Administrator Sign In
+              Administrator sign in
             </button>
           </div>
         </div>
@@ -570,10 +569,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                 placeholder="Search title, author, ISBN..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-full border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A] transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A] transition-all"
               />
               {searchQuery && (
-                <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-2xl border border-[#EAE3DE] shadow-elevated p-3 z-50 max-h-96 overflow-y-auto space-y-2">
+                <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-sm border border-[#EAE3DE] shadow-sm p-3 z-50 max-h-96 overflow-y-auto space-y-2">
                   <div className="flex items-center justify-between pb-1.5 border-b border-[#EAE3DE] text-[10px] text-[#82777A]">
                     <span>{filteredBooks.length} results found</span>
                     <button onClick={() => setSearchQuery('')} className="text-[#181716] font-semibold hover:underline">
@@ -590,7 +589,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                           setReadingBook(b);
                           setSearchQuery('');
                         }}
-                        className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-[#FAF8F3] cursor-pointer transition-colors"
+                        className="flex items-center gap-2.5 p-2 rounded-sm hover:bg-[#FAF8F3] cursor-pointer transition-colors"
                       >
                         <img src={b.cover_image || '/covers/computational-mathematics.jpg'} alt={b.title} className="w-8 h-10 object-cover rounded shadow-xs shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -609,7 +608,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
             <button
               onClick={() => setIsCartOpen(true)}
               className="storefront-cart-action relative flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#29382C] text-white hover:bg-[#1D2A20] border border-[#29382C] transition-colors font-semibold"
-              title="View Cart"
+              title="View cart"
             >
               <ShoppingBag className="w-4 h-4 text-[#181716]" />
               <span className="text-xs font-semibold">Cart</span>
@@ -642,41 +641,41 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
             <nav className="flex flex-col space-y-1 text-sm font-semibold text-[#181716]">
               <a
                 href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); setMobileNavOpen(false); }}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Home
               </a>
               <a
                 href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); setMobileNavOpen(false); }}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Bookstore
               </a>
               <a
                 href="/#about"
                 onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 About us
               </a>
               <a
                 href="/#new-releases"
                 onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 New releases
               </a>
               <a
                 href="/#editorial-statement"
                 onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Our approach
               </a>
               <a
                 href="#contact"
                 onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-xl hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
+                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
               >
                 Contact
               </a>
@@ -693,11 +692,11 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               placeholder="Search books, authors, ISBN..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-3 text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+              className="w-full h-11 pl-10 pr-3 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
             />
           </div>
           {searchQuery && (
-            <div className="absolute top-full mt-1 left-4 right-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-elevated p-3 z-50 max-h-80 overflow-y-auto space-y-2">
+            <div className="absolute top-full mt-1 left-4 right-4 bg-white rounded-sm border border-[#EAE3DE] shadow-sm p-3 z-50 max-h-80 overflow-y-auto space-y-2">
               <div className="flex items-center justify-between pb-1.5 border-b border-[#EAE3DE] text-[10px] text-[#82777A]">
                 <span>{filteredBooks.length} results</span>
                 <button onClick={() => setSearchQuery('')} className="text-[#181716] font-semibold">
@@ -714,7 +713,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                       setReadingBook(b);
                       setSearchQuery('');
                     }}
-                    className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#FAF9F5] cursor-pointer"
+                    className="flex items-center gap-2.5 p-1.5 rounded-sm hover:bg-[#FAF9F5] cursor-pointer"
                   >
                     <img src={b.cover_image || '/covers/computational-mathematics.jpg'} alt={b.title} className="w-7 h-9 object-cover rounded shadow-xs shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -746,7 +745,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
         <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="storefront-mobile-cart w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-2xl shadow-elevated flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
+            className="storefront-mobile-cart w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-sm shadow-sm flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
           >
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-full bg-[#181716] text-[#EED97A] flex items-center justify-center font-bold text-xs">
@@ -774,16 +773,16 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
             onClick={() => setIsCartOpen(false)}
           />
 
-          <div className="relative w-full max-w-md bg-white h-full shadow-2xl z-10 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
+          <div className="relative w-full max-w-md bg-white h-full shadow-lg z-10 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
             {/* Cart Header */}
             <div className="p-4 sm:p-5 border-b border-[#EAE3DE] flex items-center justify-between bg-[#FAF9F5]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#EED97A] text-[#181716] flex items-center justify-center font-bold border border-[#E5CE68]">
+                <div className="w-8 h-8 rounded-sm bg-[#EED97A] text-[#181716] flex items-center justify-center font-bold border border-[#E5CE68]">
                   <ShoppingBag className="w-4 h-4 text-[#181716]" />
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-base text-[#181716]">
-                    Your Academic Cart
+                    Your academic cart
                   </h3>
                   <span className="text-[11px] text-[#736B5E]">
                     {cartCount} {cartCount === 1 ? 'book' : 'books'} ready for order
@@ -792,7 +791,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               </div>
               <button
                 onClick={() => setIsCartOpen(false)}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[#736B5E] hover:text-[#181716] hover:bg-stone-100 transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm text-[#736B5E] hover:text-[#181716] hover:bg-stone-100 transition-colors"
                 aria-label="Close cart"
               >
                 <X className="w-5 h-5" />
@@ -810,17 +809,17 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     size="sm"
                     onClick={() => setIsCartOpen(false)}
                   >
-                    Browse Academic Catalogue
+                    Browse academic catalogue
                   </Button>
                 </div>
               ) : (
                 cart.map((item) => (
                   <div
                     key={item.book_id}
-                    className="flex gap-3 p-3 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] relative"
+                    className="flex gap-3 p-3 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] relative"
                   >
                     {/* Item Cover */}
-                    <div className="w-14 h-18 bg-stone-200 rounded-lg overflow-hidden shrink-0 border border-[#EAE3DE]">
+                    <div className="w-14 h-18 bg-stone-200 rounded-sm overflow-hidden shrink-0 border border-[#EAE3DE]">
                       {item.cover_image ? (
                         <img
                           src={item.cover_image}
@@ -854,7 +853,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
                       {/* Quantity Buttons */}
                       <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-1 bg-white border border-[#EAE3DE] rounded-lg p-0.5">
+                        <div className="flex items-center gap-1 bg-white border border-[#EAE3DE] rounded-sm p-0.5">
                           <button
                             onClick={() => updateQuantity(item.book_id, -1)}
                             className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md hover:bg-stone-100 text-[#181716]"
@@ -876,8 +875,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
                         <button
                           onClick={() => removeFromCart(item.book_id)}
-                          className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#736B5E] hover:text-red-600 hover:bg-rose-50 transition-colors"
-                          title="Remove from Cart"
+                          className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-sm text-[#736B5E] hover:text-red-600 hover:bg-rose-50 transition-colors"
+                          title="Remove from cart"
                           aria-label="Remove item"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -898,11 +897,11 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     <span className="font-semibold">₹{cartTotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#736B5E]">Institutional Delivery:</span>
+                    <span className="text-[#736B5E]">Institutional delivery:</span>
                     <span className="font-semibold text-[#3A754E]">FREE</span>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-[#EAE3DE] text-sm">
-                    <span className="font-bold">Total Amount:</span>
+                    <span className="font-bold">Total:</span>
                     <span className="font-serif font-bold text-base text-[#181716]">
                       ₹{cartTotal.toLocaleString()}
                     </span>
@@ -918,7 +917,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     setIsCheckoutOpen(true);
                   }}
                 >
-                  <span>Proceed to Institutional Checkout</span>
+                  <span>Proceed to checkout</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
@@ -948,7 +947,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row gap-6">
               {/* Cover */}
-              <div className="w-full sm:w-44 shrink-0 aspect-[3/4] bg-[#FAF8F3] rounded-xl overflow-hidden border border-[#EAE3DE] shadow-subtle">
+              <div className="w-full sm:w-44 shrink-0 aspect-[3/4] bg-[#FAF8F3] rounded-sm overflow-hidden border border-[#EAE3DE] shadow-sm">
                 <img
                   src={
                     selectedBook.cover_image ||
@@ -962,7 +961,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               {/* Metadata */}
               <div className="flex-1 space-y-3">
                 {selectedBook.category_name && (
-                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#FAF2BA] text-[#181716] text-xs font-semibold border border-[#EED97A]">
+                  <span className="inline-block px-2.5 py-0.5 rounded-sm bg-[#FAF2BA] text-[#181716] text-xs font-semibold border border-[#EED97A]">
                     {selectedBook.category_name}
                   </span>
                 )}
@@ -983,18 +982,18 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                       ₹{selectedBook.mrp}
                     </span>
                   )}
-                  <span className="text-xs text-[#3A754E] font-semibold">Available for Dispatch</span>
+                  <span className="text-xs text-[#3A754E] font-semibold">Available for dispatch</span>
                 </div>
 
                 {/* Specs Grid */}
-                <div className="grid grid-cols-2 gap-2 p-3 bg-[#FAF9F5] rounded-xl border border-[#EAE3DE] text-[11px]">
+                <div className="grid grid-cols-2 gap-2 p-3 bg-[#FAF9F5] rounded-sm border border-[#EAE3DE] text-[11px]">
                   <div>
                     <span className="text-[#736B5E]">ISBN:</span>{' '}
                     <strong className="text-[#181716] font-mono">{selectedBook.isbn || 'Pending'}</strong>
                   </div>
                   <div>
                     <span className="text-[#736B5E]">Edition:</span>{' '}
-                    <strong className="text-[#181716]">{selectedBook.edition || '1st Edition'}</strong>
+                    <strong className="text-[#181716]">{selectedBook.edition || '1st edition'}</strong>
                   </div>
                   <div>
                     <span className="text-[#736B5E]">Format:</span>{' '}
@@ -1017,7 +1016,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     }}
                   >
                     <ShoppingBag className="w-4 h-4 text-[#181716]" />
-                    <span>Add to Cart (₹{selectedBook.selling_price})</span>
+                    <span>Add to cart (₹{selectedBook.selling_price})</span>
                   </Button>
                 </div>
               </div>
@@ -1025,7 +1024,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
             {/* Description */}
             <div className="border-t border-[#EAE3DE] pt-4">
-              <h4 className="font-serif font-bold text-sm text-[#181716] mb-2">Book Synopsis & Overview</h4>
+              <h4 className="font-serif font-bold text-sm text-[#181716] mb-2">Book synopsis</h4>
               <p className="text-xs text-[#736B5E] leading-relaxed font-light whitespace-pre-line">
                 {selectedBook.full_description || selectedBook.short_description || 'No detailed synopsis provided.'}
               </p>
@@ -1044,7 +1043,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               setOrderConfirmed(null);
             }
           }}
-          title={orderConfirmed ? 'Order Confirmed!' : 'Checkout & Dispatch Information'}
+          title={orderConfirmed ? 'Order confirmed' : 'Checkout details'}
           subtitle={
             orderConfirmed
               ? 'Thank you for choosing Dotcom Publications'
@@ -1060,12 +1059,12 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
               <div>
                 <h3 className="font-serif font-bold text-xl text-[#181716]">
-                  Order Placed Successfully!
+                  Order placed
                 </h3>
                 <p className="text-xs text-[#736B5E] mt-1">
                   Your tracking order reference is:
                 </p>
-                <div className="inline-block px-4 py-1.5 rounded-lg bg-[#FAF2BA] border border-[#EED97A] font-mono font-bold text-sm text-[#181716] mt-2 shadow-xs">
+                <div className="inline-block px-4 py-1.5 rounded-sm bg-[#FAF2BA] border border-[#EED97A] font-mono font-bold text-sm text-[#181716] mt-2 shadow-xs">
                   {orderConfirmed.order_number}
                 </div>
               </div>
@@ -1082,7 +1081,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   setOrderConfirmed(null);
                 }}
               >
-                Continue Browsing
+                Continue browsing
               </Button>
             </div>
           ) : (
@@ -1090,7 +1089,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                    Full Name *
+                    Full name *
                   </label>
                   <input
                     type="text"
@@ -1098,13 +1097,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="e.g. Dr. Rajesh Sharma"
                     value={checkoutForm.name}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, name: e.target.value })}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                   />
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                    Contact Phone *
+                    Contact phone *
                   </label>
                   <input
                     type="tel"
@@ -1112,27 +1111,27 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="+91 98765 43210"
                     value={checkoutForm.phone}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, phone: e.target.value })}
-                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
+                    className="w-full min-h-[44px] px-3.5 py-2.5 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                   />
                 </div>
               </div>
 
               <div className="text-xs">
                 <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                  Email Address (for order receipt)
+                  Email address (for order receipt)
                 </label>
                 <input
                   type="email"
                   placeholder="name@university.edu.in"
                   value={checkoutForm.email}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, email: e.target.value })}
-                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
+                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                 />
               </div>
 
               <div className="text-xs">
                 <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                  Delivery Address *
+                  Delivery address *
                 </label>
                 <textarea
                   rows={2}
@@ -1140,7 +1139,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   placeholder="Department / Campus Address, Institutional Area..."
                   value={checkoutForm.address}
                   onChange={(e) => setCheckoutForm({ ...checkoutForm, address: e.target.value })}
-                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
+                  className="w-full min-h-[44px] px-3.5 py-2.5 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] focus:bg-white text-[#181716] focus:outline-none focus:ring-2 focus:ring-[#EED97A] text-xs sm:text-sm"
                 />
               </div>
 
@@ -1152,7 +1151,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="New Delhi"
                     value={checkoutForm.city}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, city: e.target.value })}
-                    className="w-full min-h-[42px] px-2.5 py-2 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
+                    className="w-full min-h-[42px] px-2.5 py-2 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
                   />
                 </div>
                 <div>
@@ -1162,7 +1161,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="Delhi"
                     value={checkoutForm.state}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, state: e.target.value })}
-                    className="w-full min-h-[42px] px-2.5 py-2 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
+                    className="w-full min-h-[42px] px-2.5 py-2 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
                   />
                 </div>
                 <div>
@@ -1172,7 +1171,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                     placeholder="110001"
                     value={checkoutForm.pincode}
                     onChange={(e) => setCheckoutForm({ ...checkoutForm, pincode: e.target.value })}
-                    className="w-full min-h-[42px] px-2.5 py-2 rounded-lg border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
+                    className="w-full min-h-[42px] px-2.5 py-2 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] text-xs"
                   />
                 </div>
               </div>
@@ -1180,10 +1179,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               {/* Payment Method */}
               <div className="text-xs pt-1">
                 <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                  Payment Method
+                  Payment method
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
+                  <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
                     <input
                       type="radio"
                       name="payment_method"
@@ -1192,9 +1191,9 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                       onChange={(e) => setCheckoutForm({ ...checkoutForm, payment_method: e.target.value })}
                       className="text-[#EED97A] focus:ring-[#EED97A]"
                     />
-                    <span className="font-semibold text-xs">Cash on Delivery</span>
+                    <span className="font-semibold text-xs">Cash on delivery</span>
                   </label>
-                  <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-xl border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
+                  <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
                     <input
                       type="radio"
                       name="payment_method"
@@ -1203,7 +1202,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                       onChange={(e) => setCheckoutForm({ ...checkoutForm, payment_method: e.target.value })}
                       className="text-[#EED97A] focus:ring-[#EED97A]"
                     />
-                    <span className="font-semibold text-xs">UPI on Delivery</span>
+                    <span className="font-semibold text-xs">UPI on delivery</span>
                   </label>
                 </div>
               </div>
@@ -1220,8 +1219,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   <CheckCircle2 className="w-4 h-4 text-[#181716]" />
                   <span>
                     {isSubmittingOrder
-                      ? 'Confirming Order...'
-                      : `Confirm & Place Order (₹${cartTotal.toLocaleString()})`}
+                      ? 'Confirming order...'
+                      : `Confirm order (₹${cartTotal.toLocaleString()})`}
                   </span>
                 </Button>
               </div>

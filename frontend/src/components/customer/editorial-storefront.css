@@ -45,8 +45,8 @@
 .editorial-hero .editorial-button-green { background: #F8F7F4; color: #651C32; }
 .editorial-hero .editorial-button-green:hover:not(:disabled) { background: #fff; }
 .editorial-hero .photo-credit { position: absolute; right: 18px; bottom: 14px; color: rgba(255,255,255,.84); font: 10px 'Inter', sans-serif; text-shadow: 0 1px 4px rgba(0,0,0,.65); }
-.editorial-reveal { opacity: 0; transform: translateY(18px); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }
-.editorial-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.editorial-reveal { opacity: 0; transform: translate3d(0, var(--reveal-offset, 40px), 0) scale(.985); transition: opacity 720ms ease, transform 720ms cubic-bezier(.18,.72,.2,1); will-change: opacity, transform; }
+.editorial-reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 .editorial-button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 48px; padding: 0 22px; border: 1px solid transparent; border-radius: 2px; font: 600 13px 'Inter', sans-serif; transition: background-color 220ms ease, border-color 220ms ease, transform 220ms ease; }
 .editorial-button:hover:not(:disabled) { transform: translateY(-2px); }
 .editorial-button:focus-visible, .editorial-text-link:focus-visible, .bookshop-card button:focus-visible { outline: 3px solid #B88C5D; outline-offset: 3px; }
@@ -137,15 +137,17 @@
   .bookstore-search { flex: initial; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .editorial-reveal { opacity: 1; transform: none; transition: none; }
+  .editorial-reveal { opacity: 1; transform: none; transition: none; will-change: auto; }
   .storefront-header, .editorial-button, .bookshop-cover img, .editorial-text-link svg, .editorial-button svg { transition: none; }
 }
 
 /* Keep the public storefront's surfaces and controls calm and consistent. */
 .storefront .storefront-header input[type="text"] { border-radius: 2px !important; }
-.storefront .rounded-xl, .storefront .rounded-2xl { border-radius: 3px !important; }
-.storefront .shadow-elevated { box-shadow: 0 10px 26px rgba(40, 25, 25, .12) !important; }
-.storefront .backdrop-blur-xs { backdrop-filter: none !important; }
+.storefront .rounded-lg, .storefront .rounded-xl, .storefront .rounded-2xl { border-radius: 3px !important; }
+.storefront .shadow-elevated { box-shadow: none !important; }
+.storefront [class*="backdrop-blur"] { backdrop-filter: none !important; }
+.storefront [class~="bg-[#292326]/90"] { background-color: #292326 !important; }
+.storefront [class~="bg-[#181716]/90"] { background-color: #181716 !important; }
 .storefront-cart-action { background: var(--editorial-forest) !important; border-color: var(--editorial-forest) !important; }
 .storefront-cart-action:hover { background: #4D1627 !important; border-color: #4D1627 !important; }
 .storefront-cart-action svg { color: #fff !important; }
