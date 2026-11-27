@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Search, ShoppingBag } from 'lucide-react';
 import { Book, Category, LandingPageContent, SiteSettings } from '../../types';
 
@@ -69,7 +69,29 @@ export const EditorialStorefront: React.FC<Props> = ({
     return matching;
   }, [category, published, query, sort]);
   const aboutCopy = landingContent?.about_description || 'Dotcom Publications brings together academic textbooks, research monographs and educational works for readers, scholars and institutions.';
-  const heroHeading = landingContent?.hero_heading || 'Ideas that move knowledge forward';
+  const heroHeading = landingContent?.hero_heading || 'Books for teaching and research';
+  const heroImage = landingContent?.hero_image || HERO_PHOTO;
+
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>('.editorial-reveal'));
+    if (!elements.length) return;
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      elements.forEach((element) => element.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [isBookstore, books.length]);
 
   const cardGrid = (items: Book[]) => items.length ? (
     <div className="bookshop-grid">{items.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onAdd={() => onAddToCart(book)} />)}</div>
@@ -77,43 +99,46 @@ export const EditorialStorefront: React.FC<Props> = ({
 
   return <div className="storefront editorial-storefront">
     {!isBookstore ? <>
-      <section className="editorial-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(20,30,22,.66), rgba(20,30,22,.12)), url("${landingContent?.hero_image || HERO_PHOTO}")` }}>
+      <section className="editorial-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(37, 24, 28, .78) 0%, rgba(37, 24, 28, .56) 48%, rgba(37, 24, 28, .18) 100%), url("${heroImage}")` }}>
         <div className="editorial-hero-content">
-          <p className="editorial-kicker">Dotcom Publications · Independent academic publishing</p>
+          <p className="editorial-kicker">Independent academic publishing</p>
           <h1>{heroHeading}</h1>
-          <p className="editorial-hero-description">{landingContent?.hero_description || 'Thoughtful books for curious minds, classrooms and the work of discovery.'}</p>
-          <button className="editorial-button editorial-button-light" onClick={() => onNavigate('/books')}>Explore the bookstore <ArrowRight size={16} /></button>
+          <p className="editorial-hero-description">{landingContent?.hero_description || 'Peer-reviewed textbooks and research monographs for students, faculty and institutional libraries.'}</p>
+          <button className="editorial-button editorial-button-green" onClick={() => onNavigate('/books')}>Browse academic books <ArrowRight size={16} /></button>
         </div>
-        <span className="photo-credit">Library photograph by Fer Troulik · Unsplash</span>
+        <span className="photo-credit">Library photograph · Unsplash</span>
       </section>
 
-      <section className="editorial-section" id="featured-books">
-        <div className="editorial-section-heading"><div><p className="editorial-kicker editorial-kicker-dark">Selected for you</p><h2>Featured books</h2></div><button className="editorial-text-link" onClick={() => onNavigate('/books')}>Explore all books <ArrowRight size={16} /></button></div>
+      <section className="editorial-section editorial-reveal" id="featured-books">
+        <div className="editorial-section-heading"><h2>Featured books</h2><button className="editorial-text-link" onClick={() => onNavigate('/books')}>View all titles <ArrowRight size={16} /></button></div>
         {cardGrid(featured)}
       </section>
 
-      <section className="editorial-about" id="about">
+      <section className="editorial-about editorial-reveal" id="about">
         <div className="editorial-about-image"><img src={READING_ROOM_PHOTO} alt="Books displayed on a library shelf" loading="lazy" /><span className="photo-credit">Library photograph · Unsplash</span></div>
-        <div className="editorial-about-copy"><p className="editorial-kicker editorial-kicker-dark">The publishing house</p><h2>{landingContent?.about_title || 'Books made for a life of learning'}</h2><p>{aboutCopy}</p><button className="editorial-button editorial-button-green" onClick={() => document.getElementById('editorial-statement')?.scrollIntoView({ behavior: 'smooth' })}>Our approach <ArrowRight size={16} /></button></div>
+        <div className="editorial-about-copy"><h2>{landingContent?.about_title || 'Books made for a life of learning'}</h2><p>{aboutCopy}</p><button className="editorial-button editorial-button-green" onClick={() => document.getElementById('editorial-statement')?.scrollIntoView({ behavior: 'smooth' })}>How we publish <ArrowRight size={16} /></button></div>
       </section>
 
-      <section id="editorial-statement" className="editorial-statement"><p className="editorial-kicker editorial-kicker-dark">A note on publishing</p><p className="editorial-quote">“A good book makes room for <em>the next question.</em>”</p><span className="editorial-rule" /></section>
+      <section id="editorial-statement" className="editorial-statement editorial-reveal">
+        <h2>Made for the work of teaching and research</h2>
+        <p>Our catalogue brings faculty research into the classroom through considered textbooks, specialist monographs and learning resources.</p>
+      </section>
 
-      <section className="editorial-section editorial-releases" id="new-releases">
-        <div className="editorial-section-heading"><div><p className="editorial-kicker editorial-kicker-dark">Recently published</p><h2>New releases</h2></div><button className="editorial-text-link" onClick={() => onNavigate('/books')}>Browse the catalogue <ArrowRight size={16} /></button></div>
+      <section className="editorial-section editorial-releases editorial-reveal" id="new-releases">
+        <div className="editorial-section-heading"><h2>New releases</h2><button className="editorial-text-link" onClick={() => onNavigate('/books')}>Browse recent titles <ArrowRight size={16} /></button></div>
         {cardGrid(latest)}
       </section>
 
-      <section className="editorial-testimonials"><p className="editorial-kicker editorial-kicker-dark">From our readers</p><h2>Words from the community</h2><p>Reader recommendations will be shared here once verified feedback is available.</p></section>
+      <section className="editorial-testimonials editorial-reveal"><h2>For classrooms and libraries</h2><p>Find course texts, research monographs and educational works selected for students, faculty and institutional collections.</p><button className="editorial-text-link" onClick={() => onNavigate('/books')}>Find books by subject <ArrowRight size={16} /></button></section>
 
-      <section className="editorial-newsletter"><p className="editorial-kicker">Notes from the press</p><h2>Stay close to new ideas.</h2><p>We’re preparing a newsletter for new titles and publishing news.</p><button className="editorial-button editorial-button-light" disabled title="Newsletter sign-up will be enabled when a subscription service is connected">Newsletter sign-up coming soon</button></section>
+      <section className="editorial-newsletter editorial-reveal"><div><h2>Course texts and research titles</h2><p>Browse the catalogue by subject, author or title.</p></div><button className="editorial-button editorial-button-light" onClick={() => onNavigate('/books')}>Browse the catalogue <ArrowRight size={16} /></button></section>
     </> : <section className="bookstore-page">
       <p className="editorial-kicker editorial-kicker-dark">Dotcom Publications</p><h1>Bookstore</h1><p className="bookstore-intro">Explore our academic books, research monographs and learning resources.</p>
       <div className="bookstore-controls"><label className="bookstore-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search books or authors" aria-label="Search books or authors" /></label>
         <label className="bookstore-filter"><span>Subject</span><select value={category} onChange={(event) => setCategory(event.target.value)}><option value="all">All subjects</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
         <label className="bookstore-filter"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Recommended</option><option value="newest">Newest</option><option value="title">Title A–Z</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
       </div>
-      <div className="bookstore-result-count">{results.length} {results.length === 1 ? 'book' : 'books'}</div>
+      <div className="bookstore-result-count">Showing {results.length} {results.length === 1 ? 'book' : 'books'}</div>
       {results.length ? <div className="bookshop-grid">{results.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onAdd={() => onAddToCart(book)} />)}</div> : <p className="bookshop-empty">No books match these filters. Try another search or subject.</p>}
     </section>}
 

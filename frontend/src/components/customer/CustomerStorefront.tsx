@@ -608,7 +608,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
             {/* Cart Button with Microinteractions & Animated Count (4.E) */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#29382C] text-white hover:bg-[#1D2A20] border border-[#29382C] transition-colors font-semibold"
+              className="storefront-cart-action relative flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#29382C] text-white hover:bg-[#1D2A20] border border-[#29382C] transition-colors font-semibold"
               title="View Cart"
             >
               <ShoppingBag className="w-4 h-4 text-[#181716]" />
@@ -746,14 +746,14 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
         <div className="md:hidden fixed bottom-4 left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-2xl shadow-elevated flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
+            className="storefront-mobile-cart w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-2xl shadow-elevated flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
           >
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-full bg-[#181716] text-[#EED97A] flex items-center justify-center font-bold text-xs">
                 {cartCount}
               </div>
               <span className="text-xs font-bold">
-                {cartCount} {cartCount === 1 ? 'Title' : 'Titles'} Selected
+                {cartCount} {cartCount === 1 ? 'book' : 'books'} in your cart
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -770,7 +770,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       {isCartOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-300"
+            className="fixed inset-0 bg-black/60 transition-opacity animate-in fade-in duration-300"
             onClick={() => setIsCartOpen(false)}
           />
 
