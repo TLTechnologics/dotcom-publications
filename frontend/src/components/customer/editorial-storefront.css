@@ -148,9 +148,6 @@
 .storefront .storefront-header input[type="text"] { border-radius: 2px !important; }
 .storefront .rounded-lg, .storefront .rounded-xl, .storefront .rounded-2xl { border-radius: 3px !important; }
 .storefront .shadow-elevated { box-shadow: none !important; }
-.storefront [class*="backdrop-blur"] { backdrop-filter: none !important; }
-.storefront [class~="bg-[#292326]/90"] { background-color: #292326 !important; }
-.storefront [class~="bg-[#181716]/90"] { background-color: #181716 !important; }
 .storefront-cart-action { background: var(--editorial-forest) !important; border-color: var(--editorial-forest) !important; }
 .storefront-cart-action:hover { background: #4D1627 !important; border-color: #4D1627 !important; }
 .storefront-cart-action svg { color: #fff !important; }

@@ -137,7 +137,7 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
     : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#292326]/90 backdrop-blur-md select-none animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#292326] select-none animate-in fade-in duration-200">
       <div className="absolute top-3 left-4 right-4 flex items-center justify-between text-white z-40">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-white overflow-hidden p-0.5 border border-[#F6E7A8]/50 shadow-md shrink-0">
@@ -149,7 +149,7 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#181716]/90 border border-[#EED97A]/40 px-3 sm:px-3.5 py-1.5 rounded-full shadow-lg text-[11px] sm:text-xs backdrop-blur-sm">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#181716] border border-[#EED97A]/40 px-3 sm:px-3.5 py-1.5 rounded-full shadow-lg text-[11px] sm:text-xs">
           <span className="text-[#EED97A] font-bold">
             {currentPage === 0 ? 'Cover' : currentPage >= totalPages - 1 ? 'Preview complete' : `Page ${currentPage} of ${totalPages - 1}`}
           </span>
@@ -162,24 +162,24 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
             <button
               type="button"
               onClick={() => { onClose(); onViewDetails(book); }}
-              className="min-h-[44px] flex items-center justify-center gap-2 rounded-sm bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 px-3 transition-colors"
+              className="min-h-[44px] flex items-center justify-center gap-2 rounded-sm bg-[#181716] hover:bg-[#282522] text-white border border-[#EED97A]/40 px-3 transition-colors"
               aria-label={`View details for ${book.title}`}
             >
               <Info className="w-4 h-4 text-[#EED97A]" />
               <span className="hidden sm:inline text-xs font-semibold">Book details</span>
             </button>
           )}
-          <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 transition-all shadow-md group" title="Close reader (Esc)" aria-label="Close reader">
+          <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#181716] hover:bg-[#282522] text-white border border-[#EED97A]/40 transition-all shadow-md group" title="Close reader (Esc)" aria-label="Close reader">
             <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
           </button>
         </div>
       </div>
 
       <div className="relative w-full max-w-4xl h-[78vh] sm:h-[82vh] flex items-center justify-center pt-8">
-        <button onClick={() => pageFlipRef.current?.flipPrev('bottom')} className="absolute left-1 sm:-left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40" title="Previous page" aria-label="Previous page">
+        <button onClick={() => pageFlipRef.current?.flipPrev('bottom')} className="absolute left-1 sm:-left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#181716] hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40" title="Previous page" aria-label="Previous page">
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
-        <button onClick={() => pageFlipRef.current?.flipNext('bottom')} className="absolute right-1 sm:-right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#181716]/90 hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40" title="Next page" aria-label="Next page">
+        <button onClick={() => pageFlipRef.current?.flipNext('bottom')} className="absolute right-1 sm:-right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#181716] hover:bg-[#282522] text-[#EED97A] border border-[#EED97A]/50 shadow-2xl flex items-center justify-center transition-all z-40" title="Next page" aria-label="Next page">
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
@@ -200,7 +200,7 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/15 pointer-events-none" />
-              <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181716]/90 border border-[#EED97A]/60 text-white shadow-xl pointer-events-none animate-corner-hint"><Hand className="w-3.5 h-3.5 text-[#EED97A]" /><span className="text-[11px] font-bold text-[#EED97A]">Drag corner to flip</span></div>
+              <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181716] border border-[#EED97A]/60 text-white shadow-xl pointer-events-none animate-corner-hint"><Hand className="w-3.5 h-3.5 text-[#EED97A]" /><span className="text-[11px] font-bold text-[#EED97A]">Drag corner to flip</span></div>
             </div>
           </div>
 

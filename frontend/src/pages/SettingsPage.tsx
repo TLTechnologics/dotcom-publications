@@ -142,7 +142,7 @@ export const SettingsPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Company name"
+              label="Publishing house"
               value={settings.company_name}
               onChange={(e) => setSettings({ ...settings, company_name: e.target.value })}
             />
