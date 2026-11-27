@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Book } from '../../types';
 import { PageFlip } from 'page-flip';
-import { X, ChevronLeft, ChevronRight, ShoppingBag, Bookmark, Hand } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ShoppingBag, Bookmark, Hand, Info } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface InteractiveBookReaderProps {
@@ -157,9 +157,22 @@ export const InteractiveBookReader: React.FC<InteractiveBookReaderProps> = ({
           <span className="text-stone-300 font-mono text-[11px] hidden sm:inline">Drag a corner or swipe to turn</span>
         </div>
 
-        <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 transition-all shadow-md group" title="Close reader (Esc)" aria-label="Close reader">
-          <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-        </button>
+        <div className="flex items-center gap-2">
+          {onViewDetails && (
+            <button
+              type="button"
+              onClick={() => { onClose(); onViewDetails(book); }}
+              className="min-h-[44px] flex items-center justify-center gap-2 rounded-sm bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 px-3 transition-colors"
+              aria-label={`View details for ${book.title}`}
+            >
+              <Info className="w-4 h-4 text-[#EED97A]" />
+              <span className="hidden sm:inline text-xs font-semibold">Book details</span>
+            </button>
+          )}
+          <button onClick={onClose} className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#181716]/90 hover:bg-[#282522] text-white border border-[#EED97A]/40 transition-all shadow-md group" title="Close reader (Esc)" aria-label="Close reader">
+            <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+          </button>
+        </div>
       </div>
 
       <div className="relative w-full max-w-4xl h-[78vh] sm:h-[82vh] flex items-center justify-center pt-8">

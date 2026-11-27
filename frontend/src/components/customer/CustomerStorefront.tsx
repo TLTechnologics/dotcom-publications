@@ -737,6 +737,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
         currentPath={currentPath || '/'}
         onNavigate={onNavigate}
         onOpenBook={setReadingBook}
+        onBookDetails={setSelectedBook}
         onAddToCart={addToCart}
       />
 

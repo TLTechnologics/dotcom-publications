@@ -13,10 +13,11 @@ interface Props {
   currentPath: string;
   onNavigate: (path: string) => void;
   onOpenBook: (book: Book) => void;
+  onBookDetails: (book: Book) => void;
   onAddToCart: (book: Book) => void;
 }
 
-const BookCard: React.FC<{ book: Book; onOpen: () => void; onAdd: () => void }> = ({ book, onOpen, onAdd }) => (
+const BookCard: React.FC<{ book: Book; onOpen: () => void; onDetails: () => void; onAdd: () => void }> = ({ book, onOpen, onDetails, onAdd }) => (
   <article className="bookshop-card group">
     <button type="button" className="bookshop-cover" onClick={onOpen} aria-label={`View ${book.title}`}>
       <img src={book.cover_image || '/covers/computational-mathematics.webp'} alt={`Cover of ${book.title}`} loading="lazy" />
@@ -24,6 +25,7 @@ const BookCard: React.FC<{ book: Book; onOpen: () => void; onAdd: () => void }> 
     <div className="bookshop-card-copy">
       <p className="bookshop-author">{book.authors?.map((a) => a.name).join(', ') || 'Dotcom Publications'}</p>
       <button type="button" onClick={onOpen} className="bookshop-title">{book.title}</button>
+      <button type="button" onClick={onDetails} className="bookshop-details">Book details <ArrowRight size={13} /></button>
       <div className="bookshop-card-bottom">
         <span className="bookshop-price">₹{book.selling_price.toLocaleString('en-IN')}</span>
         <button type="button" onClick={onAdd} className="bookshop-add" aria-label={`Add ${book.title} to cart`}>
@@ -35,7 +37,7 @@ const BookCard: React.FC<{ book: Book; onOpen: () => void; onAdd: () => void }> 
 );
 
 export const EditorialStorefront: React.FC<Props> = ({
-  books, categories, landingContent, siteSettings, currentPath, onNavigate, onOpenBook, onAddToCart,
+  books, categories, landingContent, siteSettings, currentPath, onNavigate, onOpenBook, onBookDetails, onAddToCart,
 }) => {
   const isBookstore = currentPath === '/books';
   const [category, setCategory] = useState('all');
@@ -98,7 +100,7 @@ export const EditorialStorefront: React.FC<Props> = ({
   }, [isBookstore, books.length]);
 
   const cardGrid = (items: Book[]) => items.length ? (
-    <div className="bookshop-grid">{items.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onAdd={() => onAddToCart(book)} />)}</div>
+    <div className="bookshop-grid">{items.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onDetails={() => onBookDetails(book)} onAdd={() => onAddToCart(book)} />)}</div>
   ) : <p className="bookshop-empty">New titles will appear here as they are added to the catalogue.</p>;
 
   return <div className="storefront editorial-storefront">
@@ -143,7 +145,7 @@ export const EditorialStorefront: React.FC<Props> = ({
         <label className="bookstore-filter"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Recommended</option><option value="newest">Newest</option><option value="title">Title A–Z</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
       </div>
       <div className="bookstore-result-count">Showing {results.length} {results.length === 1 ? 'book' : 'books'}</div>
-      {results.length ? <div className="bookshop-grid">{results.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onAdd={() => onAddToCart(book)} />)}</div> : <p className="bookshop-empty">No books match these filters. Try another search or subject.</p>}
+      {results.length ? <div className="bookshop-grid">{results.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onDetails={() => onBookDetails(book)} onAdd={() => onAddToCart(book)} />)}</div> : <p className="bookshop-empty">No books match these filters. Try another search or subject.</p>}
     </section>}
 
     <footer className="editorial-footer" id="contact"><div className="editorial-footer-brand"><a href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); }}>Dotcom Publications</a><p>{siteSettings?.description || 'Academic publishing for a curious world.'}</p></div><div><h3>Explore</h3><a href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); }}>Bookstore</a><a href="/#about" onClick={(event) => { event.preventDefault(); onNavigate('/#about'); }}>About the press</a></div><div><h3>Contact</h3><p>{landingContent?.contact_email || siteSettings?.contact_email || 'Contact the publishing team'}</p><p>{landingContent?.contact_phone || siteSettings?.phone || ''}</p><p>{landingContent?.contact_address || ''}</p></div><div className="editorial-copyright">© {new Date().getFullYear()} Dotcom Publications. {landingContent?.footer_text || 'All rights reserved.'}</div></footer>

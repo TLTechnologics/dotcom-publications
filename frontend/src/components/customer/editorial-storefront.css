@@ -72,6 +72,9 @@
 .bookshop-author { margin: 0 0 6px; color: var(--editorial-muted); font: 11px 'Inter', sans-serif; }
 .bookshop-title { display: block; min-height: 54px; padding: 0; border: 0; background: transparent; color: var(--editorial-ink); text-align: left; font: 600 22px/1.06 'Cormorant Garamond', Georgia, serif; cursor: pointer; }
 .bookshop-title:hover { color: var(--editorial-forest); }
+.bookshop-details { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 4px 0; border: 0; border-bottom: 1px solid var(--editorial-rule); background: transparent; color: var(--editorial-forest); font: 600 11px 'Inter', sans-serif; cursor: pointer; }
+.bookshop-details:hover { border-color: var(--editorial-forest); }
+.bookshop-details:focus-visible { outline: 2px solid #B88C5D; outline-offset: 3px; }
 .bookshop-card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--editorial-rule); }
 .bookshop-price { color: var(--editorial-forest); font: 600 14px 'Inter', sans-serif; }
 .bookshop-add { display: grid; place-items: center; width: 36px; height: 36px; color: var(--editorial-forest); background: transparent; border: 1px solid var(--editorial-rule); cursor: pointer; }
