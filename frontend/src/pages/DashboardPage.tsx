@@ -95,10 +95,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
           <div className="min-w-0">
             <h4 className="text-sm font-serif font-bold text-[#431322] tracking-tight truncate">
-              Publishing dashboard — Dotcom Publications
+              Publishing dashboard
             </h4>
             <p className="text-[11px] text-[#651C32] mt-0.5 font-medium line-clamp-2">
-              Synchronized real-time catalogue metrics, order fulfillment statuses, and audited transactions.
+              Catalogue totals, customer orders and recent publishing activity.
             </p>
           </div>
         </div>

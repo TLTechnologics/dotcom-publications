@@ -1,9 +1,154 @@
+.admin-workspace {
+  --admin-paper: #faf7f2;
+  --admin-surface: #fffefa;
+  --admin-surface-soft: #f1f3ee;
+  --admin-ink: #1b1714;
+  --admin-muted: #5f6f5c;
+  --admin-sage: #b9c4b4;
+  --admin-rule: #dce3d9;
+  --admin-burgundy: #6b1d2a;
+  --admin-burgundy-deep: #4c1520;
+  --admin-crimson: #c8102e;
+  --admin-gold: #c9962b;
+  --admin-green: #2f6b4f;
+  background-color: var(--admin-paper) !important;
+  color: var(--admin-ink) !important;
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.admin-workspace h1,
+.admin-workspace h2,
+.admin-workspace h3,
+.admin-workspace h4,
+.admin-workspace .font-serif {
+  color: var(--admin-ink);
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif !important;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.admin-workspace .font-sans,
+.admin-workspace button,
+.admin-workspace input,
+.admin-workspace select,
+.admin-workspace textarea {
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.admin-workspace .uppercase {
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+}
+
+.admin-workspace [class~="bg-[#F7F7F5]"],
+.admin-workspace [class~="bg-[#FAF8F3]"],
+.admin-workspace [class~="bg-[#FAF9F5]"],
+.admin-workspace [class~="bg-[#F8FAFD]"] {
+  background-color: var(--admin-paper) !important;
+}
+
+.admin-workspace [class~="bg-white"] {
+  background-color: var(--admin-surface) !important;
+}
+
+.admin-workspace [class~="bg-[#252624]"],
+.admin-workspace [class~="bg-[#651C32]"],
+.admin-workspace [class~="bg-[#2457C5]"],
+.admin-workspace [class~="bg-[#173B87]"] {
+  background-color: var(--admin-burgundy) !important;
+}
+
+.admin-workspace [class~="bg-[#111210]"],
+.admin-workspace [class~="bg-[#431322]"],
+.admin-workspace [class~="hover:bg-[#111210]"]:hover,
+.admin-workspace [class~="hover:bg-[#431322]"]:hover,
+.admin-workspace [class~="hover:bg-[#173B87]"]:hover {
+  background-color: var(--admin-burgundy-deep) !important;
+}
+
+.admin-workspace [class~="bg-[#EEECE7]"],
+.admin-workspace [class~="bg-[#EAF2FF]"],
+.admin-workspace [class~="bg-[#F4F7FB]"],
+.admin-workspace [class~="bg-[#EAF1F7]"],
+.admin-workspace [class~="hover:bg-[#F4F7FB]"]:hover {
+  background-color: var(--admin-surface-soft) !important;
+}
+
+.admin-workspace [class~="bg-[#FFF6D9]"],
+.admin-workspace [class~="bg-[#FAF2BA]"],
+.admin-workspace [class~="bg-[#F6E7A8]"],
+.admin-workspace [class~="bg-[#EED97A]"],
+.admin-workspace [class~="hover:bg-[#FFF6D9]"]:hover,
+.admin-workspace [class~="hover:bg-[#FAF2BA]"]:hover {
+  background-color: #f4eddd !important;
+}
+
+.admin-workspace [class~="text-[#292326]"],
+.admin-workspace [class~="text-[#222321]"],
+.admin-workspace [class~="text-[#181716]"],
+.admin-workspace [class~="text-[#172033]"] {
+  color: var(--admin-ink) !important;
+}
+
+.admin-workspace [class~="text-[#651C32]"],
+.admin-workspace [class~="text-[#431322]"],
+.admin-workspace [class~="text-[#2457C5]"],
+.admin-workspace [class~="text-[#173B87]"],
+.admin-workspace [class~="hover:text-[#651C32]"]:hover,
+.admin-workspace [class~="hover:text-[#431322]"]:hover {
+  color: var(--admin-burgundy) !important;
+}
+
+.admin-workspace [class~="text-[#82777A]"],
+.admin-workspace [class~="text-[#6F706C]"],
+.admin-workspace [class~="text-[#65728A]"],
+.admin-workspace [class~="text-[#526079]"],
+.admin-workspace [class~="text-[#8190A8]"] {
+  color: var(--admin-muted) !important;
+}
+
+.admin-workspace [class~="text-[#F6E7A8]"],
+.admin-workspace [class~="text-[#EED97A]"] {
+  color: var(--admin-gold) !important;
+}
+
+.admin-workspace [class~="text-[#477A58]"],
+.admin-workspace [class~="text-[#3A754E]"] {
+  color: var(--admin-green) !important;
+}
+
+.admin-workspace [class~="text-[#B94B4B]"],
+.admin-workspace [class~="text-[#D34545]"],
+.admin-workspace [class~="text-rose-700"] {
+  color: var(--admin-crimson) !important;
+}
+
+.admin-workspace [class~="border-[#EAE3DE]"],
+.admin-workspace [class~="border-[#DCE4EF]"],
+.admin-workspace [class~="border-[#E3E2DD]"],
+.admin-workspace [class~="border-[#C9C8C1]"],
+.admin-workspace [class~="border-[#F6E7A8]"],
+.admin-workspace [class~="border-[#EED97A]"] {
+  border-color: var(--admin-rule) !important;
+}
+
+.admin-workspace [class~="border-[#651C32]"],
+.admin-workspace [class~="border-[#2457C5]"],
+.admin-workspace [class~="border-[#173B87]"] {
+  border-color: var(--admin-burgundy) !important;
+}
+
 .admin-workspace [class~="rounded-2xl"],
 .admin-workspace [class~="rounded-3xl"] {
+  border-radius: 12px !important;
+}
+
+.admin-workspace [class~="rounded-xl"],
+.admin-workspace [class~="rounded-lg"] {
   border-radius: 8px !important;
 }
 
-.admin-workspace [class~="rounded-xl"] {
+.admin-workspace [class~="rounded-md"] {
   border-radius: 6px !important;
 }
 
@@ -12,11 +157,58 @@
   box-shadow: none !important;
 }
 
-.admin-workspace [class*="backdrop-blur"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.admin-workspace [class~="shadow-md"] {
+  box-shadow: 0 2px 8px rgba(27, 23, 20, 0.1) !important;
 }
 
+.admin-workspace [class~="shadow-lg"],
+.admin-workspace [class~="shadow-xl"],
+.admin-workspace [class~="shadow-2xl"],
 .admin-workspace .shadow-elevated {
-  box-shadow: 0 14px 32px rgba(41, 35, 38, .14) !important;
+  box-shadow: 0 14px 32px rgba(27, 23, 20, 0.14) !important;
+}
+
+.admin-workspace [class*="backdrop-blur"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.admin-workspace :is(input, select, textarea, button):focus-visible {
+  outline-color: var(--admin-gold);
+}
+
+.admin-workspace aside {
+  background-color: var(--admin-surface) !important;
+  border-color: var(--admin-rule) !important;
+}
+
+.admin-workspace aside > div:first-child,
+.admin-workspace aside > div:last-child {
+  border-color: var(--admin-rule) !important;
+}
+
+.admin-workspace aside .group > div:nth-child(2) p.text-white,
+.admin-workspace aside .group > button.text-white\/70 {
+  color: var(--admin-ink) !important;
+}
+
+.admin-workspace aside .group > div:nth-child(2) [class~="text-[#F6E7A8]/80"] {
+  color: var(--admin-muted) !important;
+}
+
+.admin-workspace aside .group:hover > div:nth-child(2) p.text-white {
+  color: #fff !important;
+}
+
+.admin-workspace aside .group:hover > div:nth-child(2) [class~="text-[#F6E7A8]/80"] {
+  color: #eadab1 !important;
+}
+
+.admin-workspace aside .group:hover > button.text-white\/70 {
+  color: #eadab1 !important;
+}
+
+.admin-workspace > div > header {
+  background-color: var(--admin-surface) !important;
+  border-color: var(--admin-rule) !important;
 }

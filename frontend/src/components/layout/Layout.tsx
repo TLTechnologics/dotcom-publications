@@ -70,7 +70,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {/* Mobile Slide-Out Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
-          {/* Backdrop with Blur and Fade Animation */}
+          {/* Navigation backdrop */}
           <div
             className="fixed inset-0 bg-[#172033]/65 transition-opacity animate-in fade-in duration-300"
             onClick={() => setMobileMenuOpen(false)}
