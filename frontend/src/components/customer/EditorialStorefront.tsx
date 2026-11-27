@@ -40,6 +40,8 @@ export const EditorialStorefront: React.FC<Props> = ({
   books, categories, landingContent, siteSettings, currentPath, onNavigate, onOpenBook, onBookDetails, onAddToCart,
 }) => {
   const isBookstore = currentPath === '/books';
+  const isAboutPage = currentPath === '/about';
+  const isContactPage = currentPath === '/contact';
   const [category, setCategory] = useState('all');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('featured');
@@ -104,7 +106,42 @@ export const EditorialStorefront: React.FC<Props> = ({
   ) : <p className="bookshop-empty">New titles will appear here as they are added to the catalogue.</p>;
 
   return <div className="storefront editorial-storefront">
-    {!isBookstore ? <>
+    {isAboutPage ? <main className="editorial-info-page">
+      <section className="editorial-info-hero">
+        <p className="editorial-kicker editorial-kicker-dark">About the press</p>
+        <h1>{landingContent?.about_title || 'Books made for a life of learning'}</h1>
+        <p>{aboutCopy}</p>
+      </section>
+      <section className="editorial-info-section">
+        <div className="editorial-info-image"><img src={READING_ROOM_PHOTO} alt="A quiet reading room lined with books" loading="lazy" /></div>
+        <div className="editorial-info-copy">
+          <p className="editorial-kicker editorial-kicker-dark">Our purpose</p>
+          <h2>Publishing for classrooms, libraries and research</h2>
+          <p>We work with educators and scholars to make rigorous ideas useful to the people who teach, study and build on them. Our catalogue brings textbooks, specialist monographs and learning resources together under one academic publishing house.</p>
+          <button className="editorial-button editorial-button-green" onClick={() => onNavigate('/books')}>Explore the catalogue <ArrowRight size={16} /></button>
+        </div>
+      </section>
+      <section className="editorial-info-principle">
+        <p className="editorial-kicker editorial-kicker-dark">How we publish</p>
+        <h2>Careful editorial work, lasting reference</h2>
+        <p>Each title is shaped around its subject and readers, with attention to clear teaching, sound research and dependable use in academic settings.</p>
+      </section>
+    </main> : isContactPage ? <main className="editorial-info-page editorial-contact-page">
+      <section className="editorial-info-hero">
+        <p className="editorial-kicker editorial-kicker-dark">Contact</p>
+        <h1>Talk with our publishing team</h1>
+        <p>For course adoption, institutional orders, author enquiries or help finding a title, reach us using the details below.</p>
+      </section>
+      <section className="editorial-contact-details">
+        <article><span>Email</span><h2>{landingContent?.contact_email || siteSettings?.contact_email || 'editor@dotcompublications.com'}</h2><a href={`mailto:${landingContent?.contact_email || siteSettings?.contact_email || 'editor@dotcompublications.com'}`}>Write to the team <ArrowRight size={15} /></a></article>
+        <article><span>Telephone</span><h2>{landingContent?.contact_phone || siteSettings?.phone || '+91 11 4567 8900'}</h2><a href={`tel:${(landingContent?.contact_phone || siteSettings?.phone || '+91 11 4567 8900').replace(/[^+\d]/g, '')}`}>Call the office <ArrowRight size={15} /></a></article>
+        <article><span>Office</span><h2>{landingContent?.contact_address || 'Knowledge Park III, Institutional Area, Greater Noida, Delhi NCR, India'}</h2><p>Academic and institutional publishing enquiries are welcome.</p></article>
+      </section>
+      <section className="editorial-info-principle">
+        <h2>Looking for a course text?</h2><p>Browse the catalogue by title, author or subject.</p>
+        <button className="editorial-button editorial-button-green" onClick={() => onNavigate('/books')}>Visit the bookstore <ArrowRight size={16} /></button>
+      </section>
+    </main> : !isBookstore ? <>
       <section className="editorial-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(37, 24, 28, .78) 0%, rgba(37, 24, 28, .56) 48%, rgba(37, 24, 28, .18) 100%), url("${heroImage}")` }}>
         <div className="editorial-hero-content">
           <p className="editorial-kicker">Independent academic publishing</p>
@@ -148,6 +185,6 @@ export const EditorialStorefront: React.FC<Props> = ({
       {results.length ? <div className="bookshop-grid">{results.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onDetails={() => onBookDetails(book)} onAdd={() => onAddToCart(book)} />)}</div> : <p className="bookshop-empty">No books match these filters. Try another search or subject.</p>}
     </section>}
 
-    <footer className="editorial-footer" id="contact"><div className="editorial-footer-brand"><a href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); }}>Dotcom Publications</a><p>{siteSettings?.description || 'Academic publishing for a curious world.'}</p></div><div><h3>Explore</h3><a href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); }}>Bookstore</a><a href="/#about" onClick={(event) => { event.preventDefault(); onNavigate('/#about'); }}>About the press</a></div><div><h3>Contact</h3><p>{landingContent?.contact_email || siteSettings?.contact_email || 'Contact the publishing team'}</p><p>{landingContent?.contact_phone || siteSettings?.phone || ''}</p><p>{landingContent?.contact_address || ''}</p></div><div className="editorial-copyright">© {new Date().getFullYear()} Dotcom Publications. {landingContent?.footer_text || 'All rights reserved.'}</div></footer>
+    <footer className="editorial-footer" id="contact"><div className="editorial-footer-brand"><a href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); }}>Dotcom Publications</a><p>{siteSettings?.description || 'Academic publishing for a curious world.'}</p></div><div><h3>Explore</h3><a href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); }}>Bookstore</a><a href="/about" onClick={(event) => { event.preventDefault(); onNavigate('/about'); }}>About us</a></div><div><h3>Contact</h3><a href="/contact" onClick={(event) => { event.preventDefault(); onNavigate('/contact'); }}>Contact the publishing team</a><p>{landingContent?.contact_phone || siteSettings?.phone || ''}</p></div><div className="editorial-copyright">© {new Date().getFullYear()} Dotcom Publications. {landingContent?.footer_text || 'All rights reserved.'}</div></footer>
   </div>;
 };

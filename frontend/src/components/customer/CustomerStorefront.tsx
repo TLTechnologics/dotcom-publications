@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Book,
   Category,
@@ -27,8 +27,8 @@ import {
   ShieldCheck,
   Truck,
   CreditCard,
-  Menu,
   Home,
+  Info,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -252,6 +252,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   // State
   const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('dotcom_cart');
@@ -268,15 +270,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   const [orderConfirmed, setOrderConfirmed] = useState<any | null>(null);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [navScrolled, setNavScrolled] = useState(false);
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
 
   useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 72);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    setSearchOpen(false);
+    setSearchQuery('');
+    window.scrollTo(0, 0);
+  }, [currentPath]);
 
   // Synchronize route paths like /cart, /checkout, /books, /authors
   useEffect(() => {
@@ -422,6 +424,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       icon: <Home size={21} />,
       label: 'Home',
       onClick: () => {
+        setSearchOpen(false);
+        setSearchQuery('');
         onNavigate('/');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       },
@@ -429,18 +433,22 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
     {
       icon: <BookOpen size={21} />,
       label: 'Bookstore',
-      onClick: () => onNavigate('/books'),
+      onClick: () => { setSearchOpen(false); setSearchQuery(''); onNavigate('/books'); },
+    },
+    {
+      icon: <Info size={21} />,
+      label: 'About us',
+      onClick: () => { setSearchOpen(false); setSearchQuery(''); onNavigate('/about'); },
+    },
+    {
+      icon: <Mail size={21} />,
+      label: 'Contact',
+      onClick: () => { setSearchOpen(false); setSearchQuery(''); onNavigate('/contact'); },
     },
     {
       icon: <Search size={21} />,
       label: 'Search books',
-      onClick: () => {
-        const searchId = window.matchMedia('(min-width: 640px)').matches
-          ? 'storefront-search-desktop'
-          : 'storefront-search-mobile';
-        const input = document.getElementById(searchId) as HTMLInputElement | null;
-        input?.focus({ preventScroll: true });
-      },
+      onClick: () => setSearchOpen((open) => !open),
     },
     {
       icon: <ShoppingBag size={21} />,
@@ -536,238 +544,35 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
   return (
     <div className="min-h-screen bg-[#FAF9F5] font-sans text-[#181716] flex flex-col selection:bg-[#E5DDCF] selection:text-[#29382C] storefront">
-      {/* Main Storefront Header */}
-      <header
-        className={`storefront-header z-40 ${navScrolled || currentPath === '/books' ? 'storefront-header-solid' : 'storefront-header-over-hero'}`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
-          {/* Logo & Brand Identity */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-sm bg-white border border-[#EAE3DE] overflow-hidden shrink-0">
-              <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-[8px]" />
-            </div>
-            <div>
-              <span className="storefront-brand-name font-serif font-semibold text-[#181716] text-lg leading-tight block tracking-tight">
-                Dotcom Publications
-              </span>
-              <span className="text-[10px] tracking-wide text-[#524B42] font-medium block">
-                Academic & Educational Publishers
-              </span>
-            </div>
+      {searchOpen && (
+        <section className="dock-search-panel" aria-label="Search the book catalogue">
+          <div className="dock-search-heading">
+            <div><span className="editorial-kicker editorial-kicker-dark">Catalogue search</span><h2>Find a book</h2></div>
+            <button type="button" className="dock-search-close" onClick={() => { setSearchOpen(false); setSearchQuery(''); }} aria-label="Close search">×</button>
           </div>
-
-          {/* Desktop Navigation Links matching Experience sequence */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#181716]">
-            <a
-              href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
-            >
-              Home
-            </a>
-            <a
-              href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); }}
-              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
-            >
-              Bookstore
-            </a>
-            <a
-              href="/#about" onClick={(event) => { event.preventDefault(); onNavigate('/#about'); }}
-              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
-            >
-              About us
-            </a>
-            <a
-              href="/#new-releases"
-              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
-            >
-              New releases
-            </a>
-            <a
-              href="/#editorial-statement"
-              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
-            >
-              Our approach
-            </a>
-            <a
-              href="/#contact"
-              className="relative hover:text-[#181716] transition-colors py-1 group after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-[#EED97A] after:transition-all after:duration-200"
-            >
-              Contact
-            </a>
-          </nav>
-
-          {/* Search Bar + Cart Action + Mobile Hamburger */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Search Input with Live Dropdown */}
-            <div className="relative hidden sm:block w-48 lg:w-64">
-              <Search className="storefront-search-icon w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
-              <input
-                id="storefront-search-desktop"
-                type="text"
-                placeholder="Search title, author, ISBN..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="storefront-search w-full pl-9 pr-3 py-1.5 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A] transition-all"
-              />
-              {searchQuery && (
-                <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-sm border border-[#EAE3DE] shadow-sm p-3 z-50 max-h-96 overflow-y-auto space-y-2">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-[#EAE3DE] text-[10px] text-[#82777A]">
-                    <span>{filteredBooks.length} results found</span>
-                    <button onClick={() => setSearchQuery('')} className="text-[#181716] font-semibold hover:underline">
-                      Close
-                    </button>
-                  </div>
-                  {filteredBooks.length === 0 ? (
-                    <p className="text-xs text-[#82777A] py-2 text-center">No matching titles</p>
-                  ) : (
-                    filteredBooks.map((b) => (
-                      <div
-                        key={b.id}
-                        onClick={() => {
-                          setReadingBook(b);
-                          setSearchQuery('');
-                        }}
-                        className="flex items-center gap-2.5 p-2 rounded-sm hover:bg-[#FAF8F3] cursor-pointer transition-colors"
-                      >
-                        <img src={b.cover_image || '/covers/computational-mathematics.jpg'} alt={b.title} className="w-8 h-10 object-cover rounded shadow-xs shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <span className="font-serif font-bold text-xs text-[#181716] block truncate">{b.title}</span>
-                          <span className="text-[10px] text-[#736B5E] block truncate">{b.authors?.map(a => a.name).join(', ')}</span>
-                        </div>
-                        <span className="font-serif font-bold text-xs text-[#181716] shrink-0">₹{b.selling_price}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Cart Button with Microinteractions & Animated Count (4.E) */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="storefront-cart-action relative flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#29382C] text-white hover:bg-[#1D2A20] border border-[#29382C] transition-colors font-semibold"
-              title="View cart"
-            >
-              <ShoppingBag className="w-4 h-4 text-[#181716]" />
-              <span className="text-xs font-semibold">Cart</span>
-              {cartCount > 0 && (
-                <span
-                  key={cartCount}
-                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#111210] text-white font-bold text-[10px] shadow-sm animate-in zoom-in-75 duration-200"
-                >
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="storefront-menu-toggle md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm border transition-colors"
-              aria-label="Toggle mobile menu"
-              aria-expanded={mobileNavOpen}
-              aria-controls="storefront-mobile-menu"
-            >
-              {mobileNavOpen ? <X className="w-[22px] h-[22px]" strokeWidth={2.5} /> : <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Dropdown Menu (4.E Smooth Opening/Closing) */}
-        {mobileNavOpen && (
-          <div id="storefront-mobile-menu" className="storefront-mobile-menu md:hidden border-t border-[#D8D1C5] bg-white px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
-            <nav className="flex flex-col space-y-1 text-sm font-semibold text-[#181716]">
-              <a
-                href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); setMobileNavOpen(false); }}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
-              >
-                Home
-              </a>
-              <a
-                href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); setMobileNavOpen(false); }}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
-              >
-                Bookstore
-              </a>
-              <a
-                href="/#about"
-                onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
-              >
-                About us
-              </a>
-              <a
-                href="/#new-releases"
-                onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
-              >
-                New releases
-              </a>
-              <a
-                href="/#editorial-statement"
-                onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
-              >
-                Our approach
-              </a>
-              <a
-                href="#contact"
-                onClick={() => setMobileNavOpen(false)}
-                className="min-h-[44px] flex items-center px-3.5 py-2.5 rounded-sm hover:bg-[#FAF9F5] active:bg-[#FAF2BA] hover:text-[#181716] transition-colors"
-              >
-                Contact
-              </a>
-            </nav>
-          </div>
-        )}
-
-        {/* Mobile Search Bar Row */}
-        <div className="sm:hidden px-4 pb-3 pt-1 border-t border-[#EAE3DE]/60 relative">
-          <div className="relative w-full">
-            <Search className="storefront-search-icon w-3.5 h-3.5 text-[#82777A] absolute left-3.5 top-3.5" />
+          <label className="dock-search-field">
+            <Search size={18} aria-hidden="true" />
             <input
-              id="storefront-search-mobile"
-              type="text"
-              placeholder="Search books, authors, ISBN..."
+              ref={searchInputRef}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="storefront-search w-full h-11 pl-10 pr-3 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+              onChange={(event) => setSearchQuery(event.target.value)}
+              onKeyDown={(event) => { if (event.key === 'Escape') { setSearchOpen(false); setSearchQuery(''); } }}
+              placeholder="Search titles, authors, ISBN or subject"
+              aria-label="Search titles, authors, ISBN or subject"
             />
+          </label>
+          <div className="dock-search-results" aria-live="polite">
+            {filteredBooks.slice(0, 5).map((book) => (
+              <button key={book.id} type="button" className="dock-search-result" onClick={() => { setReadingBook(book); setSearchOpen(false); setSearchQuery(''); }}>
+                <img src={book.cover_image || '/covers/computational-mathematics.jpg'} alt="" />
+                <span className="dock-search-result-copy"><strong>{book.title}</strong><small>{book.authors?.map((author) => author.name).join(', ') || 'Dotcom Publications'}</small></span>
+                <span className="dock-search-price">₹{book.selling_price.toLocaleString('en-IN')}</span>
+              </button>
+            ))}
+            {filteredBooks.length === 0 && <p className="dock-search-empty">No books match that search. Try a different title, author or subject.</p>}
           </div>
-          {searchQuery && (
-            <div className="absolute top-full mt-1 left-4 right-4 bg-white rounded-sm border border-[#EAE3DE] shadow-sm p-3 z-50 max-h-80 overflow-y-auto space-y-2">
-              <div className="flex items-center justify-between pb-1.5 border-b border-[#EAE3DE] text-[10px] text-[#82777A]">
-                <span>{filteredBooks.length} results</span>
-                <button onClick={() => setSearchQuery('')} className="text-[#181716] font-semibold">
-                  Close
-                </button>
-              </div>
-              {filteredBooks.length === 0 ? (
-                <p className="text-xs text-[#82777A] py-2 text-center">No matching titles</p>
-              ) : (
-                filteredBooks.map((b) => (
-                  <div
-                    key={b.id}
-                    onClick={() => {
-                      setReadingBook(b);
-                      setSearchQuery('');
-                    }}
-                    className="flex items-center gap-2.5 p-1.5 rounded-sm hover:bg-[#FAF9F5] cursor-pointer"
-                  >
-                    <img src={b.cover_image || '/covers/computational-mathematics.jpg'} alt={b.title} className="w-7 h-9 object-cover rounded shadow-xs shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <span className="font-serif font-bold text-xs text-[#181716] block truncate">{b.title}</span>
-                      <span className="text-[10px] text-[#736B5E] block truncate">{b.authors?.map(a => a.name).join(', ')}</span>
-                    </div>
-                    <span className="font-serif font-bold text-xs text-[#181716] shrink-0">₹{b.selling_price}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-      </header>
-
+        </section>
+      )}
       <EditorialStorefront
         books={publishedBooks}
         categories={effectiveCategories}
@@ -781,31 +586,6 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       />
 
       <MagnificationDock items={dockItems} />
-
-      {/* Mobile Floating Sticky Cart Bar */}
-      {cartCount > 0 && (
-        <div className="md:hidden fixed bottom-[88px] left-4 right-4 z-40 animate-in slide-in-from-bottom duration-200">
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="storefront-mobile-cart w-full bg-[#EED97A] text-[#181716] py-3.5 px-5 rounded-sm shadow-sm flex items-center justify-between border border-[#E5CE68] active:scale-95 transition-transform font-bold"
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-[#181716] text-[#EED97A] flex items-center justify-center font-bold text-xs">
-                {cartCount}
-              </div>
-              <span className="text-xs font-bold">
-                {cartCount} {cartCount === 1 ? 'book' : 'books'} in your cart
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-serif font-bold text-sm text-[#181716]">
-                ₹{cartTotal.toLocaleString()}
-              </span>
-              <ArrowRight className="w-4 h-4 text-[#181716]" />
-            </div>
-          </button>
-        </div>
-      )}
 
       {/* Cart Drawer Slide-Over (4.G Smooth Opening & Closing) */}
       {isCartOpen && (

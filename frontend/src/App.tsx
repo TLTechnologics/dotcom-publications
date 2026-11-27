@@ -62,11 +62,20 @@ export function DotcomPlatform() {
   }, []);
 
   const navigate = (path: string) => {
-    const clean = path.toLowerCase().replace(/\/+$/, '') || '/';
-    if (window.location.pathname.toLowerCase().replace(/\/+$/, '') !== clean) {
-      window.history.pushState({}, '', clean);
+    const [requestedPath, requestedHash] = path.split('#', 2);
+    const cleanPath = requestedPath.toLowerCase().replace(/\/+$/, '') || '/';
+    const destination = `${cleanPath}${requestedHash ? `#${requestedHash}` : ''}`;
+    if (`${window.location.pathname}${window.location.hash}` !== destination) {
+      window.history.pushState({}, '', destination);
     }
-    setCurrentPath(clean);
+    setCurrentPath(cleanPath);
+    window.requestAnimationFrame(() => {
+      if (requestedHash) {
+        document.getElementById(decodeURIComponent(requestedHash))?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
   };
 
   // Verify authentication token on mount

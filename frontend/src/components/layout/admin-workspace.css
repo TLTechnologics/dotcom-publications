@@ -32,6 +32,8 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
+  background-image: radial-gradient(ellipse 58% 38% at 100% 0%, rgba(201, 150, 43, 0.13), transparent 70%), radial-gradient(ellipse 55% 45% at 0% 78%, rgba(107, 29, 42, 0.055), transparent 72%);
+  background-attachment: fixed;
 }
 
 .admin-workspace h1,
@@ -67,6 +69,14 @@
 
 .admin-workspace [class~="bg-white"] {
   background-color: var(--admin-surface) !important;
+}
+
+.admin-workspace [class~="bg-white"][class*="rounded-"] {
+  background-color: rgba(255, 254, 250, 0.66) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+  border-color: rgba(201, 150, 43, 0.3) !important;
+  box-shadow: 0 12px 30px rgba(76, 21, 32, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.86) !important;
 }
 
 .admin-workspace [class~="bg-[#252624]"],
@@ -186,11 +196,6 @@
   box-shadow: 0 14px 32px rgba(27, 23, 20, 0.14) !important;
 }
 
-.admin-workspace [class*="backdrop-blur"] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
 .admin-workspace :is(input, select, textarea, button):focus-visible {
   outline-color: var(--admin-gold);
 }
@@ -233,6 +238,9 @@
 }
 
 .admin-workspace > div > header {
-  background-color: var(--admin-surface) !important;
-  border-color: var(--admin-rule) !important;
+  background-color: rgba(255, 254, 250, 0.84) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  backdrop-filter: blur(16px) saturate(145%);
+  border-color: rgba(201, 150, 43, 0.28) !important;
+  box-shadow: 0 6px 20px rgba(76, 21, 32, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
