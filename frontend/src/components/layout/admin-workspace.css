@@ -1,11 +1,11 @@
 .admin-workspace {
   --admin-paper: #faf7f2;
   --admin-surface: #fffefa;
-  --admin-surface-soft: #f1f3ee;
+  --admin-surface-soft: #f7f0df;
   --admin-ink: #1b1714;
   --admin-muted: #5f6f5c;
   --admin-sage: #b9c4b4;
-  --admin-rule: #dce3d9;
+  --admin-rule: #e2dccd;
   --admin-burgundy: #6b1d2a;
   --admin-burgundy-deep: #4c1520;
   --admin-crimson: #c8102e;
@@ -14,6 +14,24 @@
   background-color: var(--admin-paper) !important;
   color: var(--admin-ink) !important;
   font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.admin-shell {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  height: 100%;
+}
+
+.admin-content {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
 }
 
 .admin-workspace h1,
@@ -80,7 +98,7 @@
 .admin-workspace [class~="bg-[#EED97A]"],
 .admin-workspace [class~="hover:bg-[#FFF6D9]"]:hover,
 .admin-workspace [class~="hover:bg-[#FAF2BA]"]:hover {
-  background-color: #f4eddd !important;
+  background-color: #f7efcf !important;
 }
 
 .admin-workspace [class~="text-[#292326]"],
@@ -180,6 +198,12 @@
 .admin-workspace aside {
   background-color: var(--admin-surface) !important;
   border-color: var(--admin-rule) !important;
+}
+
+.admin-shell aside {
+  height: 100%;
+  position: sticky;
+  top: 0;
 }
 
 .admin-workspace aside > div:first-child,

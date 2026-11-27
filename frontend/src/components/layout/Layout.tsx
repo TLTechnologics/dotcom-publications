@@ -54,9 +54,9 @@ export const Layout: React.FC<LayoutProps> = ({
   }, [mobileMenuOpen]);
 
   return (
-    <div className="admin-workspace flex min-h-screen bg-[#F7F7F5] font-sans text-[#222321] w-full max-w-full overflow-x-hidden">
+    <div className="admin-workspace admin-shell flex h-screen min-h-0 bg-[#F7F7F5] font-sans text-[#222321] w-full max-w-full overflow-hidden">
       {/* Desktop Persistent Left Sidebar */}
-      <div className="hidden md:block">
+      <div className="admin-sidebar hidden md:block h-full shrink-0">
         <Sidebar
           currentTab={currentTab}
           onTabChange={onTabChange}
@@ -103,7 +103,7 @@ export const Layout: React.FC<LayoutProps> = ({
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">
+      <div className="admin-content flex-1 flex flex-col min-w-0 w-full h-full min-h-0 overflow-x-hidden overflow-y-auto">
         <TopNav
           currentTab={currentTab}
           onTabChange={onTabChange}
