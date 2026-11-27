@@ -107,7 +107,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
     try {
       const res = await api.togglePublishBook(book.id);
       toast.success(
-        res.is_draft ? 'Changed to Draft' : 'Book Published',
+        res.is_draft ? 'Changed to draft' : 'Book published',
         `"${book.title}" is now ${res.status}`
       );
       loadBooks();
@@ -122,7 +122,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
     setDeleteLoading(true);
     try {
       await api.deleteBook(bookToDelete.id);
-      toast.success('Book Deleted', `"${bookToDelete.title}" removed from catalogue`);
+      toast.success('Book deleted', `"${bookToDelete.title}" removed from catalogue`);
       setBookToDelete(null);
       loadBooks();
       onRefreshStats?.();
@@ -149,7 +149,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-serif font-bold text-[#292326] tracking-tight text-xl">
-            Book Catalogue Management
+            Book catalogue
           </h2>
           <p className="text-xs text-[#82777A]">
             Total of {total} academic publications, monographs, and textbooks registered
@@ -163,12 +163,12 @@ export const BooksPage: React.FC<BooksPageProps> = ({
           }}
           icon={<Plus className="w-4 h-4" />}
         >
-          Add New Book
+          Add book
         </Button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-3">
+      <div className="p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search by Title / ISBN */}
           <div className="lg:col-span-2">
@@ -185,18 +185,18 @@ export const BooksPage: React.FC<BooksPageProps> = ({
 
           {/* Filter by Category */}
           <Select
-            placeholder="All Disciplines"
+            placeholder="All subjects"
             value={selectedCategory}
             onChange={(e) => {
               setSelectedCategory(e.target.value);
               setPage(1);
             }}
             options={[
-              { value: '', label: 'All Disciplines', subtitle: 'View entire curriculum catalogue', icon: <Layers className="w-4 h-4" /> },
+              { value: '', label: 'All subjects', subtitle: 'View entire curriculum catalogue', icon: <Layers className="w-4 h-4" /> },
               ...categories.map((c) => ({
                 value: c.id,
                 label: c.name,
-                subtitle: c.description || (c.subcategories?.length ? `${c.subcategories.length} sub-disciplines available` : 'Primary Discipline'),
+                subtitle: c.description || (c.subcategories?.length ? `${c.subcategories.length} sub-disciplines available` : 'Primary subject'),
                 icon: <BookOpen className="w-4 h-4" />,
                 badge: c.subcategories?.length ? `${c.subcategories.length} sub` : undefined,
               })),
@@ -205,18 +205,18 @@ export const BooksPage: React.FC<BooksPageProps> = ({
 
           {/* Filter by Author */}
           <Select
-            placeholder="All Authors"
+            placeholder="All authors"
             value={selectedAuthor}
             onChange={(e) => {
               setSelectedAuthor(e.target.value);
               setPage(1);
             }}
             options={[
-              { value: '', label: 'All Authors & Faculty', subtitle: 'All contributing scholars', icon: <Users className="w-4 h-4" /> },
+              { value: '', label: 'All authors', subtitle: 'All contributing scholars', icon: <Users className="w-4 h-4" /> },
               ...authors.map((a) => ({
                 value: a.id,
                 label: a.name,
-                subtitle: a.bio || a.email || 'Academic Author & Researcher',
+                subtitle: a.bio || a.email || 'Academic author and researcher',
                 icon: <User className="w-4 h-4" />,
                 badge: a.books_count ? `${a.books_count} titles` : undefined,
               })),
@@ -231,9 +231,9 @@ export const BooksPage: React.FC<BooksPageProps> = ({
               setPage(1);
             }}
             options={[
-              { value: 'all', label: 'All Publication Statuses', subtitle: 'Published and draft titles', icon: <Layers className="w-4 h-4" /> },
-              { value: 'published', label: 'Published / Live', subtitle: 'Live on public website', icon: <Globe className="w-4 h-4" /> },
-              { value: 'draft', label: 'Draft / Peer Review', subtitle: 'Internal review / unreleased', icon: <Clock className="w-4 h-4" /> },
+              { value: 'all', label: 'All statuses', subtitle: 'Published and draft titles', icon: <Layers className="w-4 h-4" /> },
+              { value: 'published', label: 'Published', subtitle: 'Live on public website', icon: <Globe className="w-4 h-4" /> },
+              { value: 'draft', label: 'Draft and review', subtitle: 'Internal review / unreleased', icon: <Clock className="w-4 h-4" /> },
             ]}
           />
         </div>
@@ -256,12 +256,12 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                   }
                 }}
                 options={[
-                  { value: 'created_at-desc', label: 'Date Added (Newest First)', subtitle: 'Latest catalogue publications', icon: <Clock className="w-3.5 h-3.5" /> },
-                  { value: 'created_at-asc', label: 'Date Added (Oldest First)', subtitle: 'Earliest registered monographs', icon: <Clock className="w-3.5 h-3.5" /> },
-                  { value: 'title-asc', label: 'Title (Alphabetical A → Z)', subtitle: 'A to Z index', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
-                  { value: 'title-desc', label: 'Title (Reverse Z → A)', subtitle: 'Z to A index', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
-                  { value: 'selling_price-asc', label: 'Price (Lowest First)', subtitle: 'Student & entry edition', icon: <Coins className="w-3.5 h-3.5" /> },
-                  { value: 'selling_price-desc', label: 'Price (Highest First)', subtitle: 'Premium & reference sets', icon: <Coins className="w-3.5 h-3.5" /> },
+                  { value: 'created_at-desc', label: 'Date added (newest first)', subtitle: 'Latest catalogue publications', icon: <Clock className="w-3.5 h-3.5" /> },
+                  { value: 'created_at-asc', label: 'Date added (oldest first)', subtitle: 'Earliest registered monographs', icon: <Clock className="w-3.5 h-3.5" /> },
+                  { value: 'title-asc', label: 'Title (Alphabetical A → Z)', subtitle: 'Title (A to Z)', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                  { value: 'title-desc', label: 'Title (Reverse Z → A)', subtitle: 'Title (Z to A)', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                  { value: 'selling_price-asc', label: 'Price (lowest first)', subtitle: 'Student & entry edition', icon: <Coins className="w-3.5 h-3.5" /> },
+                  { value: 'selling_price-desc', label: 'Price (highest first)', subtitle: 'Premium & reference sets', icon: <Coins className="w-3.5 h-3.5" /> },
                 ]}
               />
             </div>
@@ -272,22 +272,22 @@ export const BooksPage: React.FC<BooksPageProps> = ({
               onClick={resetFilters}
               className="touch-target text-[#651C32] hover:text-[#431322] hover:underline font-semibold self-start sm:self-auto py-1"
             >
-              Reset All Filters
+              Reset filters
             </button>
           )}
         </div>
       </div>
 
       {/* Professional Books Data: Responsive Cards on Mobile (<md) & Table on Desktop (>=md) */}
-      <div className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden">
+      <div className="bg-white rounded-lg border border-[#EAE3DE] shadow-none overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-xs text-[#82777A]">Loading catalogue data...</div>
         ) : books.length === 0 ? (
           <EmptyState
             icon={<BookOpen className="w-8 h-8" />}
-            title="No Books Found"
+            title="No books found"
             description="No publications match the current filter or search criteria. Try adjusting your query or add a new title."
-            actionText="Add New Book"
+            actionText="Add book"
             onAction={() => {
               setBookToEdit(null);
               setIsFormOpen(true);
@@ -309,7 +309,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                       <img
                         src={book.cover_image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'}
                         alt={book.title}
-                        className="w-16 h-22 object-cover rounded-xl shadow-subtle border border-[#EAE3DE] shrink-0"
+                        className="w-16 h-22 object-cover rounded-md shadow-none border border-[#EAE3DE] shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -364,8 +364,8 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => setBookToPreview(book)}
-                          title="Preview Book Presentation"
-                          className="touch-target p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                          title="Preview book"
+                          className="touch-target p-2.5 rounded-md border border-[#EAE3DE] bg-[#FAF8F3] text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -374,15 +374,15 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                             setBookToEdit(book);
                             setIsFormOpen(true);
                           }}
-                          title="Edit Book Details"
-                          className="touch-target p-2.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                          title="Edit book details"
+                          className="touch-target p-2.5 rounded-md border border-[#EAE3DE] bg-[#FAF8F3] text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setBookToDelete(book)}
-                          title="Delete Book"
-                          className="touch-target p-2.5 rounded-xl border border-rose-200 bg-rose-50/50 text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-100 transition-colors"
+                          title="Delete book"
+                          className="touch-target p-2.5 rounded-md border border-rose-200 bg-rose-50/50 text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-100 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -405,7 +405,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                     <th className="py-3.5 px-4">ISBN</th>
                     <th className="py-3.5 px-4">Price (INR)</th>
                     <th className="py-3.5 px-4">Status</th>
-                    <th className="py-3.5 px-4">Last Updated</th>
+                    <th className="py-3.5 px-4">Last updated</th>
                     <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -429,7 +429,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                               'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'
                             }
                             alt={book.title}
-                            className="w-10 h-14 object-cover rounded shadow-subtle border border-[#EAE3DE] shrink-0"
+                            className="w-10 h-14 object-cover rounded shadow-none border border-[#EAE3DE] shrink-0"
                           />
                         </td>
 
@@ -510,7 +510,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                           </button>
                         </td>
 
-                        {/* Last Updated */}
+                        {/* Last updated */}
                         <td className="py-3 px-4 text-[#82777A] text-[11px]">
                           {new Date(book.updated_at).toLocaleDateString('en-GB', {
                             day: 'numeric',
@@ -524,7 +524,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => setBookToPreview(book)}
-                              title="Preview Book Presentation"
+                              title="Preview book"
                               className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
                             >
                               <Eye className="w-4 h-4" />
@@ -534,14 +534,14 @@ export const BooksPage: React.FC<BooksPageProps> = ({
                                 setBookToEdit(book);
                                 setIsFormOpen(true);
                               }}
-                              title="Edit Book Details"
+                              title="Edit book details"
                               className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setBookToDelete(book)}
-                              title="Delete Book"
+                              title="Delete book"
                               className="p-1.5 rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -599,9 +599,9 @@ export const BooksPage: React.FC<BooksPageProps> = ({
         isOpen={!!bookToDelete}
         onClose={() => setBookToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Book Catalogue Entry"
+        title="Delete book"
         message={`Are you sure you want to remove "${bookToDelete?.title}" from the Dotcom Publications catalogue? This action cannot be undone.`}
-        confirmText="Yes, Delete Book"
+        confirmText="Yes, delete book"
         loading={deleteLoading}
       />
     </div>

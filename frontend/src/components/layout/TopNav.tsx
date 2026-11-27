@@ -31,43 +31,43 @@ interface TopNavProps {
 
 const TAB_TITLES: Record<NavigationTab, { title: string; subtitle: string }> = {
   dashboard: {
-    title: 'Publishing Executive Dashboard',
+    title: 'Publishing dashboard',
     subtitle: 'Real-time catalogue statistics, active titles, and recent editorial actions',
   },
   orders: {
-    title: 'Customer Book Orders',
+    title: 'Customer orders',
     subtitle: 'Track customer purchases, fulfillment status, and delivery details',
   },
   books: {
-    title: 'Books & Monograph Catalogue',
+    title: 'Book catalogue',
     subtitle: 'Manage titles, authors, pricing, ISBNs, and publication statuses',
   },
   authors: {
-    title: 'Academic Faculty & Authors',
+    title: 'Authors',
     subtitle: 'Profiles, institutional affiliations, bibliographies, and authored volumes',
   },
   categories: {
-    title: 'Disciplines & Subject Categories',
+    title: 'Categories and subjects',
     subtitle: 'Organize academic knowledge structures, taxonomy, and curriculum areas',
   },
   publishers: {
-    title: 'Publisher Imprints & Presses',
+    title: 'Publishers',
     subtitle: 'Manage co-publishing partners, imprints, addresses, and contacts',
   },
   media: {
-    title: 'Centralized Media Library',
+    title: 'Media library',
     subtitle: 'High-resolution book covers, author portraits, and editorial marketing assets',
   },
   landing: {
-    title: 'Landing Page CMS',
+    title: 'Landing page',
     subtitle: 'Configure hero banners, featured titles, and public website showcase modules',
   },
   settings: {
-    title: 'System & Publisher Settings',
+    title: 'System settings',
     subtitle: 'Global publishing house metadata, currency rules, and infrastructure parameters',
   },
   users: {
-    title: 'Administrator Accounts & Access Control',
+    title: 'Admin accounts and access',
     subtitle: 'Manage staff credentials, assigned operational roles, and system permissions',
   },
 };
@@ -135,7 +135,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   };
 
   const currentInfo = TAB_TITLES[currentTab] || {
-    title: 'Admin Portal',
+    title: 'Admin portal',
     subtitle: 'Dotcom Publications',
   };
 
@@ -151,14 +151,14 @@ export const TopNav: React.FC<TopNavProps> = ({
     : 'AD';
 
   return (
-    <header className="bg-white/95 backdrop-blur-md border-b border-[#EAE3DE] sticky top-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between shadow-subtle">
+    <header className="bg-white border-b border-[#EAE3DE] sticky top-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between shadow-none">
       {/* Left: Mobile Toggle & Title / Breadcrumbs */}
       <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         {onMobileMenuToggle && (
           <button
             onClick={onMobileMenuToggle}
-            className="md:hidden touch-target p-2 rounded-xl text-[#292326] hover:bg-[#FFF6D9] border border-[#EAE3DE] transition-colors shrink-0 active:scale-95"
-            aria-label="Toggle Navigation Drawer"
+            className="md:hidden touch-target p-2 rounded-md text-[#292326] hover:bg-[#FFF6D9] border border-[#EAE3DE] transition-colors shrink-0 active:scale-95"
+            aria-label="Toggle navigation"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -194,12 +194,12 @@ export const TopNav: React.FC<TopNavProps> = ({
           <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
         </div>
 
-        {/* Switch to Customer Storefront Button */}
+        {/* Switch to Customer storefront Button */}
         {onSwitchToCustomer && (
           <button
             onClick={onSwitchToCustomer}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold text-[#173B87] bg-[#EAF2FF] hover:bg-[#DCE9FF] border border-[#DCE4EF] transition-all min-h-[36px] sm:min-h-0"
-            title="Open Public Storefront"
+            title="Open storefront"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
             <span className="hidden sm:inline text-[11px]">Storefront</span>
@@ -211,8 +211,8 @@ export const TopNav: React.FC<TopNavProps> = ({
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="touch-target p-2 rounded-full text-[#292326] hover:bg-[#FFF6D9] relative transition-colors border border-transparent hover:border-[#EAE3DE]"
-            title="System Notifications"
-            aria-label="System Notifications"
+            title="Notifications"
+            aria-label="Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
@@ -222,7 +222,7 @@ export const TopNav: React.FC<TopNavProps> = ({
 
           {showNotifications && (
             <div
-              className="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-2rem)] rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated p-3 z-50 text-left animate-in fade-in"
+              className="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-2rem)] rounded-lg bg-white border border-[#EAE3DE] shadow-lg p-3 z-50 text-left animate-in fade-in"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between border-b border-[#EAE3DE] pb-2 px-1">
@@ -246,7 +246,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                     <div
                       key={n.id}
                       onClick={() => handleNotificationClick(n)}
-                      className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer border ${
+                      className={`p-2.5 rounded-md text-xs transition-colors cursor-pointer border ${
                         !n.is_read
                           ? 'bg-[#FFF6D9]/50 border-[#F6E7A8] hover:bg-[#FFF6D9]'
                           : 'hover:bg-[#FAF8F3] border-transparent'
@@ -277,7 +277,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 pr-1.5 py-1 rounded-full border border-[#EAE3DE] bg-[#FAF8F3] hover:border-[#651C32] transition-colors min-h-[36px]"
-            aria-label="Admin Profile Menu"
+            aria-label="Admin profile"
           >
             <div className="w-6 h-6 rounded-full bg-[#651C32] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
               {userInitials}
@@ -290,10 +290,10 @@ export const TopNav: React.FC<TopNavProps> = ({
 
           {showProfileMenu && (
             <div
-              className="absolute right-0 mt-2 w-56 sm:w-60 max-w-[calc(100vw-2rem)] rounded-2xl bg-white border border-[#EAE3DE] shadow-elevated py-1.5 z-50 text-xs animate-in fade-in"
+              className="absolute right-0 mt-2 w-56 sm:w-60 max-w-[calc(100vw-2rem)] rounded-lg bg-white border border-[#EAE3DE] shadow-lg py-1.5 z-50 text-xs animate-in fade-in"
               onClick={() => setShowProfileMenu(false)}
             >
-              <div className="px-3.5 py-2.5 border-b border-[#EAE3DE] bg-[#FAF8F3]/60">
+              <div className="px-3.5 py-2.5 border-b border-[#EAE3DE] bg-[#FAF8F3]">
                 <p className="font-semibold text-[#292326] text-xs truncate">
                   {currentUser?.full_name || 'Admin'}
                 </p>
@@ -310,7 +310,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                   onClick={onSwitchToCustomer}
                   className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors font-medium min-h-[40px]"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View Storefront
+                  <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" /> View storefront
                 </button>
               )}
 
@@ -318,21 +318,21 @@ export const TopNav: React.FC<TopNavProps> = ({
                 onClick={() => onTabChange('users')}
                 className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors min-h-[40px]"
               >
-                <Users className="w-3.5 h-3.5 text-[#651C32]" /> Admin Accounts
+                <Users className="w-3.5 h-3.5 text-[#651C32]" /> Admin accounts
               </button>
 
               <button
                 onClick={() => onTabChange('orders')}
                 className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors min-h-[40px]"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#651C32]" /> Customer Orders
+                <BookOpen className="w-3.5 h-3.5 text-[#651C32]" /> Customer orders
               </button>
 
               <button
                 onClick={() => onTabChange('settings')}
                 className="w-full text-left px-3.5 py-2 text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322] flex items-center gap-2 transition-colors min-h-[40px]"
               >
-                <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> System Settings
+                <Sliders className="w-3.5 h-3.5 text-[#651C32]" /> System settings
               </button>
 
               <div className="border-t border-[#EAE3DE] my-1" />
@@ -346,7 +346,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                 }}
                 className="w-full text-left px-3.5 py-2.5 text-[#B94B4B] hover:bg-rose-50 flex items-center gap-2 font-medium transition-colors min-h-[40px]"
               >
-                <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Exit Admin Portal
+                <LogOut className="w-3.5 h-3.5 text-[#B94B4B]" /> Sign out
               </button>
             </div>
           )}

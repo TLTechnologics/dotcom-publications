@@ -39,15 +39,15 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F3] flex flex-col justify-between font-sans text-[#292326]">
+    <div className="admin-workspace min-h-screen bg-[#FAF8F3] flex flex-col justify-between font-sans text-[#292326]">
       {/* Top Header Bar */}
-      <header className="px-4 sm:px-6 py-3.5 border-b border-[#EAE3DE] bg-white/90 backdrop-blur-md flex items-center justify-between">
+      <header className="px-4 sm:px-6 py-3.5 border-b border-[#EAE3DE] bg-white flex items-center justify-between">
         <button
           onClick={() => onNavigate('/')}
           className="touch-target flex items-center gap-2 text-xs font-semibold text-[#651C32] hover:text-[#431322] transition-colors p-1"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Customer Storefront</span>
+          <span>Customer storefront</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -60,25 +60,25 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
 
       {/* Main Login Card */}
       <main className="flex-1 flex items-center justify-center p-3 sm:p-6">
-        <div className="w-full max-w-md bg-white rounded-3xl border border-[#EAE3DE] shadow-card p-6 sm:p-10 space-y-6">
+        <div className="w-full max-w-md bg-white rounded-lg border border-[#EAE3DE] shadow-none p-6 sm:p-10 space-y-6">
           {/* Brand Logo & Heading */}
           <div className="text-center space-y-3">
-            <div className="w-16 h-16 rounded-2xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mx-auto">
+            <div className="w-16 h-16 rounded-lg bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-1 mx-auto">
               <img
                 src="/logo.jpg"
                 alt="Dotcom Publications"
-                className="w-full h-full object-cover rounded-xl"
+                className="w-full h-full object-cover rounded-md"
               />
             </div>
 
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold tracking-normal mb-2 bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#651C32]" />
-                <span>Enterprise Authentication</span>
+                <span>Admin sign in</span>
               </span>
 
               <h1 className="font-serif font-bold text-2xl text-[#292326]">
-                Publishing Administration
+                Publishing admin
               </h1>
               <p className="text-xs text-[#82777A] mt-1 font-light">
                 Sign in with verified administrator credentials to access publishing tools.
@@ -91,7 +91,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
             {/* Username / Email */}
             <div>
               <label className="block text-xs font-semibold text-[#292326] mb-1.5">
-                Username or Official Email
+                Username or email
               </label>
               <div className="relative">
                 <input
@@ -104,7 +104,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                     setIdentifier(e.target.value);
                     setError('');
                   }}
-                  className="w-full pl-9 pr-4 py-2.5 min-h-[44px] text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+                  className="w-full pl-9 pr-4 py-2.5 min-h-[44px] text-xs rounded-md border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
                 />
                 <UserIcon className="w-4 h-4 text-[#82777A] absolute left-3 top-3.5" />
               </div>
@@ -114,7 +114,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-semibold text-[#292326]">
-                  Account Password
+                  Password
                 </label>
               </div>
               <div className="relative">
@@ -127,7 +127,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                     setPassword(e.target.value);
                     setError('');
                   }}
-                  className="w-full pl-9 pr-16 py-2.5 min-h-[44px] text-xs rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+                  className="w-full pl-9 pr-16 py-2.5 min-h-[44px] text-xs rounded-md border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#292326] focus:outline-none focus:ring-2 focus:ring-[#651C32]"
                 />
                 <Lock className="w-4 h-4 text-[#82777A] absolute left-3 top-3.5" />
                 <button
@@ -139,7 +139,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                 </button>
               </div>
               {error && (
-                <div className="p-2.5 mt-2 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
+                <div className="p-2.5 mt-2 rounded-md bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
                   {error}
                 </div>
               )}
@@ -155,12 +155,12 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-[#F6E7A8]" />
-                  <span>Verifying Credentials...</span>
+                  <span>Signing in…</span>
                 </>
               ) : (
                 <>
                   <KeyRound className="w-4 h-4 text-[#F6E7A8]" />
-                  <span>Sign In to Admin Workspace</span>
+                  <span>Sign in to admin</span>
                 </>
               )}
             </Button>
@@ -176,8 +176,8 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-[#82777A] border-t border-[#EAE3DE] bg-white/60">
-        <p>© 2026 Dotcom Publications • All Rights Reserved</p>
+      <footer className="py-4 text-center text-xs text-[#82777A] border-t border-[#EAE3DE] bg-white">
+        <p>© 2026 Dotcom Publications • All rights reserved</p>
       </footer>
     </div>
   );

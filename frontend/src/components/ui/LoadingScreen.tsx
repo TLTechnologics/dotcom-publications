@@ -20,7 +20,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
     ? 'bg-transparent'
     : theme === 'dark'
     ? 'bg-[#431322]'
-    : 'bg-[#FAF8F3]/95 backdrop-blur-sm';
+    : 'bg-[#FAF8F3]';
 
   const content = (
     <div className="flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">

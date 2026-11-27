@@ -92,7 +92,7 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Author Full Name & Academic Titles"
+            label="Author name and titles"
             required
             placeholder="e.g. Dr. Arvind R. Subramanian, PhD"
             value={name}
@@ -138,7 +138,7 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
             </label>
             <textarea
               rows={4}
-              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
+              className="w-full rounded-md border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               placeholder="Academic appointments, research awards, university department..."
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -147,7 +147,7 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
-              label="Contact Email (Optional)"
+              label="Contact email (Optional)"
               type="email"
               icon={<Mail className="w-3.5 h-3.5 text-[#82777A]" />}
               placeholder="author@institution.edu"
@@ -155,7 +155,7 @@ export const AuthorFormModal: React.FC<AuthorFormModalProps> = ({
               onChange={(e) => setEmail(e.target.value)}
             />
             <Input
-              label="Faculty / Personal Website (Optional)"
+              label="Website (optional)"
               icon={<Globe className="w-3.5 h-3.5 text-[#82777A]" />}
               placeholder="https://scholar.org"
               value={website}

@@ -47,19 +47,19 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={author.name}
-      subtitle="Faculty Member & Author Bibliography"
+      subtitle="Author profile and bibliography"
       size="lg"
     >
       <div className="space-y-6">
         {/* Profile Card */}
-        <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-xl bg-[#FAF8F3] border border-[#EAE3DE]">
+        <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-md bg-[#FAF8F3] border border-[#EAE3DE]">
           <img
             src={
               author.profile_picture ||
               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80'
             }
             alt={author.name}
-            className="w-20 h-20 rounded-xl object-cover border border-[#EAE3DE] shadow-sm shrink-0"
+            className="w-20 h-20 rounded-md object-cover border border-[#EAE3DE] shadow-sm shrink-0"
           />
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-serif font-bold text-[#292326]">{author.name}</h3>
@@ -104,7 +104,7 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
           {loading ? (
             <div className="py-8 text-center text-xs text-[#82777A]">Loading bibliography...</div>
           ) : books.length === 0 ? (
-            <div className="p-6 text-center text-xs text-[#82777A] bg-[#FAF8F3] rounded-xl border border-[#EAE3DE]">
+            <div className="p-6 text-center text-xs text-[#82777A] bg-[#FAF8F3] rounded-md border border-[#EAE3DE]">
               No books currently linked to this author.
             </div>
           ) : (
@@ -116,7 +116,7 @@ export const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({
                     onClose();
                     onBookClick?.(b);
                   }}
-                  className="flex items-center justify-between p-3 rounded-xl border border-[#EAE3DE] hover:border-[#651C32]/40 hover:bg-[#FFF6D9]/30 transition-all cursor-pointer group"
+                  className="flex items-center justify-between p-3 rounded-md border border-[#EAE3DE] hover:border-[#651C32]/40 hover:bg-[#FFF6D9]/30 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <img

@@ -25,11 +25,11 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Public Website Live Preview"
+      title="Public website preview"
       subtitle="How visitors experience Dotcom Publications homepage"
       size="full"
     >
-      <div className="border border-[#EAE3DE] rounded-2xl overflow-hidden bg-[#FAF8F3] text-[#292326] shadow-xl">
+      <div className="border border-[#EAE3DE] rounded-lg overflow-hidden bg-[#FAF8F3] text-[#292326] shadow-xl">
         {/* Mock Browser Header Bar */}
         <div className="bg-[#FAF8F3] border-b border-[#EAE3DE] px-4 py-2 flex items-center justify-between text-xs text-[#82777A]">
           <div className="flex items-center gap-1.5">
@@ -48,7 +48,7 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
         {/* Public Website Header */}
         <div className="px-6 py-4 border-b border-[#EAE3DE] bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-0.5 shrink-0">
+            <div className="w-10 h-10 rounded-md bg-white border border-[#EAE3DE] overflow-hidden shadow-sm p-0.5 shrink-0">
               <img src="/logo.jpg" alt="Dotcom Publications" className="w-full h-full object-cover rounded-[8px]" />
             </div>
             <div>
@@ -64,7 +64,7 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
             <span className="text-[#651C32] font-semibold">Home</span>
             <span className="hover:text-[#651C32] cursor-pointer">Catalogue</span>
             <span className="hover:text-[#651C32] cursor-pointer">Scholars & Authors</span>
-            <span className="hover:text-[#651C32] cursor-pointer">About Us</span>
+            <span className="hover:text-[#651C32] cursor-pointer">About us</span>
             <span className="hover:text-[#651C32] cursor-pointer">Contact</span>
           </div>
         </div>
@@ -72,8 +72,6 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
         {/* Hero Section */}
         <div className="relative bg-[#651C32] text-white p-8 md:p-14 overflow-hidden">
           {/* Subtle Background Glow */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#F6E7A8]/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#431322] rounded-full blur-2xl pointer-events-none" />
 
           {content.hero_image && (
             <img
@@ -84,7 +82,7 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
           )}
           <div className="relative z-10 max-w-2xl">
             <span className="text-xs uppercase tracking-widest text-[#F6E7A8] font-semibold inline-block mb-3 bg-[#431322]/80 px-3 py-1 rounded-full border border-[#F6E7A8]/30">
-              Scholarly Excellence • Global Standard
+              Academic publishing
             </span>
             <h1 className="text-3xl sm:text-4xl font-serif font-bold leading-tight mb-4 text-[#FFF6D9]">
               {content.hero_heading}
@@ -94,28 +92,28 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
             </p>
             <div className="flex flex-wrap gap-3">
               <button className="px-5 py-2.5 rounded-lg bg-[#F6E7A8] hover:bg-[#FFF6D9] text-[#431322] text-xs font-semibold shadow-md flex items-center gap-2 transition-all">
-                Explore Complete Catalogue <ArrowRight className="w-3.5 h-3.5" />
+                Explore the catalogue <ArrowRight className="w-3.5 h-3.5" />
               </button>
-              <button className="px-5 py-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium border border-white/20 backdrop-blur-sm transition-all">
-                University Adoptions
+              <button className="px-5 py-2.5 rounded-lg bg-[#431322] hover:bg-[#37101C] text-white text-xs font-medium border border-white/20  transition-all">
+                University adoptions
               </button>
             </div>
           </div>
         </div>
 
-        {/* Featured Titles Section */}
+        {/* Featured titles Section */}
         <div className="p-8 bg-[#FAF8F3] border-b border-[#EAE3DE]">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-serif font-bold text-[#292326]">
-                Featured Academic Publications
+                Featured books
               </h2>
               <p className="text-xs text-[#82777A]">
                 Peer-reviewed monographs and textbooks recommended by university boards
               </p>
             </div>
             <span className="text-xs text-[#651C32] font-semibold cursor-pointer hover:underline flex items-center gap-1">
-              View All Titles <ArrowRight className="w-3 h-3" />
+              View all titles <ArrowRight className="w-3 h-3" />
             </span>
           </div>
 
@@ -123,7 +121,7 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
             {featuredBooks.map((b) => (
               <div
                 key={b.id}
-                className="bg-white rounded-xl border border-[#EAE3DE] overflow-hidden shadow-subtle hover:shadow-md hover:border-[#651C32]/40 transition-all group flex flex-col"
+                className="bg-white rounded-md border border-[#EAE3DE] overflow-hidden shadow-none hover:shadow-md hover:border-[#651C32]/40 transition-all group flex flex-col"
               >
                 <div className="aspect-[2/3] overflow-hidden bg-[#FAF8F3] relative">
                   <img
@@ -156,7 +154,7 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
         {/* Popular Disciplines */}
         <div className="p-8 bg-white border-b border-[#EAE3DE]">
           <h2 className="text-lg font-serif font-bold text-[#292326] mb-1">
-            Browse by Discipline
+            Browse by subject
           </h2>
           <p className="text-xs text-[#82777A] mb-6">
             Structured curricula spanning engineering, social sciences, medicine, and humanities
@@ -166,12 +164,12 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
             {popularCats.map((cat) => (
               <div
                 key={cat.id}
-                className="p-4 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-[#FFF6D9]/40 hover:border-[#651C32]/40 transition-all cursor-pointer"
+                className="p-4 rounded-md border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-[#FFF6D9]/40 hover:border-[#651C32]/40 transition-all cursor-pointer"
               >
                 <h4 className="text-sm font-serif font-bold text-[#292326]">{cat.name}</h4>
                 <p className="text-xs text-[#82777A] mt-1 line-clamp-2">{cat.description}</p>
                 <div className="mt-3 flex items-center justify-between text-[11px] text-[#651C32] font-semibold">
-                  <span>{cat.books_count || 0} Titles Published</span>
+                  <span>{cat.books_count || 0} books published</span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
               </div>
@@ -191,7 +189,7 @@ export const LandingPreviewModal: React.FC<LandingPreviewModalProps> = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
               {content.about_stats.map((s, idx) => (
-                <div key={idx} className="p-3.5 bg-white rounded-xl border border-[#EAE3DE] shadow-subtle">
+                <div key={idx} className="p-3.5 bg-white rounded-md border border-[#EAE3DE] shadow-none">
                   <span className="text-2xl font-serif font-bold text-[#651C32] block">
                     {s.value}
                   </span>

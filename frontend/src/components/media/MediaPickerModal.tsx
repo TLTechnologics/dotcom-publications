@@ -78,7 +78,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Select Asset" subtitle="Choose from media library or upload a new image" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Select an asset" subtitle="Choose from media library or upload a new image" size="lg">
       <div className="flex gap-2 border-b border-[#EAE3DE] pb-3 mb-4">
         <button
           onClick={() => setActiveTab('library')}
@@ -88,7 +88,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
               : 'text-[#82777A] hover:bg-[#FAF8F3]'
           }`}
         >
-          Media Library ({items.length})
+          Media library ({items.length})
         </button>
         <button
           onClick={() => setActiveTab('upload')}
@@ -167,7 +167,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
 
       {activeTab === 'upload' && (
         <div className="py-8">
-          <label className="border-2 border-dashed border-[#EAE3DE] hover:border-[#651C32] rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#FAF8F3]">
+          <label className="border-2 border-dashed border-[#EAE3DE] hover:border-[#651C32] rounded-md p-8 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#FAF8F3]">
             <Upload className="w-10 h-10 text-[#651C32] mb-3" />
             <span className="text-sm font-medium text-[#292326]">
               {uploading ? 'Uploading asset...' : 'Click to select image file'}
@@ -187,7 +187,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
       {activeTab === 'url' && (
         <div className="py-6 space-y-4">
           <Input
-            label="Image Public URL"
+            label="Image URL"
             placeholder="https://example.com/cover.jpg"
             value={customUrl}
             onChange={(e) => setCustomUrl(e.target.value)}

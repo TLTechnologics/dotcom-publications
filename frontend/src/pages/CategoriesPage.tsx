@@ -58,7 +58,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
     setDeleteLoading(true);
     try {
       await api.deleteCategory(categoryToDelete.id);
-      toast.success('Category Deleted', `Discipline "${categoryToDelete.name}" removed`);
+      toast.success('Category deleted', `Discipline "${categoryToDelete.name}" removed`);
       setCategoryToDelete(null);
       loadCategories();
       onRefreshStats?.();
@@ -75,7 +75,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-            Disciplines & Categories Taxonomy
+            Categories and subjects
           </h2>
           <p className="text-xs text-[#82777A]">
             Hierarchical academic knowledge classifications, syllabi, and research clusters
@@ -90,12 +90,12 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
           className="w-full sm:w-auto min-h-[44px]"
           icon={<Plus className="w-4 h-4" />}
         >
-          Create Discipline / Category
+          Create category
         </Button>
       </div>
 
       {/* Search Header */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex items-center justify-between gap-4">
+      <div className="p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-none flex items-center justify-between gap-4">
         <div className="max-w-md w-full">
           <Input
             placeholder="Search disciplines..."
@@ -112,9 +112,9 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
       ) : categories.length === 0 ? (
         <EmptyState
           icon={<FolderTree className="w-8 h-8" />}
-          title="No Categories Configured"
+          title="No categories yet"
           description="Create primary disciplines and subcategories to organise the Dotcom Publications library."
-          actionText="Create Category"
+          actionText="Create category"
           onAction={() => {
             setCategoryToEdit(null);
             setIsFormOpen(true);
@@ -125,7 +125,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
           {categories.map((parent) => (
             <div
               key={parent.id}
-              className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden"
+              className="bg-white rounded-lg border border-[#EAE3DE] shadow-none overflow-hidden"
             >
               {/* Parent Category Header */}
               <div className="p-4 sm:p-5 bg-[#FAF8F3] border-b border-[#EAE3DE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -134,10 +134,10 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                     <img
                       src={parent.image_url}
                       alt={parent.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-[#EAE3DE] shadow-sm shrink-0"
+                      className="w-12 h-12 rounded-md object-cover border border-[#EAE3DE] shadow-sm shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8] flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-md bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8] flex items-center justify-center shrink-0">
                       <FolderTree className="w-6 h-6" />
                     </div>
                   )}
@@ -174,16 +174,16 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                         setCategoryToEdit(parent);
                         setIsFormOpen(true);
                       }}
-                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
-                      title="Edit Category"
+                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
+                      title="Edit category"
                       aria-label="Edit category"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setCategoryToDelete(parent)}
-                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
-                      title="Delete Category"
+                      className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                      title="Delete category"
                       aria-label="Delete category"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -223,7 +223,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                               setIsFormOpen(true);
                             }}
                             className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9]"
-                            title="Edit Subcategory"
+                            title="Edit subcategory"
                             aria-label="Edit subcategory"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -231,7 +231,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
                           <button
                             onClick={() => setCategoryToDelete(sub)}
                             className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50"
-                            title="Delete Subcategory"
+                            title="Delete subcategory"
                             aria-label="Delete subcategory"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -271,9 +271,9 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onRefreshStats }
         isOpen={!!categoryToDelete}
         onClose={() => setCategoryToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Discipline Category"
+        title="Delete category"
         message={`Are you sure you want to delete "${categoryToDelete?.name}"? Subcategories and associated books will need reassignment.`}
-        confirmText="Yes, Delete Category"
+        confirmText="Yes, delete category"
         loading={deleteLoading}
       />
     </div>

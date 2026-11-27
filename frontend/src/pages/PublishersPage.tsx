@@ -57,7 +57,7 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
     setDeleteLoading(true);
     try {
       await api.deletePublisher(publisherToDelete.id);
-      toast.success('Publisher Deleted', `"${publisherToDelete.name}" removed from imprints`);
+      toast.success('Publisher deleted', `"${publisherToDelete.name}" removed from imprints`);
       setPublisherToDelete(null);
       loadPublishers();
       onRefreshStats?.();
@@ -74,7 +74,7 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-            Publisher Imprints & Presses
+            Publishers
           </h2>
           <p className="text-xs text-[#82777A]">
             {publishers.length} scholarly imprints, university presses, and co-publishing partners
@@ -89,12 +89,12 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
           className="w-full sm:w-auto min-h-[44px]"
           icon={<Plus className="w-4 h-4" />}
         >
-          Add Publisher Imprint
+          Add publisher
         </Button>
       </div>
 
       {/* Search Header */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex items-center justify-between gap-4">
+      <div className="p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-none flex items-center justify-between gap-4">
         <div className="max-w-md w-full">
           <Input
             placeholder="Search imprints..."
@@ -111,9 +111,9 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
       ) : publishers.length === 0 ? (
         <EmptyState
           icon={<Building2 className="w-8 h-8" />}
-          title="No Publishers Registered"
+          title="No publishers yet"
           description="Register academic publishers and imprints to associate monographs."
-          actionText="Add Publisher"
+          actionText="Add publisher"
           onAction={() => {
             setPublisherToEdit(null);
             setIsFormOpen(true);
@@ -124,7 +124,7 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
           {publishers.map((pub) => (
             <div
               key={pub.id}
-              className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
+              className="p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none hover:shadow-none hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-start gap-3.5">
@@ -132,10 +132,10 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
                     <img
                       src={pub.logo_url}
                       alt={pub.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-[#EAE3DE] shadow-sm shrink-0"
+                      className="w-12 h-12 rounded-md object-cover border border-[#EAE3DE] shadow-sm shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8] flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-md bg-[#FFF6D9] text-[#651C32] border border-[#F6E7A8] flex items-center justify-center shrink-0">
                       <Building2 className="w-6 h-6" />
                     </div>
                   )}
@@ -200,16 +200,16 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
                     setPublisherToEdit(pub);
                     setIsFormOpen(true);
                   }}
-                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
-                  title="Edit Publisher"
+                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
+                  title="Edit publisher"
                   aria-label="Edit publisher"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setPublisherToDelete(pub)}
-                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
-                  title="Delete Publisher"
+                  className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                  title="Delete publisher"
                   aria-label="Delete publisher"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -239,9 +239,9 @@ export const PublishersPage: React.FC<PublishersPageProps> = ({ onRefreshStats }
         isOpen={!!publisherToDelete}
         onClose={() => setPublisherToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Publisher Imprint"
+        title="Delete publisher"
         message={`Are you sure you want to delete "${publisherToDelete?.name}"? Publications associated with this imprint will need an updated publisher.`}
-        confirmText="Yes, Delete Publisher"
+        confirmText="Yes, delete publisher"
         loading={deleteLoading}
       />
     </div>

@@ -22,14 +22,14 @@ export const BookPreviewModal: React.FC<BookPreviewModalProps> = ({ book, isOpen
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Catalogue Book Preview"
-      subtitle="Public-facing preview presentation for Dotcom Publications"
+      title="Book preview"
+      subtitle="Preview as visitors see the public site"
       size="xl"
     >
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-2">
         {/* Cover Column */}
         <div className="md:col-span-4 flex flex-col items-center">
-          <div className="relative w-full aspect-[2/3] max-w-[260px] rounded-xl overflow-hidden shadow-2xl border border-[#EAE3DE] bg-[#FAF8F3] group">
+          <div className="relative w-full aspect-[2/3] max-w-[260px] rounded-md overflow-hidden shadow-md border border-[#EAE3DE] bg-[#FAF8F3] group">
             {book.cover_image ? (
               <img
                 src={book.cover_image}
@@ -39,12 +39,12 @@ export const BookPreviewModal: React.FC<BookPreviewModalProps> = ({ book, isOpen
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-[#82777A] bg-[#FAF8F3]">
                 <BookOpen className="w-12 h-12 stroke-[1.2] mb-2 text-[#651C32]" />
-                <span className="text-xs font-serif text-[#292326]">No Cover Image</span>
+                <span className="text-xs font-serif text-[#292326]">No cover image</span>
               </div>
             )}
             {book.is_featured && (
               <div className="absolute top-3 left-3">
-                <Badge variant="featured">Featured Title</Badge>
+                <Badge variant="featured">Featured title</Badge>
               </div>
             )}
           </div>
@@ -105,7 +105,7 @@ export const BookPreviewModal: React.FC<BookPreviewModalProps> = ({ book, isOpen
           </div>
 
           {/* Pricing Box */}
-          <div className="p-4 rounded-xl bg-[#FFF6D9]/50 border border-[#F6E7A8] flex items-center justify-between">
+          <div className="p-4 rounded-md bg-[#FFF6D9]/50 border border-[#F6E7A8] flex items-center justify-between">
             <div>
               <span className="text-[11px] uppercase tracking-wider text-[#82777A] font-semibold block">
                 Publisher Price

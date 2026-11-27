@@ -86,7 +86,7 @@ export const SettingsPage: React.FC = () => {
     setPasswordLoading(true);
     try {
       await api.changePassword(oldPassword, newPassword);
-      toast.success('Password Updated', 'Your administrator password has been securely changed.');
+      toast.success('Password updated', 'Your administrator password has been securely changed.');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -103,7 +103,7 @@ export const SettingsPage: React.FC = () => {
     try {
       const updated = await api.updateSettings(settings);
       setSettings(updated);
-      toast.success('Settings Saved', 'Global platform parameters updated successfully');
+      toast.success('Settings saved', 'Global platform parameters updated successfully');
     } catch (err: any) {
       toast.error('Failed to save settings', err.message);
     } finally {
@@ -120,7 +120,7 @@ export const SettingsPage: React.FC = () => {
       {/* Header */}
       <div>
         <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-          System & Publishing House Settings
+          Publishing house settings
         </h2>
         <p className="text-xs text-[#82777A]">
           Configure corporate publisher identity, institutional contact routing, and global currency parameters
@@ -129,27 +129,27 @@ export const SettingsPage: React.FC = () => {
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Brand Identity */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
               <Building className="w-4 h-4 text-[#651C32]" />
-              Corporate Brand Identity
+              Brand identity
             </h3>
             <span className="text-[10px] font-bold text-[#82777A] uppercase tracking-wider">
-              Legal Imprint
+              Legal imprint
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Company Legal Name"
+              label="Company name"
               value={settings.company_name}
               onChange={(e) => setSettings({ ...settings, company_name: e.target.value })}
             />
 
             <div>
               <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
-                Official Publisher Logo
+                Publisher logo
               </label>
               <div className="flex gap-2">
                 <Input
@@ -171,11 +171,11 @@ export const SettingsPage: React.FC = () => {
 
           <div>
             <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
-              Corporate Description / Mission
+              Description and mission
             </label>
             <textarea
               rows={3}
-              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
+              className="w-full rounded-md border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               value={settings.description}
               onChange={(e) => setSettings({ ...settings, description: e.target.value })}
             />
@@ -183,47 +183,47 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Official Communications & Address */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3">
             <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
               <Mail className="w-4 h-4 text-[#651C32]" />
-              Headquarters & Contact Information
+              Address and contact
             </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Primary Contact Email"
+              label="Contact email"
               type="email"
               value={settings.contact_email}
               onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
             />
             <Input
-              label="Customer & Academic Phone"
+              label="Customer phone"
               value={settings.phone}
               onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
             />
           </div>
 
           <Input
-            label="Corporate Registered Address"
+            label="Registered address"
             value={settings.address}
             onChange={(e) => setSettings({ ...settings, address: e.target.value })}
           />
         </div>
 
         {/* Social Media Links */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3">
             <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
               <Share2 className="w-4 h-4 text-[#651C32]" />
-              Academic Outreach & Social Media
+              Outreach and social media
             </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Twitter / X Profile"
+              label="Social media profile"
               placeholder="https://twitter.com/dotcombooks"
               value={settings.social_links?.twitter || ''}
               onChange={(e) =>
@@ -234,7 +234,7 @@ export const SettingsPage: React.FC = () => {
               }
             />
             <Input
-              label="LinkedIn Corporate Page"
+              label="LinkedIn page"
               placeholder="https://linkedin.com/company/dotcom-publications"
               value={settings.social_links?.linkedin || ''}
               onChange={(e) =>
@@ -245,7 +245,7 @@ export const SettingsPage: React.FC = () => {
               }
             />
             <Input
-              label="Facebook Page"
+              label="Facebook page"
               placeholder="https://facebook.com/dotcombooks"
               value={settings.social_links?.facebook || ''}
               onChange={(e) =>
@@ -256,7 +256,7 @@ export const SettingsPage: React.FC = () => {
               }
             />
             <Input
-              label="Instagram Profile"
+              label="Instagram profile"
               placeholder="https://instagram.com/dotcombooks"
               value={settings.social_links?.instagram || ''}
               onChange={(e) =>
@@ -270,17 +270,17 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Website Configuration & Operations */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3">
             <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
               <Sliders className="w-4 h-4 text-[#651C32]" />
-              Catalogue & Operational Configuration
+              Catalogue settings
             </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
-              label="Catalogue Base Currency"
+              label="Base currency"
               value={settings.currency}
               onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
               options={[
@@ -292,7 +292,7 @@ export const SettingsPage: React.FC = () => {
             />
 
             <Input
-              label="Complete Annual Catalogue PDF Link"
+              label="Annual catalogue PDF"
               placeholder="https://dotcompublications.com/downloads/catalogue.pdf"
               value={settings.catalogue_download_url || ''}
               onChange={(e) =>
@@ -302,12 +302,12 @@ export const SettingsPage: React.FC = () => {
           </div>
 
           {/* Maintenance Mode Toggle */}
-          <div className="p-4 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] flex items-center justify-between mt-2">
+          <div className="p-4 rounded-md border border-[#EAE3DE] bg-[#FAF8F3] flex items-center justify-between mt-2">
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-5 h-5 text-[#C58B35]" />
               <div>
                 <span className="text-xs font-bold text-[#292326] block">
-                  Public Website Maintenance Mode
+                  Public website maintenance
                 </span>
                 <p className="text-[11px] text-[#82777A]">
                   When enabled, visitors to the public site see an under-construction announcement.
@@ -333,9 +333,9 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* Institutional System Status */}
-        <div className="p-4 rounded-xl bg-[#FFF6D9]/40 border border-[#F6E7A8] text-xs text-[#292326] flex items-center justify-between">
+        <div className="p-4 rounded-md bg-[#FFF6D9]/40 border border-[#F6E7A8] text-xs text-[#292326] flex items-center justify-between">
           <div>
-            <span className="font-semibold text-[#651C32]">Dotcom Publications Operations</span>
+            <span className="font-semibold text-[#651C32]">Dotcom Publications</span>
             <p className="text-[11px] text-[#82777A] mt-0.5">
               Dotcom Publications • Secure Admin Workspace & Catalogue CMS
             </p>
@@ -352,20 +352,20 @@ export const SettingsPage: React.FC = () => {
             className="w-full sm:w-auto min-h-[44px]"
             icon={<Save className="w-4 h-4" />}
           >
-            Save All Settings
+            Save settings
           </Button>
         </div>
       </form>
 
       {/* Security & Password Management Form */}
-      <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+      <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
         <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
           <h3 className="text-sm font-serif font-bold text-[#292326] flex items-center gap-2">
             <Lock className="w-4 h-4 text-[#651C32]" />
-            Security & Account Password Management
+            Security and password
           </h3>
           <span className="text-[10px] font-bold text-[#651C32] bg-[#FFF6D9] px-2.5 py-0.5 rounded-full border border-[#F6E7A8]">
-            Bcrypt Hashed
+            Password protected
           </span>
         </div>
 
@@ -374,14 +374,14 @@ export const SettingsPage: React.FC = () => {
         </p>
 
         {passwordError && (
-          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700">
+          <div className="p-3 rounded-md bg-rose-50 border border-rose-200 text-xs text-rose-700">
             {passwordError}
           </div>
         )}
 
         <form onSubmit={handlePasswordChange} className="space-y-4 max-w-lg">
           <Input
-            label="Current Password"
+            label="Current password"
             type="password"
             placeholder="Enter your current password"
             value={oldPassword}
@@ -391,7 +391,7 @@ export const SettingsPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="New Password"
+              label="New password"
               type="password"
               placeholder="Min. 8 characters"
               value={newPassword}
@@ -399,7 +399,7 @@ export const SettingsPage: React.FC = () => {
               required
             />
             <Input
-              label="Confirm New Password"
+              label="Confirm new password"
               type="password"
               placeholder="Re-enter new password"
               value={confirmPassword}
@@ -416,7 +416,7 @@ export const SettingsPage: React.FC = () => {
               className="w-full sm:w-auto min-h-[44px]"
               icon={<KeyRound className="w-4 h-4" />}
             >
-              Update Password
+              Update password
             </Button>
           </div>
         </form>

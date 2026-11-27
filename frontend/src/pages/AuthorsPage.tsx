@@ -58,7 +58,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
     setDeleteLoading(true);
     try {
       await api.deleteAuthor(authorToDelete.id);
-      toast.success('Author Removed', `Profile for "${authorToDelete.name}" has been deleted`);
+      toast.success('Author removed', `Profile for "${authorToDelete.name}" has been deleted`);
       setAuthorToDelete(null);
       loadAuthors();
       onRefreshStats?.();
@@ -75,7 +75,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-            Academic Faculty & Authors Registry
+            Authors
           </h2>
           <p className="text-xs text-[#82777A]">
             {authors.length} scholars, researchers, and editorial contributors
@@ -90,12 +90,12 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
           className="w-full sm:w-auto min-h-[44px]"
           icon={<Plus className="w-4 h-4" />}
         >
-          Add New Author
+          Add author
         </Button>
       </div>
 
       {/* Search Header */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex items-center justify-between gap-4">
+      <div className="p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-none flex items-center justify-between gap-4">
         <div className="max-w-md w-full">
           <Input
             placeholder="Search scholars by name..."
@@ -112,9 +112,9 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
       ) : authors.length === 0 ? (
         <EmptyState
           icon={<Users className="w-8 h-8" />}
-          title="No Authors Registered"
+          title="No authors yet"
           description="No authors match your search criteria. Create a new author profile to begin associating monographs."
-          actionText="Add New Author"
+          actionText="Add author"
           onAction={() => {
             setAuthorToEdit(null);
             setIsFormOpen(true);
@@ -125,7 +125,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
           {authors.map((author) => (
             <div
               key={author.id}
-              className="p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
+              className="p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none hover:shadow-none hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-start gap-3.5">
@@ -149,7 +149,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                       <span className="font-semibold text-[#292326]">
                         {author.books_count || 0}
                       </span>
-                      <span>Volumes Authored</span>
+                      <span>Books published</span>
                     </div>
                   </div>
                 </div>
@@ -190,7 +190,7 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                   onClick={() => setAuthorToView(author)}
                   className="min-h-[40px] text-xs font-semibold text-[#651C32] hover:text-[#431322] flex items-center gap-1"
                 >
-                  View Associated Works ({author.books_count || 0}) →
+                  View books ({author.books_count || 0}) →
                 </button>
                 <div className="flex items-center gap-1">
                   <button
@@ -198,16 +198,16 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
                       setAuthorToEdit(author);
                       setIsFormOpen(true);
                     }}
-                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
-                    title="Edit Profile"
+                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#292326] hover:bg-[#FFF6D9] transition-colors"
+                    title="Edit profile"
                     aria-label="Edit author"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setAuthorToDelete(author)}
-                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
-                    title="Delete Author"
+                    className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
+                    title="Delete author"
                     aria-label="Delete author"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -246,9 +246,9 @@ export const AuthorsPage: React.FC<AuthorsPageProps> = ({ onRefreshStats, onView
         isOpen={!!authorToDelete}
         onClose={() => setAuthorToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Author Profile"
+        title="Delete author"
         message={`Are you sure you want to delete profile for "${authorToDelete?.name}"? Books associated will remain in the catalogue.`}
-        confirmText="Yes, Delete Author"
+        confirmText="Yes, delete author"
         loading={deleteLoading}
       />
     </div>

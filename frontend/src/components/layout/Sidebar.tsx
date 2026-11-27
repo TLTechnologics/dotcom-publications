@@ -59,53 +59,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'orders',
-      label: 'Customer Orders',
+      label: 'Customer orders',
       icon: <ShoppingBag className="w-4 h-4" />,
       count: counts?.orders,
     },
     {
       id: 'books',
-      label: 'Books Catalogue',
+      label: 'Book catalogue',
       icon: <BookOpen className="w-4 h-4" />,
       count: counts?.books,
     },
     {
       id: 'authors',
-      label: 'Faculty & Authors',
+      label: 'Authors',
       icon: <Users className="w-4 h-4" />,
       count: counts?.authors,
     },
     {
       id: 'categories',
-      label: 'Disciplines & Categories',
+      label: 'Categories',
       icon: <FolderTree className="w-4 h-4" />,
       count: counts?.categories,
     },
     {
       id: 'publishers',
-      label: 'Publisher Imprints',
+      label: 'Publishers',
       icon: <Building2 className="w-4 h-4" />,
       count: counts?.publishers,
     },
     {
       id: 'media',
-      label: 'Media Library',
+      label: 'Media library',
       icon: <ImageIcon className="w-4 h-4" />,
     },
     {
       id: 'landing',
-      label: 'Landing Page CMS',
+      label: 'Landing page',
       icon: <Globe className="w-4 h-4" />,
     },
     {
       id: 'users',
-      label: 'Admin Accounts',
+      label: 'Admin accounts',
       icon: <UserCheck className="w-4 h-4" />,
       count: counts?.users,
     },
     {
       id: 'settings',
-      label: 'System Settings',
+      label: 'System settings',
       icon: <Settings className="w-4 h-4" />,
     },
   ];
@@ -123,12 +123,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside
       className={`${
         isMobile ? 'w-full h-full' : 'w-64 h-screen sticky top-0 shrink-0'
-      } bg-white text-[#172033] flex flex-col select-none border-r border-[#DCE4EF] shadow-elevated`}
+      } bg-white text-[#172033] flex flex-col select-none border-r border-[#DCE4EF] shadow-none`}
     >
       {/* Brand Header */}
       <div className="p-4 sm:p-5 border-b border-[#DCE4EF] flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white border border-[#F6E7A8]/60 overflow-hidden shadow-md shrink-0 p-0.5">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md bg-white border border-[#F6E7A8]/60 overflow-hidden shadow-md shrink-0 p-0.5">
             <img
               src="/logo.jpg"
               alt="Dotcom Publications"
@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Dotcom Publications
             </h1>
             <p className="text-[10px] font-semibold text-[#65728A] mt-0.5">
-              Admin Portal
+              Admin portal
             </p>
           </div>
         </div>
@@ -149,8 +149,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onClose && (
           <button
             onClick={onClose}
-            className="md:hidden touch-target rounded-xl text-white/80 hover:text-white hover:bg-[#431322] transition-colors p-2"
-            aria-label="Close Navigation Drawer"
+            className="md:hidden touch-target rounded-md text-white/80 hover:text-white hover:bg-[#431322] transition-colors p-2"
+            aria-label="Close navigation"
           >
             <X className="w-5 h-5" />
           </button>
@@ -160,7 +160,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
         <div className="px-3 pb-2 text-[10px] font-semibold text-[#65728A]">
-          Publishing Core
+          Publishing
         </div>
         {navItems.map((item) => {
           const isActive = currentTab === item.id;
@@ -171,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onTabChange(item.id);
                 onClose?.();
               }}
-              className={`w-full min-h-[44px] flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 group active:scale-[0.98] ${
+              className={`w-full min-h-[44px] flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-medium transition-all duration-200 group active:scale-[0.98] ${
                 isActive
                   ? 'bg-[#EAF2FF] text-[#173B87] font-semibold'
                   : 'text-[#526079] hover:bg-[#F4F7FB] hover:text-[#172033]'
@@ -213,17 +213,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onSwitchToCustomer();
               onClose?.();
             }}
-            className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#EAF2FF] text-[#173B87] hover:bg-[#DCE9FF] active:scale-[0.98] transition-all border border-[#DCE4EF]"
+            className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-md text-xs font-semibold bg-[#EAF2FF] text-[#173B87] hover:bg-[#DCE9FF] active:scale-[0.98] transition-all border border-[#DCE4EF]"
           >
             <ExternalLink className="w-3.5 h-3.5 text-[#651C32]" />
-            <span>Customer Storefront</span>
+            <span>Customer storefront</span>
           </button>
         </div>
       )}
 
       {/* Sidebar Footer — User Identity and Sign Out */}
       <div className="p-3 border-t border-[#DCE4EF] bg-[#F8FAFD]">
-        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-[#431322] transition-colors group">
+        <div className="flex items-center gap-2.5 p-2 rounded-md hover:bg-[#431322] transition-colors group">
           <div className="relative">
             <div className="w-9 h-9 rounded-full bg-[#EAF2FF] border border-[#DCE4EF] flex items-center justify-center text-[#2457C5] font-sans font-bold text-xs">
               {userInitials}
@@ -250,7 +250,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onLogoutClick?.();
               onClose?.();
             }}
-            title="Sign Out of Portal"
+            title="Sign out"
             className="touch-target p-2 rounded-lg text-white/70 hover:text-[#B94B4B] hover:bg-[#300D18] transition-colors"
           >
             <LogOut className="w-4 h-4" />

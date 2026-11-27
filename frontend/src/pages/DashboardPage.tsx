@@ -68,12 +68,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       <div className="space-y-6 animate-pulse">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 rounded-2xl bg-[#EAE3DE]/60" />
+            <div key={i} className="h-28 rounded-lg bg-[#EAE3DE]/60" />
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 h-96 rounded-2xl bg-[#EAE3DE]/60" />
-          <div className="h-96 rounded-2xl bg-[#EAE3DE]/60" />
+          <div className="lg:col-span-2 h-96 rounded-lg bg-[#EAE3DE]/60" />
+          <div className="h-96 rounded-lg bg-[#EAE3DE]/60" />
         </div>
       </div>
     );
@@ -88,14 +88,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Platform Status Banner */}
-      <div className="bg-[#FFF6D9] border border-[#F6E7A8] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-subtle">
+      <div className="bg-[#FFF6D9] border border-[#F6E7A8] rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-none">
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-[#651C32] text-[#F6E7A8] flex items-center justify-center shadow-subtle shrink-0">
+          <div className="w-10 h-10 rounded-md bg-[#651C32] text-[#F6E7A8] flex items-center justify-center shadow-none shrink-0">
             <Sparkles className="w-5 h-5" />
           </div>
           <div className="min-w-0">
             <h4 className="text-sm font-serif font-bold text-[#431322] tracking-tight truncate">
-              Publishing Executive Dashboard — Dotcom Publications
+              Publishing dashboard — Dotcom Publications
             </h4>
             <p className="text-[11px] text-[#651C32] mt-0.5 font-medium line-clamp-2">
               Synchronized real-time catalogue metrics, order fulfillment statuses, and audited transactions.
@@ -104,7 +104,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap w-full sm:w-auto">
           <Button variant="secondary" size="sm" onClick={() => onNavigate('landing')} className="flex-1 sm:flex-initial">
-            Landing Page CMS
+            Landing page
           </Button>
           <Button variant="primary" size="sm" onClick={onAddBook} icon={<Plus className="w-3.5 h-3.5" />} className="flex-1 sm:flex-initial">
             New Title
@@ -117,11 +117,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Total Revenue */}
         <div
           onClick={() => onNavigate('orders')}
-          className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-4 sm:p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none hover:shadow-none hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-[#82777A] leading-tight">Total Gross Revenue</span>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-[#FFF6D9] text-[#651C32] group-hover:scale-105 transition-transform shadow-subtle shrink-0">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Gross revenue</span>
+            <div className="p-2 sm:p-2.5 rounded-md bg-[#FFF6D9] text-[#651C32] group-hover:scale-105 transition-transform shadow-none shrink-0">
               <span className="font-serif font-bold text-sm">₹</span>
             </div>
           </div>
@@ -138,14 +138,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
 
-        {/* Total Customer Orders */}
+        {/* Total Customer orders */}
         <div
           onClick={() => onNavigate('orders')}
-          className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-4 sm:p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none hover:shadow-none hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-[#82777A] leading-tight">Customer Orders</span>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-[#EAF1F7] text-[#557A9C] group-hover:scale-105 transition-transform shadow-subtle shrink-0">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Customer orders</span>
+            <div className="p-2 sm:p-2.5 rounded-md bg-[#EAF1F7] text-[#557A9C] group-hover:scale-105 transition-transform shadow-none shrink-0">
               <ShoppingBag className="w-5 h-5" />
             </div>
           </div>
@@ -167,11 +167,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Catalogue Titles */}
         <div
           onClick={() => onNavigate('books')}
-          className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-4 sm:p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none hover:shadow-none hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold text-[#82777A] leading-tight">Published Titles</span>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-[#F5E6EA] text-[#651C32] group-hover:scale-105 transition-transform shadow-subtle shrink-0">
+            <span className="text-xs font-semibold text-[#82777A] leading-tight">Published books</span>
+            <div className="p-2 sm:p-2.5 rounded-md bg-[#F5E6EA] text-[#651C32] group-hover:scale-105 transition-transform shadow-none shrink-0">
               <BookOpen className="w-5 h-5" />
             </div>
           </div>
@@ -188,14 +188,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
         </div>
 
-        {/* Faculty & Authors */}
+        {/* Authors */}
         <div
           onClick={() => onNavigate('authors')}
-          className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle hover:shadow-card hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
+          className="p-4 sm:p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none hover:shadow-none hover:border-[#651C32] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-start justify-between">
             <span className="text-xs font-semibold text-[#82777A] leading-tight">Faculty Authors & Imprints</span>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-[#FAF0E2] text-[#C58B35] group-hover:scale-105 transition-transform shadow-subtle shrink-0">
+            <div className="p-2 sm:p-2.5 rounded-md bg-[#FAF0E2] text-[#C58B35] group-hover:scale-105 transition-transform shadow-none shrink-0">
               <Users className="w-5 h-5" />
             </div>
           </div>
@@ -217,7 +217,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {analytics && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
           {/* Monthly Revenue Bars (8 cols) */}
-          <div className="lg:col-span-8 p-4 sm:p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col justify-between overflow-hidden">
+          <div className="lg:col-span-8 p-4 sm:p-6 rounded-lg bg-white border border-[#EAE3DE] shadow-none flex flex-col justify-between overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-6 pb-3 border-b border-[#EAE3DE]">
               <div>
                 <h3 className="text-sm sm:text-base font-serif font-bold text-[#292326] tracking-tight flex items-center gap-2">
@@ -265,7 +265,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           {/* Order Status Distribution (4 cols) */}
-          <div className="lg:col-span-4 p-4 sm:p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle flex flex-col justify-between">
+          <div className="lg:col-span-4 p-4 sm:p-6 rounded-lg bg-white border border-[#EAE3DE] shadow-none flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#EAE3DE]">
                 <h3 className="text-sm sm:text-base font-serif font-bold text-[#292326] tracking-tight">
@@ -331,10 +331,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
       {/* Main Content Sections: 2-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-        {/* Left Column (8 cols): Recently Added Books + Featured Titles */}
+        {/* Left Column (8 cols): Recently Added Books + Featured titles */}
         <div className="lg:col-span-8 space-y-6 sm:space-y-8">
           {/* Recently Added Books */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
+          <div className="p-4 sm:p-6 rounded-lg bg-white border border-[#EAE3DE] shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-5 pb-3 border-b border-[#EAE3DE]">
               <div>
                 <h3 className="text-sm sm:text-base font-serif font-bold text-[#292326] tracking-tight">
@@ -348,7 +348,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 onClick={() => onNavigate('books')}
                 className="text-xs font-semibold text-[#651C32] hover:text-[#431322] flex items-center gap-1 group transition-colors self-start sm:self-auto touch-target"
               >
-                <span>View Complete Catalogue</span>
+                <span>View catalogue</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
@@ -357,13 +357,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               {stats.recently_added_books.map((book) => (
                 <div
                   key={book.id}
-                  className="py-3 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF8F3] px-2 sm:px-2.5 rounded-xl transition-colors group"
+                  className="py-3 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF8F3] px-2 sm:px-2.5 rounded-md transition-colors group"
                 >
                   <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
                     <img
                       src={book.cover_image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'}
                       alt={book.title}
-                      className="w-11 h-15 sm:w-12 sm:h-16 object-cover rounded-lg shadow-subtle border border-[#EAE3DE] shrink-0"
+                      className="w-11 h-15 sm:w-12 sm:h-16 object-cover rounded-lg shadow-none border border-[#EAE3DE] shrink-0"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -396,7 +396,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     <button
                       onClick={() => onViewBook(book)}
                       className="touch-target p-2 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
-                      title="Quick Preview"
+                      title="Quick preview"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -407,7 +407,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           {/* Featured Academic Titles */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
+          <div className="p-4 sm:p-6 rounded-lg bg-white border border-[#EAE3DE] shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-5 pb-3 border-b border-[#EAE3DE]">
               <div>
                 <h3 className="text-sm sm:text-base font-serif font-bold text-[#292326] tracking-tight">
@@ -427,12 +427,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 <div
                   key={book.id}
                   onClick={() => onViewBook(book)}
-                  className="p-3 sm:p-3.5 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-white hover:border-[#651C32] hover:shadow-subtle transition-all cursor-pointer group flex items-start gap-3"
+                  className="p-3 sm:p-3.5 rounded-md border border-[#EAE3DE] bg-[#FAF8F3] hover:bg-white hover:border-[#651C32] hover:shadow-none transition-all cursor-pointer group flex items-start gap-3"
                 >
                   <img
                     src={book.cover_image || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=100&auto=format&fit=crop&q=80'}
                     alt={book.title}
-                    className="w-12 h-18 sm:w-14 sm:h-20 object-cover rounded-lg shadow-subtle border border-[#EAE3DE] shrink-0"
+                    className="w-12 h-18 sm:w-14 sm:h-20 object-cover rounded-lg shadow-none border border-[#EAE3DE] shrink-0"
                   />
                   <div className="min-w-0 flex-1 flex flex-col justify-between h-18 sm:h-20">
                     <div>
@@ -461,14 +461,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Right Column (4 cols): Quick Publishing Actions + Recent System Activity */}
         <div className="lg:col-span-4 space-y-6">
           {/* Quick Publishing Actions */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
+          <div className="p-4 sm:p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#82777A] mb-3">
               Publishing Actions
             </h3>
             <div className="space-y-2">
               <button
                 onClick={onAddBook}
-                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
+                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-md border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#F5E6EA] text-[#651C32] flex items-center justify-center font-bold shrink-0">
@@ -488,7 +488,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
               <button
                 onClick={onAddAuthor}
-                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
+                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-md border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#EAF1F7] text-[#557A9C] flex items-center justify-center shrink-0">
@@ -508,7 +508,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
               <button
                 onClick={onAddCategory}
-                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
+                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-md border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#FAF0E2] text-[#C58B35] flex items-center justify-center shrink-0">
@@ -528,7 +528,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
               <button
                 onClick={() => onNavigate('landing')}
-                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-xl border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
+                className="w-full min-h-[50px] flex items-center justify-between p-3 rounded-md border border-[#EAE3DE] hover:border-[#651C32] hover:bg-[#FFF6D9]/40 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#EAF3ED] text-[#477A58] flex items-center justify-center shrink-0">
@@ -536,7 +536,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-[#292326] block group-hover:text-[#651C32]">
-                      Landing Page CMS
+                      Landing page
                     </span>
                     <span className="text-[10px] text-[#82777A]">
                       Hero banners & showcases
@@ -549,7 +549,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           {/* Recent System Activity */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3DE] shadow-subtle">
+          <div className="p-4 sm:p-5 rounded-lg bg-white border border-[#EAE3DE] shadow-none">
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#EAE3DE]">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#82777A]">
                 Recent System Activity

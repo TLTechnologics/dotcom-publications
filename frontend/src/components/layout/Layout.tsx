@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopNav } from './TopNav';
 import { NavigationTab, User } from '../../types';
+import './admin-workspace.css';
 
 interface LayoutProps {
   currentTab: NavigationTab;
@@ -53,7 +54,7 @@ export const Layout: React.FC<LayoutProps> = ({
   }, [mobileMenuOpen]);
 
   return (
-    <div className="flex min-h-screen bg-[#F7F7F5] font-sans text-[#222321] w-full max-w-full overflow-x-hidden">
+    <div className="admin-workspace flex min-h-screen bg-[#F7F7F5] font-sans text-[#222321] w-full max-w-full overflow-x-hidden">
       {/* Desktop Persistent Left Sidebar */}
       <div className="hidden md:block">
         <Sidebar
@@ -68,16 +69,16 @@ export const Layout: React.FC<LayoutProps> = ({
 
       {/* Mobile Slide-Out Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Admin Navigation">
+        <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Admin navigation">
           {/* Backdrop with Blur and Fade Animation */}
           <div
-            className="fixed inset-0 bg-[#172033]/55 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
+            className="fixed inset-0 bg-[#172033]/65 transition-opacity animate-in fade-in duration-300"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
           {/* Drawer Slide-In Panel */}
-          <div className="relative flex-1 flex flex-col max-w-[280px] sm:max-w-xs w-full bg-white z-10 shadow-2xl animate-in slide-in-from-left duration-300 ease-out h-full">
+          <div className="relative flex-1 flex flex-col max-w-[280px] sm:max-w-xs w-full bg-white z-10 shadow-xl animate-in slide-in-from-left duration-300 ease-out h-full">
             <Sidebar
               isMobile={true}
               currentTab={currentTab}

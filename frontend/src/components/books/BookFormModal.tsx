@@ -255,7 +255,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
       } else {
         await api.createBook(payload);
         toast.success(
-          payload.is_draft ? 'Draft Saved' : 'Book Published',
+          payload.is_draft ? 'Draft Saved' : 'Book published',
           `"${payload.title}" has been saved in the catalogue`
         );
       }
@@ -393,7 +393,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         isOpen={isOpen}
         onClose={handleRequestClose}
         title={bookToEdit ? `Edit Monograph: ${bookToEdit.title}` : 'Add New Academic Title'}
-        subtitle="Catalogue Entry & Metadata Specifications"
+        subtitle="Catalogue entry and details"
         size="full"
       >
         {/* Section Navigation Tabs */}
@@ -408,9 +408,9 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id as any)}
-              className={`min-h-[42px] flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`min-h-[42px] flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-semibold whitespace-nowrap transition-all ${
                 activeSection === tab.id
-                  ? 'bg-[#651C32] text-white shadow-subtle'
+                  ? 'bg-[#651C32] text-white shadow-none'
                   : 'text-[#292326] hover:bg-[#FFF6D9] hover:text-[#431322]'
               }`}
             >
@@ -425,7 +425,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           {/* SECTION A — BASIC INFORMATION */}
           {activeSection === 'A' && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="p-4 rounded-xl bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
+              <div className="p-4 rounded-md bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#431322]">
                   Section A: Core Title & Overview
                 </h4>
@@ -436,7 +436,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Book Title"
+                  label="Book title"
                   required
                   placeholder="e.g. Principles of Modern Deep Learning"
                   value={formData.title}
@@ -444,7 +444,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
                 <Input
-                  label="Subtitle / Monograph Sub-heading"
+                  label="Subtitle"
                   placeholder="e.g. A Rigorous Mathematical and Algorithmic Exposition"
                   value={formData.subtitle || ''}
                   onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
@@ -457,7 +457,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 </label>
                 <textarea
                   rows={2}
-                  className="block w-full rounded-xl border border-[#EAE3DE] bg-white text-sm text-[#292326] placeholder-[#82777A]/70 p-3 focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32]"
+                  className="block w-full rounded-md border border-[#EAE3DE] bg-white text-sm text-[#292326] placeholder-[#82777A]/70 p-3 focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32]"
                   placeholder="Brief synopsis for catalogue cards and search results..."
                   value={formData.short_description || ''}
                   onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
@@ -470,7 +470,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 </label>
                 <textarea
                   rows={5}
-                  className="block w-full rounded-xl border border-[#EAE3DE] bg-white text-sm text-[#292326] placeholder-[#82777A]/70 p-3 focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed"
+                  className="block w-full rounded-md border border-[#EAE3DE] bg-white text-sm text-[#292326] placeholder-[#82777A]/70 p-3 focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed"
                   placeholder="Complete academic synopsis, target readership, syllabus coverage, and pedagogical features..."
                   value={formData.full_description || ''}
                   onChange={(e) => setFormData({ ...formData, full_description: e.target.value })}
@@ -482,8 +482,8 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-2">
                   Book Cover Image
                 </label>
-                <div className="flex items-start gap-4 p-4 rounded-xl border border-[#EAE3DE] bg-[#FAF8F3]">
-                  <div className="w-20 h-28 rounded-lg overflow-hidden border border-[#EAE3DE] bg-white flex items-center justify-center shrink-0 shadow-subtle">
+                <div className="flex items-start gap-4 p-4 rounded-md border border-[#EAE3DE] bg-[#FAF8F3]">
+                  <div className="w-20 h-28 rounded-lg overflow-hidden border border-[#EAE3DE] bg-white flex items-center justify-center shrink-0 shadow-none">
                     {formData.cover_image ? (
                       <img
                         src={formData.cover_image}
@@ -511,7 +511,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                         }}
                         icon={<Upload className="w-3.5 h-3.5" />}
                       >
-                        Choose from Media Library / Upload
+                        Choose from Media library / Upload
                       </Button>
                       {formData.cover_image && (
                         <button
@@ -535,7 +535,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           {/* SECTION B — AUTHOR INFORMATION */}
           {activeSection === 'B' && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="p-4 rounded-xl bg-[#FFF6D9] border border-[#F6E7A8] mb-4 flex items-center justify-between">
+              <div className="p-4 rounded-md bg-[#FFF6D9] border border-[#F6E7A8] mb-4 flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-[#431322]">
                     Section B: Author Information
@@ -579,7 +579,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                             });
                           }
                         }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                        className={`flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-all ${
                           isSelected
                             ? 'bg-[#FFF6D9] border-[#F6E7A8] ring-1 ring-[#F6E7A8]'
                             : 'bg-white border-[#EAE3DE] hover:border-[#651C32]'
@@ -650,7 +650,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               {/* Quick Author Drawer */}
               {showAuthorDrawer && (
-                <div className="p-4 rounded-xl border border-[#F6E7A8] bg-[#FFF6D9]/70 mt-4 space-y-3 animate-in fade-in">
+                <div className="p-4 rounded-md border border-[#F6E7A8] bg-[#FFF6D9]/70 mt-4 space-y-3 animate-in fade-in">
                   <div className="flex items-center justify-between">
                     <h5 className="text-xs font-bold text-[#431322]">
                       Quick Add Author Without Leaving Form
@@ -665,7 +665,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
-                      label="Author Name"
+                      label="Author name"
                       placeholder="e.g. Dr. Jane Doe"
                       value={newAuthorName}
                       onChange={(e) => setNewAuthorName(e.target.value)}
@@ -683,7 +683,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                     </label>
                     <textarea
                       rows={2}
-                      className="w-full text-xs rounded-xl border border-[#EAE3DE] bg-white p-2.5 focus:outline-none focus:ring-2 focus:ring-[#651C32]"
+                      className="w-full text-xs rounded-md border border-[#EAE3DE] bg-white p-2.5 focus:outline-none focus:ring-2 focus:ring-[#651C32]"
                       placeholder="Affiliation, department, research specialisation..."
                       value={newAuthorBio}
                       onChange={(e) => setNewAuthorBio(e.target.value)}
@@ -716,7 +716,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           {/* SECTION C — PUBLICATION DETAILS */}
           {activeSection === 'C' && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="p-4 rounded-xl bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
+              <div className="p-4 rounded-md bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#431322]">
                   Section C: Publication Details & Taxonomy
                 </h4>
@@ -727,7 +727,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input
-                  label="ISBN Number"
+                  label="ISBN"
                   placeholder="e.g. 978-81-945621-0-4"
                   value={formData.isbn || ''}
                   onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
@@ -740,7 +740,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, edition: e.target.value })}
                 />
                 <Input
-                  label="Publication Year"
+                  label="Publication year"
                   type="number"
                   placeholder="2026"
                   value={formData.publication_year || ''}
@@ -782,18 +782,18 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 </div>
 
                 <Select
-                  label="Book Format"
+                  label="Book format"
                   value={formData.book_format}
                   onChange={(e) => setFormData({ ...formData, book_format: e.target.value })}
                   options={[
                     { value: 'Paperback', label: 'Paperback', subtitle: 'Standard flexible trade binding', icon: <BookIcon className="w-4 h-4" /> },
                     { value: 'Hardcover', label: 'Hardcover', subtitle: 'Stiff board binding with dust jacket', icon: <BookOpen className="w-4 h-4" /> },
                     { value: 'E-Book', label: 'E-Book / Digital Monograph', subtitle: 'Searchable PDF & EPUB publication', icon: <FileText className="w-4 h-4" /> },
-                    { value: 'Box Set', label: 'Multi-Volume Box Set', subtitle: 'Complete collection boxed edition', icon: <Layers className="w-4 h-4" /> },
+                    { value: 'Box Set', label: 'Multi-volume box set', subtitle: 'Complete collection boxed edition', icon: <Layers className="w-4 h-4" /> },
                   ]}
                 />
                 <Input
-                  label="Number of Pages"
+                  label="Page count"
                   type="number"
                   placeholder="e.g. 640"
                   value={formData.pages || ''}
@@ -803,7 +803,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               {/* Quick Publisher Creation Card Drawer */}
               {showPublisherDrawer && (
-                <div className="p-4 rounded-xl border border-[#F6E7A8] bg-[#FFF6D9]/60 space-y-3 animate-in fade-in">
+                <div className="p-4 rounded-md border border-[#F6E7A8] bg-[#FFF6D9]/60 space-y-3 animate-in fade-in">
                   <div className="flex items-center justify-between border-b border-[#F6E7A8]/80 pb-2">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-[#651C32]" />
@@ -827,7 +827,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                       onChange={(e) => setNewPublisherName(e.target.value)}
                     />
                     <Input
-                      label="Contact Email (Optional)"
+                      label="Contact email (Optional)"
                       placeholder="editorial@press.org"
                       value={newPublisherEmail}
                       onChange={(e) => setNewPublisherEmail(e.target.value)}
@@ -835,13 +835,13 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
-                      label="Editorial Specialty / Description"
+                      label="Description"
                       placeholder="e.g. Higher education, research monographs, STEM"
                       value={newPublisherDescription}
                       onChange={(e) => setNewPublisherDescription(e.target.value)}
                     />
                     <Input
-                      label="Official Website (Optional)"
+                      label="Website (optional)"
                       placeholder="https://press.example.org"
                       value={newPublisherWebsite}
                       onChange={(e) => setNewPublisherWebsite(e.target.value)}
@@ -875,7 +875,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider">
-                      Primary Discipline / Category
+                      Primary subject / Category
                     </label>
                     <button
                       type="button"
@@ -898,7 +898,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                     options={localCategories.map((c) => ({
                       value: c.id,
                       label: c.name,
-                      subtitle: c.description || (c.subcategories?.length ? `${c.subcategories.length} sub-disciplines` : 'Primary Discipline'),
+                      subtitle: c.description || (c.subcategories?.length ? `${c.subcategories.length} sub-disciplines` : 'Primary subject'),
                       icon: <FolderTree className="w-4 h-4" />,
                       badge: c.subcategories?.length ? `${c.subcategories.length} sub` : undefined,
                     }))}
@@ -906,7 +906,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 </div>
 
                 <Select
-                  label="Subcategory / Specialisation"
+                  label="Subcategory or field"
                   placeholder="Select subcategory (optional)"
                   value={formData.subcategory_id || ''}
                   onChange={(e) =>
@@ -922,23 +922,23 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 />
 
                 <Select
-                  label="Language of Publication"
+                  label="Language"
                   value={formData.language || 'English'}
                   onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                   options={[
-                    { value: 'English', label: 'English', subtitle: 'Standard Academic Editorial Medium', icon: <Globe className="w-4 h-4" /> },
+                    { value: 'English', label: 'English', subtitle: 'Standard academic text', icon: <Globe className="w-4 h-4" /> },
                     { value: 'Hindi', label: 'Hindi (हिंदी)', subtitle: 'Devanagari Script', icon: <Globe className="w-4 h-4" /> },
-                    { value: 'Sanskrit', label: 'Sanskrit (संस्कृतम्)', subtitle: 'Classical Vedic & Literary Corpus', icon: <Globe className="w-4 h-4" /> },
-                    { value: 'Bilingual', label: 'Bilingual (English + Hindi)', subtitle: 'Dual-Language Scholarly Edition', icon: <Globe className="w-4 h-4" /> },
-                    { value: 'French', label: 'French (Français)', subtitle: 'European Humanities & Philosophy', icon: <Globe className="w-4 h-4" /> },
-                    { value: 'German', label: 'German (Deutsch)', subtitle: 'Academic & Scientific Translation', icon: <Globe className="w-4 h-4" /> },
+                    { value: 'Sanskrit', label: 'Sanskrit (संस्कृतम्)', subtitle: 'Classical Vedic and literary corpus', icon: <Globe className="w-4 h-4" /> },
+                    { value: 'Bilingual', label: 'Bilingual (English + Hindi)', subtitle: 'Dual-language edition', icon: <Globe className="w-4 h-4" /> },
+                    { value: 'French', label: 'French (Français)', subtitle: 'European humanities and philosophy', icon: <Globe className="w-4 h-4" /> },
+                    { value: 'German', label: 'German (Deutsch)', subtitle: 'Academic and scientific translation', icon: <Globe className="w-4 h-4" /> },
                   ]}
                 />
               </div>
 
               {/* Quick Category & Discipline Creation Card Drawer */}
               {showCategoryDrawer && (
-                <div className="p-4 rounded-xl border border-[#F6E7A8] bg-[#FFF6D9]/60 space-y-3 animate-in fade-in">
+                <div className="p-4 rounded-md border border-[#F6E7A8] bg-[#FFF6D9]/60 space-y-3 animate-in fade-in">
                   <div className="flex items-center justify-between border-b border-[#F6E7A8]/80 pb-2">
                     <div className="flex items-center gap-2">
                       <FolderTree className="w-4 h-4 text-[#651C32]" />
@@ -956,20 +956,20 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Input
-                      label="Discipline / Category Name *"
+                      label="Discipline / Category name *"
                       placeholder="e.g. Cognitive Neuroscience"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                     />
                     <Select
-                      label="Parent Discipline (Optional)"
-                      placeholder="None (Top-Level Primary Discipline)"
+                      label="Parent subject (optional)"
+                      placeholder="None (Top-Level Primary subject)"
                       value={newCategoryParentId || ''}
                       onChange={(e) =>
                         setNewCategoryParentId(e.target.value ? Number(e.target.value) : undefined)
                       }
                       options={[
-                        { value: '', label: 'None (Root Discipline)', subtitle: 'Independent top-level field', icon: <FolderTree className="w-4 h-4" /> },
+                        { value: '', label: 'None (top-level subject)', subtitle: 'Independent top-level field', icon: <FolderTree className="w-4 h-4" /> },
                         ...localCategories
                           .filter((c) => !c.parent_id)
                           .map((c) => ({
@@ -983,7 +983,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                     />
                   </div>
                   <Input
-                    label="Description / Curriculum Scope (Optional)"
+                    label="Description and subject scope (optional)"
                     placeholder="e.g. Computational models, brain imaging, and neural systems"
                     value={newCategoryDescription}
                     onChange={(e) => setNewCategoryDescription(e.target.value)}
@@ -1013,7 +1013,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               <div>
                 <Input
-                  label="Subject / Academic Field Tags"
+                  label="Subject and field tags"
                   placeholder="e.g. Machine Learning, Distributed Systems, Neural Computing"
                   value={formData.subject || ''}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -1026,7 +1026,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           {/* SECTION D — PRICING */}
           {activeSection === 'D' && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="p-4 rounded-xl bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
+              <div className="p-4 rounded-md bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#431322]">
                   Section D: Pricing & Commercial Terms
                 </h4>
@@ -1060,7 +1060,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                   }
                 />
                 <Input
-                  label="Currency Code"
+                  label="Currency code"
                   value={formData.currency}
                   disabled
                   helper="Default publication currency for Dotcom Publications"
@@ -1068,7 +1068,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
               </div>
 
               {/* Automatic Discount Calculation Box */}
-              <div className="p-4 rounded-xl bg-[#FAF8F3] border border-[#EAE3DE] flex items-center justify-between">
+              <div className="p-4 rounded-md bg-[#FAF8F3] border border-[#EAE3DE] flex items-center justify-between">
                 <div>
                   <span className="text-xs font-semibold text-[#292326] block">
                     Calculated Institutional Discount
@@ -1092,7 +1092,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
           {/* SECTION E — PUBLISHING OPTIONS */}
           {activeSection === 'E' && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="p-4 rounded-xl bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
+              <div className="p-4 rounded-md bg-[#FFF6D9] border border-[#F6E7A8] mb-4">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#431322]">
                   Section E: Publication Status, Visibility & SEO
                 </h4>
@@ -1103,7 +1103,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Publication Status Toggle */}
-                <div className="p-4 rounded-xl border border-[#EAE3DE] bg-white flex items-center justify-between">
+                <div className="p-4 rounded-md border border-[#EAE3DE] bg-white flex items-center justify-between">
                   <div>
                     <span className="text-xs font-bold text-[#292326] block">
                       Publication Mode
@@ -1130,7 +1130,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 </div>
 
                 {/* Featured Toggle */}
-                <div className="p-4 rounded-xl border border-[#EAE3DE] bg-white flex items-center justify-between">
+                <div className="p-4 rounded-md border border-[#EAE3DE] bg-white flex items-center justify-between">
                   <div>
                     <span className="text-xs font-bold text-[#292326] block">
                       Featured Monograph
@@ -1157,19 +1157,19 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
-                  label="Warehouse Availability Status"
+                  label="Availability"
                   value={formData.availability_status}
                   onChange={(e) =>
                     setFormData({ ...formData, availability_status: e.target.value as any })
                   }
                   options={[
-                    { value: 'in_stock', label: 'In Stock (Ready to dispatch)', subtitle: 'Stored in central academic repository', icon: <CheckCircle className="w-4 h-4" /> },
-                    { value: 'out_of_stock', label: 'Out of Stock (Reprint scheduled)', subtitle: 'Awaiting next press run', icon: <Clock className="w-4 h-4" /> },
-                    { value: 'pre_order', label: 'Pre-Order / Advance Reservation', subtitle: 'Accept advance institutional reservations', icon: <Sparkles className="w-4 h-4" /> },
+                    { value: 'in_stock', label: 'In stock (ready to dispatch)', subtitle: 'Stored in central academic repository', icon: <CheckCircle className="w-4 h-4" /> },
+                    { value: 'out_of_stock', label: 'Out of stock (reprint scheduled)', subtitle: 'Awaiting next press run', icon: <Clock className="w-4 h-4" /> },
+                    { value: 'pre_order', label: 'Pre-order', subtitle: 'Accept advance institutional reservations', icon: <Sparkles className="w-4 h-4" /> },
                   ]}
                 />
                 <Input
-                  label="Search Engine Title (SEO)"
+                  label="Search result title (SEO)"
                   placeholder="e.g. Principles of Modern Deep Learning | Dotcom Publications"
                   value={formData.seo_title || ''}
                   onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })}
@@ -1182,7 +1182,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
                 </label>
                 <textarea
                   rows={2}
-                  className="block w-full rounded-xl border border-[#EAE3DE] bg-white text-sm text-[#292326] placeholder-[#82777A]/70 p-3 focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32]"
+                  className="block w-full rounded-md border border-[#EAE3DE] bg-white text-sm text-[#292326] placeholder-[#82777A]/70 p-3 focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32]"
                   placeholder="Search snippet summary for Google scholar and indexing robots..."
                   value={formData.seo_description || ''}
                   onChange={(e) => setFormData({ ...formData, seo_description: e.target.value })}
@@ -1193,7 +1193,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         </div>
 
         {/* Action Buttons: Save as Draft, Preview, Publish Book */}
-        <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#EAE3DE] bg-[#FAF8F3] p-3 sm:p-4 rounded-2xl">
+        <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#EAE3DE] bg-[#FAF8F3] p-3 sm:p-4 rounded-lg">
           <Button
             type="button"
             variant="ghost"
@@ -1246,8 +1246,8 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({
         }}
         title="Discard Unsaved Changes?"
         message="You have unsaved changes in this monograph catalogue entry. Discarding will lose any changes you have made."
-        confirmText="Discard Changes"
-        cancelText="Continue Editing"
+        confirmText="Discard changes"
+        cancelText="Continue editing"
         isDestructive={true}
       />
 

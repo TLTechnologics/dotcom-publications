@@ -111,7 +111,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Category Name"
+            label="Category name"
             required
             placeholder="e.g. Pure & Applied Mathematics"
             value={name}
@@ -120,7 +120,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
           />
 
           <Input
-            label="URL Slug Identifier"
+            label="URL slug"
             required
             placeholder="pure-applied-mathematics"
             value={slug}
@@ -130,12 +130,12 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
           />
 
           <Select
-            label="Parent Discipline (For Subcategories)"
+            label="Parent subject (for subcategories)"
             placeholder="None (This is a Top-Level Root Discipline)"
             value={parentId || ''}
             onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : undefined)}
             options={[
-              { value: '', label: 'None (Root Discipline)', subtitle: 'Independent primary academic field', icon: <FolderTree className="w-4 h-4" /> },
+              { value: '', label: 'None (top-level subject)', subtitle: 'Independent primary academic field', icon: <FolderTree className="w-4 h-4" /> },
               ...parentCategories
                 .filter((c) => !categoryToEdit || c.id !== categoryToEdit.id)
                 .map((c) => ({
@@ -154,7 +154,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             </label>
             <textarea
               rows={3}
-              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
+              className="w-full rounded-md border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] transition-colors"
               placeholder="Curriculum coverage, academic subjects included..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -187,7 +187,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               Cancel
             </Button>
             <Button type="submit" variant="primary" loading={loading}>
-              {categoryToEdit ? 'Save Changes' : 'Create Category'}
+              {categoryToEdit ? 'Save Changes' : 'Create category'}
             </Button>
           </div>
         </form>

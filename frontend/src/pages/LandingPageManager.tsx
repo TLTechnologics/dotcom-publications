@@ -110,7 +110,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
   const addStat = () => {
     setContent((prev) => ({
       ...prev,
-      about_stats: [...prev.about_stats, { label: 'New Metric', value: '100+' }],
+      about_stats: [...prev.about_stats, { label: 'Add statistic', value: '100+' }],
     }));
   };
 
@@ -131,7 +131,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-            Landing Page CMS Studio
+            Landing page Studio
           </h2>
           <p className="text-xs text-[#82777A]">
             Dynamically powers the future public-facing website at dotcompublications.com
@@ -162,7 +162,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
       {/* Structured Sections */}
       <div className="space-y-6">
         {/* Section 1: Hero Section */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-serif font-bold text-[#292326]">
@@ -179,7 +179,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
 
           <div className="space-y-4">
             <Input
-              label="Hero Main Headline"
+              label="Hero headline"
               value={content.hero_heading}
               onChange={(e) => setContent({ ...content, hero_heading: e.target.value })}
             />
@@ -190,7 +190,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
               </label>
               <textarea
                 rows={3}
-                className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed transition-colors"
+                className="w-full rounded-md border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed transition-colors"
                 value={content.hero_description}
                 onChange={(e) => setContent({ ...content, hero_description: e.target.value })}
               />
@@ -211,11 +211,11 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                   onClick={() => setIsMediaPickerOpen(true)}
                   icon={<Upload className="w-3.5 h-3.5" />}
                 >
-                  Media Library
+                  Media library
                 </Button>
               </div>
               {content.hero_image && (
-                <div className="mt-2 h-28 rounded-xl overflow-hidden border border-[#EAE3DE]">
+                <div className="mt-2 h-28 rounded-md overflow-hidden border border-[#EAE3DE]">
                   <img
                     src={content.hero_image}
                     alt="Hero preview"
@@ -228,11 +228,11 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 2: Featured Books Selector */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-serif font-bold text-[#292326]">
-                2. Featured Academic Titles Selector
+                2. Choose featured books
               </h3>
               <p className="text-xs text-[#82777A]">
                 Select which books from the catalogue appear prominently in the homepage spotlight ({content.featured_book_ids.length} selected)
@@ -248,7 +248,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                 <div
                   key={book.id}
                   onClick={() => toggleFeaturedBook(book.id)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-all ${
                     isSelected
                       ? 'bg-[#FFF6D9]/50 border-[#F6E7A8] ring-1 ring-[#F6E7A8]'
                       : 'bg-white border-[#EAE3DE] hover:border-[#651C32]/40'
@@ -279,8 +279,8 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
           </div>
         </div>
 
-        {/* Section 3: Popular Categories Display Selector */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        {/* Section 3: Choose popular subjects */}
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-serif font-bold text-[#292326]">
@@ -300,7 +300,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                 <div
                   key={cat.id}
                   onClick={() => togglePopularCategory(cat.id)}
-                  className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                  className={`p-3 rounded-md border cursor-pointer transition-all ${
                     isSelected
                       ? 'bg-[#FFF6D9]/50 border-[#F6E7A8] ring-1 ring-[#F6E7A8]'
                       : 'bg-[#FAF8F3] border-[#EAE3DE] hover:border-[#651C32]/40'
@@ -327,7 +327,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 4: About Dotcom Publications & Impact Metrics */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-serif font-bold text-[#292326]">
@@ -341,18 +341,18 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
           </div>
 
           <Input
-            label="Section Heading"
+            label="Section heading"
             value={content.about_title}
             onChange={(e) => setContent({ ...content, about_title: e.target.value })}
           />
 
           <div>
             <label className="block text-xs font-semibold text-[#292326] uppercase tracking-wider mb-1.5">
-              Institutional Narrative / Story
+              Institutional story
             </label>
             <textarea
               rows={4}
-              className="w-full rounded-xl border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed transition-colors"
+              className="w-full rounded-md border border-[#EAE3DE] bg-white p-3 text-sm text-[#292326] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#651C32] focus:border-[#651C32] leading-relaxed transition-colors"
               value={content.about_description}
               onChange={(e) => setContent({ ...content, about_description: e.target.value })}
             />
@@ -375,7 +375,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               {content.about_stats.map((st, idx) => (
-                <div key={idx} className="p-3 bg-[#FAF8F3] rounded-xl border border-[#EAE3DE] relative group">
+                <div key={idx} className="p-3 bg-[#FAF8F3] rounded-md border border-[#EAE3DE] relative group">
                   <Input
                     label="Value"
                     value={st.value}
@@ -392,7 +392,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
                     type="button"
                     onClick={() => removeStat(idx)}
                     className="absolute top-2 right-2 text-[#82777A] hover:text-[#B94B4B] p-1"
-                    title="Remove Metric"
+                    title="Remove statistic"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -403,7 +403,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
         </div>
 
         {/* Section 5: Contact Information & Public Footer */}
-        <div className="p-6 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle space-y-4">
+        <div className="p-6 bg-white rounded-lg border border-[#EAE3DE] shadow-none space-y-4">
           <div className="border-b border-[#EAE3DE] pb-3 flex items-center justify-between">
             <div>
               <h3 className="text-sm font-serif font-bold text-[#292326]">
@@ -418,26 +418,26 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Contact Email"
+              label="Contact email"
               type="email"
               value={content.contact_email}
               onChange={(e) => setContent({ ...content, contact_email: e.target.value })}
             />
             <Input
-              label="Contact Phone"
+              label="Contact phone"
               value={content.contact_phone}
               onChange={(e) => setContent({ ...content, contact_phone: e.target.value })}
             />
           </div>
 
           <Input
-            label="Headquarters Address"
+            label="Head office address"
             value={content.contact_address}
             onChange={(e) => setContent({ ...content, contact_address: e.target.value })}
           />
 
           <Input
-            label="Footer Copyright & Legal Disclaimer"
+            label="Footer and legal text"
             value={content.footer_text}
             onChange={(e) => setContent({ ...content, footer_text: e.target.value })}
           />
@@ -445,7 +445,7 @@ export const LandingPageManager: React.FC<LandingPageManagerProps> = ({ books, c
       </div>
 
       {/* Floating Save Bar */}
-      <div className="sticky bottom-4 z-20 p-4 bg-white/95 backdrop-blur-md rounded-2xl border border-[#EAE3DE] shadow-xl flex items-center justify-between">
+      <div className="sticky bottom-4 z-20 p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-xl flex items-center justify-between">
         <span className="text-xs text-[#82777A] font-medium">
           Changes will dynamically reflect on the public website upon saving.
         </span>

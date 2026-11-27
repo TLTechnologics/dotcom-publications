@@ -107,7 +107,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
     }
 
     if (!editingUser && (!formData.password || formData.password.length < 6)) {
-      setFormError('New administrator password must be at least 6 characters.');
+      setFormError('New admin password must be at least 6 characters.');
       return;
     }
 
@@ -122,7 +122,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
           is_active: formData.is_active,
           ...(formData.password ? { password: formData.password } : {}),
         });
-        toast.success('Account Updated', `Administrator ${formData.username} updated.`);
+        toast.success('Account updated', `Administrator ${formData.username} updated.`);
       } else {
         await api.createUser({
           username: formData.username.trim(),
@@ -132,7 +132,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
           password: formData.password,
           is_active: formData.is_active,
         });
-        toast.success('Account Created', `New administrator ${formData.username} registered.`);
+        toast.success('Account created', `New admin ${formData.username} registered.`);
       }
       setIsModalOpen(false);
       loadUsers();
@@ -148,11 +148,11 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
     setDeleteLoading(true);
     try {
       await api.deleteUser(userToDelete.id);
-      toast.success('Account Deleted', `Administrator '${userToDelete.username}' removed.`);
+      toast.success('Account deleted', `Administrator '${userToDelete.username}' removed.`);
       setUserToDelete(null);
       loadUsers();
     } catch (err: any) {
-      toast.error('Deletion Failed', err.message);
+      toast.error('Could not delete account', err.message);
     } finally {
       setDeleteLoading(false);
     }
@@ -172,7 +172,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-            Administrator Accounts & Access Control
+            Admin accounts and access
           </h2>
           <p className="text-xs text-[#82777A]">
             Manage staff credentials, assigned operational roles, and system permissions
@@ -183,12 +183,12 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
           onClick={handleOpenCreate}
           icon={<UserPlus className="w-4 h-4" />}
         >
-          Add Administrator
+          Add admin
         </Button>
       </div>
 
       {/* Search Bar */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-center gap-3">
+      <div className="p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-none flex flex-col sm:flex-row items-center gap-3">
         <div className="flex-1 w-full">
           <Input
             placeholder="Search administrators by username, full name, or email..."
@@ -200,16 +200,16 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
       </div>
 
       {/* Table (Desktop) & Cards (Mobile) */}
-      <div className="bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle overflow-hidden">
+      <div className="bg-white rounded-lg border border-[#EAE3DE] shadow-none overflow-hidden">
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-[#FAF8F3] border-b border-[#EAE3DE] text-[#82777A] font-semibold uppercase tracking-wider text-[10px]">
                 <th className="py-3.5 px-4">Administrator</th>
-                <th className="py-3.5 px-4">Assigned Role</th>
+                <th className="py-3.5 px-4">Assigned role</th>
                 <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4">Last Login</th>
+                <th className="py-3.5 px-4">Last login</th>
                 <th className="py-3.5 px-4">Created</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
@@ -231,7 +231,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
                 users.map((u) => {
                   const isCurrent = currentUser?.id === u.id;
                   return (
-                    <tr key={u.id} className="hover:bg-[#FAF8F3]/60 transition-colors">
+                    <tr key={u.id} className="hover:bg-[#FAF8F3] transition-colors">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-[#651C32] text-white flex items-center justify-center font-bold text-[10px] shrink-0">
@@ -293,7 +293,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
                           <button
                             onClick={() => handleOpenEdit(u)}
                             className="p-1.5 rounded-lg text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
-                            title="Edit Administrator"
+                            title="Edit admin"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -301,7 +301,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
                             <button
                               onClick={() => setUserToDelete(u)}
                               className="p-1.5 rounded-lg text-[#82777A] hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                              title="Delete Administrator"
+                              title="Delete admin"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -361,8 +361,8 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleOpenEdit(u)}
-                        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
-                        title="Edit Administrator"
+                        className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-[#651C32] hover:bg-[#FFF6D9] transition-colors"
+                        title="Edit admin"
                         aria-label="Edit administrator"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -370,8 +370,8 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
                       {!isCurrent && (
                         <button
                           onClick={() => setUserToDelete(u)}
-                          className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[#82777A] hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                          title="Delete Administrator"
+                          className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-md text-[#82777A] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Delete admin"
                           aria-label="Delete administrator"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -405,18 +405,18 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingUser ? `Edit Account: ${editingUser.username}` : 'Add New Administrator'}
+        title={editingUser ? `Edit account: ${editingUser.username}` : 'Add New Administrator'}
         size="md"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {formError && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
+            <div className="p-3 rounded-md bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
               {formError}
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-[#292326] mb-1">Full Name *</label>
+            <label className="block text-xs font-semibold text-[#292326] mb-1">Full name *</label>
             <Input
               required
               placeholder="e.g. Dr. Arthur Pendelton"
@@ -436,7 +436,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#292326] mb-1">Email Address *</label>
+              <label className="block text-xs font-semibold text-[#292326] mb-1">Email address *</label>
               <Input
                 type="email"
                 required
@@ -479,7 +479,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={formLoading}>
-              {formLoading ? 'Saving...' : editingUser ? 'Update Account' : 'Create Account'}
+              {formLoading ? 'Saving...' : editingUser ? 'Update account' : 'Create account'}
             </Button>
           </div>
         </form>
@@ -489,10 +489,10 @@ export const UsersPage: React.FC<UsersPageProps> = ({ currentUser, onRefreshCoun
       <ConfirmDialog
         isOpen={!!userToDelete}
         onClose={() => setUserToDelete(null)}
-        title="Delete Administrator Account"
+        title="Delete admin account"
         message={`Are you sure you want to permanently delete administrator '${userToDelete?.username}' (${userToDelete?.full_name})? This action will revoke all access immediately.`}
-        confirmText="Permanently Delete"
-        cancelText="Keep Account"
+        confirmText="Delete permanently"
+        cancelText="Keep account"
         onConfirm={handleDeleteConfirm}
         loading={deleteLoading}
       />

@@ -105,7 +105,7 @@ export const MediaLibraryPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-serif font-bold text-[#292326] tracking-tight">
-            Centralized Media Library
+            Media library
           </h2>
           <p className="text-xs text-[#82777A]">
             {items.length} high-resolution book jackets, faculty portraits, and editorial marketing imagery
@@ -117,12 +117,12 @@ export const MediaLibraryPage: React.FC = () => {
           className="w-full sm:w-auto min-h-[44px]"
           icon={<Upload className="w-4 h-4" />}
         >
-          Upload Media Asset
+          Upload media
         </Button>
       </div>
 
       {/* Search and Category Filter Bar */}
-      <div className="p-4 bg-white rounded-2xl border border-[#EAE3DE] shadow-subtle flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="p-4 bg-white rounded-lg border border-[#EAE3DE] shadow-none flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="w-full sm:w-80">
           <Input
             placeholder="Search assets by file name..."
@@ -137,9 +137,9 @@ export const MediaLibraryPage: React.FC = () => {
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
+              className={`min-h-[38px] px-3 py-1.5 rounded-md text-xs font-semibold capitalize transition-all ${
                 category === cat
-                  ? 'bg-[#651C32] text-white shadow-subtle'
+                  ? 'bg-[#651C32] text-white shadow-none'
                   : 'bg-[#FAF8F3] text-[#82777A] border border-[#EAE3DE] hover:bg-[#FFF6D9] hover:text-[#292326]'
               }`}
             >
@@ -155,9 +155,9 @@ export const MediaLibraryPage: React.FC = () => {
       ) : items.length === 0 ? (
         <EmptyState
           icon={<ImageIcon className="w-8 h-8" />}
-          title="No Media Assets Found"
+          title="No media assets yet"
           description="Upload book covers, author portraits, or promotional banners to populate the library."
-          actionText="Upload Asset"
+          actionText="Upload asset"
           onAction={() => setIsUploadModalOpen(true)}
         />
       ) : (
@@ -165,7 +165,7 @@ export const MediaLibraryPage: React.FC = () => {
           {items.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl border border-[#EAE3DE] shadow-subtle overflow-hidden hover:shadow-card hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
+              className="bg-white rounded-md border border-[#EAE3DE] shadow-none overflow-hidden hover:shadow-none hover:border-[#651C32]/40 transition-all flex flex-col justify-between group"
             >
               <div
                 onClick={() => setPreviewItem(item)}
@@ -208,7 +208,7 @@ export const MediaLibraryPage: React.FC = () => {
                   <button
                     onClick={() => setItemToDelete(item)}
                     className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg text-[#82777A] hover:text-[#B94B4B] hover:bg-rose-50 transition-colors"
-                    title="Delete Asset"
+                    title="Delete asset"
                     aria-label="Delete asset"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -224,24 +224,24 @@ export const MediaLibraryPage: React.FC = () => {
       <Modal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        title="Upload Media Asset"
+        title="Upload media"
         subtitle="Select image destination category and file"
         size="md"
       >
         <div className="space-y-4">
           <Select
-            label="Media Asset Category"
+            label="Media category"
             value={uploadCategory}
             onChange={(e) => setUploadCategory(e.target.value)}
             options={[
-              { value: 'covers', label: 'Book Covers & Jackets', subtitle: 'Front covers, spine art & dust jackets', icon: <BookOpen className="w-4 h-4" /> },
-              { value: 'authors', label: 'Faculty & Author Portraits', subtitle: 'Biographical high-res headshots', icon: <Users className="w-4 h-4" /> },
-              { value: 'banners', label: 'Landing Page & Hero Banners', subtitle: 'Promotional header artwork', icon: <ImageIcon className="w-4 h-4" /> },
-              { value: 'general', label: 'General Editorial Assets', subtitle: 'Catalogue logos & press materials', icon: <Layers className="w-4 h-4" /> },
+              { value: 'covers', label: 'Book covers', subtitle: 'Front covers, spine art & dust jackets', icon: <BookOpen className="w-4 h-4" /> },
+              { value: 'authors', label: 'Author portraits', subtitle: 'Biographical high-res headshots', icon: <Users className="w-4 h-4" /> },
+              { value: 'banners', label: 'Homepage banners', subtitle: 'Promotional header artwork', icon: <ImageIcon className="w-4 h-4" /> },
+              { value: 'general', label: 'Other publishing assets', subtitle: 'Catalogue logos & press materials', icon: <Layers className="w-4 h-4" /> },
             ]}
           />
 
-          <label className="border-2 border-dashed border-[#EAE3DE] hover:border-[#651C32] rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#FAF8F3]">
+          <label className="border-2 border-dashed border-[#EAE3DE] hover:border-[#651C32] rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer transition-colors bg-[#FAF8F3]">
             <Upload className="w-10 h-10 text-[#651C32] mb-3" />
             <span className="text-sm font-semibold text-[#292326]">
               {uploading ? 'Uploading asset to server...' : 'Choose image file to upload'}
@@ -268,7 +268,7 @@ export const MediaLibraryPage: React.FC = () => {
           size="lg"
         >
           <div className="space-y-4">
-            <div className="rounded-xl overflow-hidden bg-[#FAF8F3] border border-[#EAE3DE] max-h-[60vh] flex items-center justify-center">
+            <div className="rounded-md overflow-hidden bg-[#FAF8F3] border border-[#EAE3DE] max-h-[60vh] flex items-center justify-center">
               <img
                 src={previewItem.url}
                 alt={previewItem.original_name}
@@ -276,7 +276,7 @@ export const MediaLibraryPage: React.FC = () => {
               />
             </div>
 
-            <div className="p-3 bg-[#FAF8F3] rounded-xl border border-[#EAE3DE] flex items-center justify-between gap-3 text-xs">
+            <div className="p-3 bg-[#FAF8F3] rounded-md border border-[#EAE3DE] flex items-center justify-between gap-3 text-xs">
               <div className="font-mono text-[#292326] truncate">{previewItem.url}</div>
               <Button
                 variant="secondary"
@@ -296,9 +296,9 @@ export const MediaLibraryPage: React.FC = () => {
         isOpen={!!itemToDelete}
         onClose={() => setItemToDelete(null)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Media Asset"
+        title="Delete asset"
         message={`Are you sure you want to permanently delete "${itemToDelete?.original_name}"? Existing book covers referencing this URL may appear blank.`}
-        confirmText="Yes, Delete Asset"
+        confirmText="Yes, delete asset"
         loading={deleteLoading}
       />
     </div>
