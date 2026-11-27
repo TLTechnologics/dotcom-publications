@@ -1,44 +1,16 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import {
-  Book,
-  Category,
-  LandingPageContent,
-  SiteSettings,
-  OrderItem,
-  Author,
-  Publisher
-} from '../../types';
-import {
-  Search,
-  ShoppingBag,
-  Lock,
-  ArrowRight,
-  Plus,
-  Minus,
-  Trash2,
-  CheckCircle2,
-  X,
-  BookOpen,
-  MapPin,
-  Phone,
-  Mail,
-  Filter,
-  Sparkles,
-  ShieldCheck,
-  Truck,
-  CreditCard,
-  Home,
-  Info,
-} from 'lucide-react';
+import { lazy, Suspense, useState, useMemo, useEffect, useRef } from 'react';
+import type { Book, Category, LandingPageContent, SiteSettings, OrderItem, Order } from '../../types';
+import { CheckCircle2 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
-import { InteractiveBookReader } from '../books/InteractiveBookReader';
+
 import { EditorialStorefront } from './EditorialStorefront';
-import { MagnificationDock, type DockItemData } from './MagnificationDock';
-import './editorial-storefront.css';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { DetailBook, OrderClipboard, CheckoutSheet } from './PublicationOverlays';
+import './publication-overlays.css';
+
+const InteractiveBookReader = lazy(() => import('../books/InteractiveBookReader').then(module => ({default: module.InteractiveBookReader})));
 
 interface CartItem extends OrderItem {
   cover_image?: string | null;
@@ -249,49 +221,74 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
     return propCategories && propCategories.length > 0 ? propCategories : DEFAULT_CATEGORIES;
   }, [propCategories]);
 
-  // State
-  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchOpen, setSearchOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('dotcom_cart');
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed)
+        ? parsed.filter(
+            (i) => i && Number.isSafeInteger(i.quantity) && i.quantity > 0 && Number.isFinite(i.price),
+          )
+        : [];
     } catch {
       return [];
     }
   });
 
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const path = currentPath || '/';
+  const productPath = path.match(/^\/books\/(\d+)$/);
+  const isCartOpen = path === '/cart';
+  const isCheckoutOpen = path === '/checkout';
+  const foreground = !!productPath || isCartOpen || isCheckoutOpen;
+  const background = foreground ? history.state?.publicationUnderlay || (productPath ? '/books' : '/') : path;
+  const [entryProduct, setEntryProduct] = useState(() =>
+    productPath && !matchMedia('(prefers-reduced-motion:reduce)').matches ? path : null,
+  );
+  const arriving = entryProduct === path;
+  useEffect(() => {
+    if (entryProduct && path !== entryProduct) setEntryProduct(null);
+  }, [entryProduct, path]);
+  const productId = Number(productPath?.[1] || (foreground && history.state?.publicationProduct));
+  const selectedBook = effectiveBooks.find((b) => b.id === productId && !b.is_draft);
   const [readingBook, setReadingBook] = useState<Book | null>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [orderConfirmed, setOrderConfirmed] = useState<any | null>(null);
+  const [orderConfirmed, setOrderConfirmed] = useState<Order | null>(null);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
-
+  const [orderError, setOrderError] = useState('');
   useEffect(() => {
-    if (searchOpen) searchInputRef.current?.focus();
-  }, [searchOpen]);
+    setReadingBook(null);
+    setOrderError('');
+    if (!isCheckoutOpen) setOrderConfirmed(null);
+  }, [path, isCheckoutOpen]);
 
+  const opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    setSearchOpen(false);
-    setSearchQuery('');
-    window.scrollTo(0, 0);
-  }, [currentPath]);
+    if (foreground || !opener.current) return;
+    const target = opener.current;
+    const frame = requestAnimationFrame(() => {
+      if (target.isConnected) target.focus({ preventScroll: true });
+      opener.current = null;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [foreground]);
 
-  // Synchronize route paths like /cart, /checkout, /books, /authors
-  useEffect(() => {
-    const raw = currentPath || (typeof window !== 'undefined' ? window.location.pathname : '/');
-    const path = raw.toLowerCase().replace(/\/+$/, '');
-    if (path === '/cart') {
-      setIsCartOpen(true);
-      setIsCheckoutOpen(false);
-    } else if (path === '/checkout') {
-      setIsCheckoutOpen(true);
-      setIsCartOpen(false);
-    }
-  }, [currentPath]);
+  const openOverlay = (destination: string, bookId = productId) => {
+    if (!foreground && document.activeElement instanceof HTMLElement) opener.current = document.activeElement;
+    if (destination === path) return;
+    onNavigate(destination);
+    history.replaceState(
+      {
+        ...history.state,
+        publicationParent: path,
+        publicationUnderlay: background,
+        publicationProduct: bookId,
+      },
+      '',
+    );
+  };
+  const closeOverlay = () => {
+    if (history.state?.publicationParent) history.back();
+    else onNavigate(background);
+  };
 
   // Checkout Form State
   const [checkoutForm, setCheckoutForm] = useState({
@@ -305,39 +302,6 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
     payment_method: 'Cash on Delivery',
   });
 
-  // Lock body scroll when cart or modal is open
-  useEffect(() => {
-    if (isCartOpen) {
-      document.body.style.overflow = 'hidden';
-    } else if (!selectedBook && !readingBook && !isCheckoutOpen) {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isCartOpen, selectedBook, readingBook, isCheckoutOpen]);
-
-  // IntersectionObserver for 4.C Scroll Reveal Animation
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-revealed');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    const elements = document.querySelectorAll('.scroll-reveal');
-    elements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, [effectiveBooks]);
-
   // Save cart to localStorage
   const updateCart = (newCart: CartItem[]) => {
     setCart(newCart);
@@ -349,11 +313,16 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   };
 
   const addToCart = (book: Book, quantity = 1) => {
+    if (book.availability_status === 'out_of_stock' || !Number.isSafeInteger(quantity) || quantity < 1)
+      return;
     const existingIndex = cart.findIndex((item) => item.book_id === book.id);
     let updated: CartItem[];
     if (existingIndex > -1) {
       updated = [...cart];
-      updated[existingIndex].quantity += quantity;
+      updated[existingIndex] = {
+        ...updated[existingIndex],
+        quantity: updated[existingIndex].quantity + quantity,
+      };
     } else {
       updated = [
         ...cart,
@@ -372,6 +341,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   };
 
   const updateQuantity = (bookId: number, delta: number) => {
+    if (delta > 0 && effectiveBooks.find((b) => b.id === bookId)?.availability_status === 'out_of_stock')
+      return;
     const updated = cart
       .map((item) => {
         if (item.book_id === bookId) {
@@ -403,66 +374,14 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
     return effectiveBooks.filter((b) => !b.is_draft);
   }, [effectiveBooks]);
 
-  const filteredBooks = useMemo(() => {
-    return publishedBooks.filter((book) => {
-      const matchesCategory =
-        selectedCategory === 'all' ||
-        book.category_id === selectedCategory ||
-        book.subcategory_id === selectedCategory;
-      const matchesSearch =
-        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (book.authors &&
-          book.authors.some((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()))) ||
-        (book.isbn && book.isbn.includes(searchQuery)) ||
-        (book.subject && book.subject.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesCategory && matchesSearch;
-    });
-  }, [publishedBooks, selectedCategory, searchQuery]);
-
-  const dockItems = useMemo<DockItemData[]>(() => [
-    {
-      icon: <Home size={21} />,
-      label: 'Home',
-      onClick: () => {
-        setSearchOpen(false);
-        setSearchQuery('');
-        onNavigate('/');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      },
-    },
-    {
-      icon: <BookOpen size={21} />,
-      label: 'Bookstore',
-      onClick: () => { setSearchOpen(false); setSearchQuery(''); onNavigate('/books'); },
-    },
-    {
-      icon: <Info size={21} />,
-      label: 'About us',
-      onClick: () => { setSearchOpen(false); setSearchQuery(''); onNavigate('/about'); },
-    },
-    {
-      icon: <Mail size={21} />,
-      label: 'Contact',
-      onClick: () => { setSearchOpen(false); setSearchQuery(''); onNavigate('/contact'); },
-    },
-    {
-      icon: <Search size={21} />,
-      label: 'Search books',
-      onClick: () => setSearchOpen((open) => !open),
-    },
-    {
-      icon: <ShoppingBag size={21} />,
-      label: 'Your cart',
-      badge: cartCount,
-      onClick: () => setIsCartOpen(true),
-    },
-  ], [cartCount, onNavigate]);
-
   // Handle Checkout Submit
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!checkoutForm.name || !checkoutForm.phone || !checkoutForm.address) {
-      toast.error('Required Information Missing', 'Please fill in your name, contact phone, and delivery address.');
+      toast.error(
+        'Required Information Missing',
+        'Please fill in your name, contact phone, and delivery address.',
+      );
       return;
     }
 
@@ -471,11 +390,21 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       return;
     }
 
+    if (
+      cart.some(
+        (item) => effectiveBooks.find((b) => b.id === item.book_id)?.availability_status === 'out_of_stock',
+      )
+    ) {
+      setOrderError('Remove out-of-stock titles from your cart before checkout.');
+      return;
+    }
+    if (isSubmittingOrder) return;
+    setOrderError('');
     setIsSubmittingOrder(true);
     try {
       const orderPayload = {
         customer_name: checkoutForm.name,
-        customer_email: checkoutForm.email || 'customer@dotcompublications.com',
+        customer_email: checkoutForm.email.trim(),
         customer_phone: checkoutForm.phone,
         shipping_address: checkoutForm.address,
         city: checkoutForm.city,
@@ -496,17 +425,8 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       setOrderConfirmed(result);
       updateCart([]);
       toast.success('Order Placed!', `Your order #${result.order_number} has been recorded.`);
-    } catch (err: any) {
-      // Graceful offline fallback simulation
-      const fallbackOrder = {
-        order_number: `ORD-${Date.now().toString().slice(-6)}`,
-        customer_name: checkoutForm.name,
-        customer_phone: checkoutForm.phone,
-        total_amount: cartTotal,
-      };
-      setOrderConfirmed(fallbackOrder);
-      updateCart([]);
-      toast.success('Order Placed!', `Your order #${fallbackOrder.order_number} has been recorded.`);
+    } catch {
+      setOrderError('Your order could not be placed. Your cart has been kept. Please try again.');
     } finally {
       setIsSubmittingOrder(false);
     }
@@ -523,11 +443,10 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
           <span className="inline-block px-3 py-1 rounded-sm bg-[#FAF2BA] text-[#181716] text-xs font-bold tracking-wide border border-[#EED97A]">
             Scheduled maintenance
           </span>
-          <h1 className="font-serif font-bold text-3xl text-[#181716]">
-            Catalogue temporarily offline
-          </h1>
+          <h1 className="font-serif font-bold text-3xl text-[#181716]">Catalogue temporarily offline</h1>
           <p className="text-xs text-[#524B42] leading-relaxed">
-            Dotcom Publications is currently performing scheduled infrastructure maintenance. Our bookstore, catalog, and reader will return shortly.
+            Dotcom Publications is currently performing scheduled infrastructure maintenance. Our bookstore,
+            catalog, and reader will return shortly.
           </p>
           <div className="pt-4 border-t border-[#EAE3DE] flex justify-center gap-3">
             <button
@@ -543,325 +462,77 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] font-sans text-[#181716] flex flex-col selection:bg-[#E5DDCF] selection:text-[#29382C] storefront">
-      {searchOpen && (
-        <section className="dock-search-panel" aria-label="Search the book catalogue">
-          <div className="dock-search-heading">
-            <div><span className="editorial-kicker editorial-kicker-dark">Catalogue search</span><h2>Find a book</h2></div>
-            <button type="button" className="dock-search-close" onClick={() => { setSearchOpen(false); setSearchQuery(''); }} aria-label="Close search">×</button>
-          </div>
-          <label className="dock-search-field">
-            <Search size={18} aria-hidden="true" />
-            <input
-              ref={searchInputRef}
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onKeyDown={(event) => { if (event.key === 'Escape') { setSearchOpen(false); setSearchQuery(''); } }}
-              placeholder="Search titles, authors, ISBN or subject"
-              aria-label="Search titles, authors, ISBN or subject"
-            />
-          </label>
-          <div className="dock-search-results" aria-live="polite">
-            {filteredBooks.slice(0, 5).map((book) => (
-              <button key={book.id} type="button" className="dock-search-result" onClick={() => { setReadingBook(book); setSearchOpen(false); setSearchQuery(''); }}>
-                <img src={book.cover_image || '/covers/computational-mathematics.jpg'} alt="" />
-                <span className="dock-search-result-copy"><strong>{book.title}</strong><small>{book.authors?.map((author) => author.name).join(', ') || 'Dotcom Publications'}</small></span>
-                <span className="dock-search-price">₹{book.selling_price.toLocaleString('en-IN')}</span>
-              </button>
-            ))}
-            {filteredBooks.length === 0 && <p className="dock-search-empty">No books match that search. Try a different title, author or subject.</p>}
-          </div>
-        </section>
-      )}
+    <div>
       <EditorialStorefront
         books={publishedBooks}
         categories={effectiveCategories}
         landingContent={landingContent}
         siteSettings={siteSettings}
-        currentPath={currentPath || '/'}
+        currentPath={background}
         onNavigate={onNavigate}
-        onOpenBook={setReadingBook}
-        onBookDetails={setSelectedBook}
-        onAddToCart={addToCart}
+        active={arriving || (!foreground && !readingBook)}
+        onArrived={() => setEntryProduct(null)}
+        onBookDetails={(b) => openOverlay('/books/' + b.id, b.id)}
+        cartCount={cartCount}
+        onCart={() => openOverlay('/cart')}
       />
-
-      <MagnificationDock items={dockItems} />
-
-      {/* Cart Drawer Slide-Over (4.G Smooth Opening & Closing) */}
-      {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div
-            className="fixed inset-0 bg-black/60 transition-opacity animate-in fade-in duration-300"
-            onClick={() => setIsCartOpen(false)}
-          />
-
-          <div className="relative w-full max-w-md bg-white h-full shadow-lg z-10 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
-            {/* Cart Header */}
-            <div className="p-4 sm:p-5 border-b border-[#EAE3DE] flex items-center justify-between bg-[#FAF9F5]">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-sm bg-[#EED97A] text-[#181716] flex items-center justify-center font-bold border border-[#E5CE68]">
-                  <ShoppingBag className="w-4 h-4 text-[#181716]" />
-                </div>
-                <div>
-                  <h3 className="font-serif font-bold text-base text-[#181716]">
-                    Your academic cart
-                  </h3>
-                  <span className="text-[11px] text-[#736B5E]">
-                    {cartCount} {cartCount === 1 ? 'book' : 'books'} ready for order
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsCartOpen(false)}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-sm text-[#736B5E] hover:text-[#181716] hover:bg-stone-100 transition-colors"
-                aria-label="Close cart"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Cart Items List */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-              {cart.length === 0 ? (
-                <div className="text-center py-16 text-stone-400 space-y-3">
-                  <ShoppingBag className="w-12 h-12 mx-auto stroke-1 text-[#736B5E]" />
-                  <p className="text-sm font-medium text-[#181716]">Your cart is currently empty</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsCartOpen(false)}
-                  >
-                    Browse academic catalogue
-                  </Button>
-                </div>
-              ) : (
-                cart.map((item) => (
-                  <div
-                    key={item.book_id}
-                    className="flex gap-3 p-3 rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] relative"
-                  >
-                    {/* Item Cover */}
-                    <div className="w-14 h-18 bg-stone-200 rounded-sm overflow-hidden shrink-0 border border-[#EAE3DE]">
-                      {item.cover_image ? (
-                        <img
-                          src={item.cover_image}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-[#181716] flex items-center justify-center text-[#EED97A] text-[9px] font-bold">
-                          DOTCOM
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Details */}
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div>
-                        <h4 className="font-serif font-bold text-xs text-[#181716] line-clamp-1">
-                          {item.title}
-                        </h4>
-                        <div className="flex items-baseline gap-2 mt-0.5">
-                          <span className="font-serif font-bold text-xs text-[#181716]">
-                            ₹{item.price}
-                          </span>
-                          {item.mrp && item.mrp > item.price && (
-                            <span className="text-[10px] text-[#736B5E] line-through">
-                              ₹{item.mrp}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Quantity Buttons */}
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-1 bg-white border border-[#EAE3DE] rounded-sm p-0.5">
-                          <button
-                            onClick={() => updateQuantity(item.book_id, -1)}
-                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md hover:bg-stone-100 text-[#181716]"
-                            aria-label="Decrease quantity"
-                          >
-                            <Minus className="w-3.5 h-3.5" />
-                          </button>
-                          <span className="px-2.5 text-xs font-bold text-[#181716]">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.book_id, 1)}
-                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-md hover:bg-stone-100 text-[#181716]"
-                            aria-label="Increase quantity"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        <button
-                          onClick={() => removeFromCart(item.book_id)}
-                          className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-sm text-[#736B5E] hover:text-red-600 hover:bg-rose-50 transition-colors"
-                          title="Remove from cart"
-                          aria-label="Remove item"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Cart Footer / Checkout Trigger */}
-            {cart.length > 0 && (
-              <div className="p-4 sm:p-5 border-t border-[#EAE3DE] bg-[#FAF9F5] space-y-3">
-                <div className="space-y-1.5 text-xs text-[#181716]">
-                  <div className="flex justify-between">
-                    <span className="text-[#736B5E]">Subtotal:</span>
-                    <span className="font-semibold">₹{cartTotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#736B5E]">Institutional delivery:</span>
-                    <span className="font-semibold text-[#3A754E]">FREE</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-[#EAE3DE] text-sm">
-                    <span className="font-bold">Total:</span>
-                    <span className="font-serif font-bold text-base text-[#181716]">
-                      ₹{cartTotal.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="w-full min-h-[48px] flex items-center justify-center gap-2"
-                  onClick={() => {
-                    setIsCartOpen(false);
-                    setIsCheckoutOpen(true);
-                  }}
-                >
-                  <span>Proceed to checkout</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 3D Physical Page-Flip Interactive Reader (3. Perfected) */}
-      <InteractiveBookReader
-        book={readingBook}
-        isOpen={!!readingBook}
-        onClose={() => setReadingBook(null)}
-        onAddToCart={(b) => addToCart(b)}
-        onViewDetails={(b) => setSelectedBook(b)}
-      />
-
-      {/* Book Detail Modal (4.G Smooth Opening) */}
       {selectedBook && (
-        <Modal
-          isOpen={!!selectedBook}
-          onClose={() => setSelectedBook(null)}
-          title={selectedBook.title}
-          subtitle={`By ${selectedBook.authors?.map((a) => a.name).join(', ') || 'Faculty Authors'}`}
-          size="lg"
-        >
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-6">
-              {/* Cover */}
-              <div className="w-full sm:w-44 shrink-0 aspect-[3/4] bg-[#FAF8F3] rounded-sm overflow-hidden border border-[#EAE3DE] shadow-sm">
-                <img
-                  src={
-                    selectedBook.cover_image ||
-                    '/covers/computational-mathematics.jpg'
-                  }
-                  alt={selectedBook.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Metadata */}
-              <div className="flex-1 space-y-3">
-                {selectedBook.category_name && (
-                  <span className="inline-block px-2.5 py-0.5 rounded-sm bg-[#FAF2BA] text-[#181716] text-xs font-semibold border border-[#EED97A]">
-                    {selectedBook.category_name}
-                  </span>
-                )}
-
-                {selectedBook.subtitle && (
-                  <h4 className="font-serif text-[#736B5E] text-xs italic">
-                    {selectedBook.subtitle}
-                  </h4>
-                )}
-
-                {/* Price block */}
-                <div className="flex items-baseline gap-2 pt-1">
-                  <span className="text-2xl font-serif font-bold text-[#181716]">
-                    ₹{selectedBook.selling_price}
-                  </span>
-                  {selectedBook.mrp > selectedBook.selling_price && (
-                    <span className="text-sm text-[#736B5E] line-through">
-                      ₹{selectedBook.mrp}
-                    </span>
-                  )}
-                  <span className="text-xs text-[#3A754E] font-semibold">Available for dispatch</span>
-                </div>
-
-                {/* Specs Grid */}
-                <div className="grid grid-cols-2 gap-2 p-3 bg-[#FAF9F5] rounded-sm border border-[#EAE3DE] text-[11px]">
-                  <div>
-                    <span className="text-[#736B5E]">ISBN:</span>{' '}
-                    <strong className="text-[#181716] font-mono">{selectedBook.isbn || 'Pending'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#736B5E]">Edition:</span>{' '}
-                    <strong className="text-[#181716]">{selectedBook.edition || '1st edition'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#736B5E]">Format:</span>{' '}
-                    <strong className="text-[#181716]">{selectedBook.book_format || 'Hardbound'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#736B5E]">Language:</span>{' '}
-                    <strong className="text-[#181716]">{selectedBook.language || 'English'}</strong>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <Button
-                    variant="primary"
-                    size="md"
-                    className="w-full flex items-center justify-center gap-2"
-                    onClick={() => {
-                      addToCart(selectedBook);
-                      setSelectedBook(null);
-                    }}
-                  >
-                    <ShoppingBag className="w-4 h-4 text-[#181716]" />
-                    <span>Add to cart (₹{selectedBook.selling_price})</span>
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="border-t border-[#EAE3DE] pt-4">
-              <h4 className="font-serif font-bold text-sm text-[#181716] mb-2">Book synopsis</h4>
-              <p className="text-xs text-[#736B5E] leading-relaxed font-light whitespace-pre-line">
-                {selectedBook.full_description || selectedBook.short_description || 'No detailed synopsis provided.'}
-              </p>
-            </div>
-          </div>
+        <DetailBook
+          key={selectedBook.id}
+          book={selectedBook}
+          active={!!productPath && !readingBook && !arriving}
+          close={closeOverlay}
+          add={(n) => addToCart(selectedBook, n)}
+          buy={(n) => {
+            addToCart(selectedBook, n);
+            openOverlay('/checkout');
+          }}
+          cart={() => openOverlay('/cart')}
+          preview={() => setReadingBook(selectedBook)}
+          count={cartCount}
+        />
+      )}
+      {productPath && !arriving && !selectedBook && (
+        <Modal isOpen onClose={closeOverlay} title="Title unavailable">
+          <p>This title is unavailable in the current catalogue.</p>
+          <button className="tb-link" onClick={() => onNavigate('/books')}>
+            Browse books
+          </button>
         </Modal>
       )}
-
+      {isCartOpen && (
+        <OrderClipboard
+          items={cart}
+          change={updateQuantity}
+          remove={removeFromCart}
+          close={closeOverlay}
+          checkout={() => openOverlay('/checkout')}
+          browse={() => onNavigate('/books')}
+        />
+      )}
+      {readingBook && (
+        <Suspense
+          fallback={
+            <div role="status" className="fixed inset-0 grid place-items-center bg-stone-100">
+              Opening preview…
+            </div>
+          }
+        >
+          <InteractiveBookReader
+            book={readingBook}
+            isOpen
+            onClose={() => setReadingBook(null)}
+            onAddToCart={addToCart}
+            onViewDetails={() => setReadingBook(null)}
+          />
+        </Suspense>
+      )}
       {/* Checkout / Order Placement Modal */}
       {isCheckoutOpen && (
-        <Modal
-          isOpen={isCheckoutOpen}
-          onClose={() => {
+        <CheckoutSheet
+          close={() => {
             if (!isSubmittingOrder) {
-              setIsCheckoutOpen(false);
+              closeOverlay();
               setOrderConfirmed(null);
             }
           }}
@@ -871,7 +542,6 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               ? 'Thank you for choosing Dotcom Publications'
               : `Order Total: ₹${cartTotal.toLocaleString()} (${cartCount} titles)`
           }
-          size="md"
         >
           {orderConfirmed ? (
             <div className="text-center py-6 space-y-4">
@@ -880,40 +550,47 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               </div>
 
               <div>
-                <h3 className="font-serif font-bold text-xl text-[#181716]">
-                  Order placed
-                </h3>
-                <p className="text-xs text-[#736B5E] mt-1">
-                  Your tracking order reference is:
-                </p>
+                <h3 className="font-serif font-bold text-xl text-[#181716]">Order placed</h3>
+                <p className="text-xs text-[#736B5E] mt-1">Your tracking order reference is:</p>
                 <div className="inline-block px-4 py-1.5 rounded-sm bg-[#FAF2BA] border border-[#EED97A] font-mono font-bold text-sm text-[#181716] mt-2 shadow-xs">
                   {orderConfirmed.order_number}
                 </div>
               </div>
 
               <p className="text-xs text-[#736B5E] max-w-sm mx-auto">
-                Our logistics dispatch team will prepare your shipment. You will receive dispatch updates on <strong>{orderConfirmed.customer_phone}</strong>.
+                Contact phone for this order: <strong>{orderConfirmed.customer_phone}</strong>.
               </p>
 
               <Button
                 variant="primary"
-                size="md"
                 onClick={() => {
-                  setIsCheckoutOpen(false);
                   setOrderConfirmed(null);
+                  onNavigate(background);
                 }}
               >
                 Continue browsing
               </Button>
             </div>
+          ) : cart.length === 0 ? (
+            <div className="tb-empty">
+              <p>Your order sheet is empty.</p>
+              <button className="tb-link" onClick={() => onNavigate('/books')}>
+                Browse books
+              </button>
+            </div>
           ) : (
             <form onSubmit={handlePlaceOrder} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                  <label
+                    htmlFor="checkout-name"
+                    className="block text-[11px] font-semibold text-[#181716] mb-1"
+                  >
                     Full name *
                   </label>
                   <input
+                    id="checkout-name"
+                    autoComplete="name"
                     type="text"
                     required
                     placeholder="e.g. Dr. Rajesh Sharma"
@@ -924,11 +601,17 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                  <label
+                    htmlFor="checkout-phone"
+                    className="block text-[11px] font-semibold text-[#181716] mb-1"
+                  >
                     Contact phone *
                   </label>
                   <input
+                    id="checkout-phone"
+                    autoComplete="tel"
                     type="tel"
+                    minLength={5}
                     required
                     placeholder="+91 98765 43210"
                     value={checkoutForm.phone}
@@ -939,10 +622,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               </div>
 
               <div className="text-xs">
-                <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                  Email address (for order receipt)
+                <label
+                  htmlFor="checkout-email"
+                  className="block text-[11px] font-semibold text-[#181716] mb-1"
+                >
+                  Email address (for order receipt) *
                 </label>
                 <input
+                  id="checkout-email"
+                  autoComplete="email"
                   type="email"
                   placeholder="name@university.edu.in"
                   value={checkoutForm.email}
@@ -952,10 +640,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               </div>
 
               <div className="text-xs">
-                <label className="block text-[11px] font-semibold text-[#181716] mb-1">
+                <label
+                  htmlFor="checkout-address"
+                  className="block text-[11px] font-semibold text-[#181716] mb-1"
+                >
                   Delivery address *
                 </label>
                 <textarea
+                  id="checkout-address"
+                  autoComplete="street-address"
                   rows={2}
                   required
                   placeholder="Department / Campus Address, Institutional Area..."
@@ -967,8 +660,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#181716] mb-1">City</label>
+                  <label
+                    htmlFor="checkout-city"
+                    className="block text-[10px] font-semibold text-[#181716] mb-1"
+                  >
+                    City
+                  </label>
                   <input
+                    id="checkout-city"
+                    autoComplete="address-level2"
                     type="text"
                     placeholder="New Delhi"
                     value={checkoutForm.city}
@@ -977,8 +677,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#181716] mb-1">State</label>
+                  <label
+                    htmlFor="checkout-state"
+                    className="block text-[10px] font-semibold text-[#181716] mb-1"
+                  >
+                    State
+                  </label>
                   <input
+                    id="checkout-state"
+                    autoComplete="address-level1"
                     type="text"
                     placeholder="Delhi"
                     value={checkoutForm.state}
@@ -987,8 +694,15 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-[#181716] mb-1">PIN Code</label>
+                  <label
+                    htmlFor="checkout-pincode"
+                    className="block text-[10px] font-semibold text-[#181716] mb-1"
+                  >
+                    PIN Code
+                  </label>
                   <input
+                    id="checkout-pincode"
+                    autoComplete="postal-code"
                     type="text"
                     placeholder="110001"
                     value={checkoutForm.pincode}
@@ -1000,9 +714,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
 
               {/* Payment Method */}
               <div className="text-xs pt-1">
-                <label className="block text-[11px] font-semibold text-[#181716] mb-1">
-                  Payment method
-                </label>
+                <label className="block text-[11px] font-semibold text-[#181716] mb-1">Payment method</label>
                 <div className="grid grid-cols-2 gap-2">
                   <label className="flex items-center gap-2 p-2.5 min-h-[44px] rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] cursor-pointer hover:border-[#EED97A]">
                     <input
@@ -1029,6 +741,11 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
                 </div>
               </div>
 
+              {orderError && (
+                <p role="alert" className="tb-order-error">
+                  {orderError}
+                </p>
+              )}
               {/* Submit Button */}
               <div className="pt-2">
                 <Button
@@ -1048,7 +765,7 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
               </div>
             </form>
           )}
-        </Modal>
+        </CheckoutSheet>
       )}
     </div>
   );

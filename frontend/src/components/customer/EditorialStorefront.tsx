@@ -1,9 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Search, ShoppingBag } from 'lucide-react';
-import { Book, Category, LandingPageContent, SiteSettings } from '../../types';
-
-const HERO_PHOTO = 'https://images.unsplash.com/photo-1760166699654-5d0e10f51994?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=82&w=2400';
-const READING_ROOM_PHOTO = 'https://images.unsplash.com/photo-1789052085265-cee095d15979?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=82&w=1400';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
+import { ArrowLeft, ArrowRight, BookOpen, Home, Info, Mail, Search, ShoppingBag } from 'lucide-react';
+import type { Book, Category, LandingPageContent, SiteSettings } from '../../types';
+import { Leaves, ProductCover, useBookInput, useMedia, useTurns } from './BookMechanics';
+import { AnimatedHeading } from './AnimatedHeading';
+import './textbook.css';
 
 interface Props {
   books: Book[];
@@ -12,179 +20,782 @@ interface Props {
   siteSettings: SiteSettings | null;
   currentPath: string;
   onNavigate: (path: string) => void;
-  onOpenBook: (book: Book) => void;
   onBookDetails: (book: Book) => void;
-  onAddToCart: (book: Book) => void;
+  active: boolean;
+  onArrived: () => void;
+  cartCount: number;
+  onCart: () => void;
 }
-
-const BookCard: React.FC<{ book: Book; onOpen: () => void; onDetails: () => void; onAdd: () => void }> = ({ book, onOpen, onDetails, onAdd }) => (
-  <article className="bookshop-card group">
-    <button type="button" className="bookshop-cover" onClick={onOpen} aria-label={`View ${book.title}`}>
-      <img src={book.cover_image || '/covers/computational-mathematics.webp'} alt={`Cover of ${book.title}`} loading="lazy" />
+const chapters = [
+  'Opening spread',
+  'Featured books',
+  'About the press',
+  'Editorial statement',
+  'New releases',
+  'Reader voices',
+  'Newsletter',
+  'Publisher information',
+];
+const dock = [
+  { path: '/', name: 'Home', icon: Home },
+  { path: '/books', name: 'Book Store', icon: BookOpen },
+  { path: '/about', name: 'About Us', icon: Info },
+  { path: '/contact', name: 'Contact Us', icon: Mail },
+  { path: '/search', name: 'Search', icon: Search },
+  { path: '/cart', name: 'Cart', icon: ShoppingBag },
+];
+const money = (b: Book) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: b.currency || 'INR',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  }).format(b.selling_price);
+const authors = (b: Book) => b.authors?.map((a) => a.name).join(', ');
+const clamp = (n: number) => Math.min(1, Math.max(0, n));
+const even = (n: number) => Math.max(2, 2 * Math.ceil(n / 2));
+function PrintedBook({
+  book,
+  choose,
+  large = false,
+}: {
+  book: Book;
+  choose: (b: Book) => void;
+  large?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={'tb-entry' + (large ? ' large' : '')}
+      onClick={(e) => {
+        e.currentTarget.focus({ preventScroll: true });
+        choose(book);
+      }}
+    >
+      <ProductCover src={book.cover_image} title={book.title} />
+      <span className="tb-entry-copy">
+        <strong>{book.title}</strong>
+        {authors(book) && <small>{authors(book)}</small>}
+        <span className="tb-entry-price">
+          {money(book)} <ArrowRight size={15} />
+        </span>
+      </span>
     </button>
-    <div className="bookshop-card-copy">
-      <p className="bookshop-author">{book.authors?.map((a) => a.name).join(', ') || 'Dotcom Publications'}</p>
-      <button type="button" onClick={onOpen} className="bookshop-title">{book.title}</button>
-      <button type="button" onClick={onDetails} className="bookshop-details">Book details <ArrowRight size={13} /></button>
-      <div className="bookshop-card-bottom">
-        <span className="bookshop-price">₹{book.selling_price.toLocaleString('en-IN')}</span>
-        <button type="button" onClick={onAdd} className="bookshop-add" aria-label={`Add ${book.title} to cart`}>
-          <ShoppingBag size={16} />
-        </button>
-      </div>
-    </div>
-  </article>
-);
-
-export const EditorialStorefront: React.FC<Props> = ({
-  books, categories, landingContent, siteSettings, currentPath, onNavigate, onOpenBook, onBookDetails, onAddToCart,
-}) => {
-  const isBookstore = currentPath === '/books';
-  const isAboutPage = currentPath === '/about';
-  const isContactPage = currentPath === '/contact';
-  const [category, setCategory] = useState('all');
-  const [query, setQuery] = useState('');
+  );
+}
+export function EditorialStorefront({
+  books,
+  categories,
+  landingContent: content,
+  siteSettings: settings,
+  currentPath,
+  onNavigate,
+  onBookDetails,
+  active,
+  onArrived,
+  cartCount,
+  onCart,
+}: Props) {
+  const single = useMedia('(max-width: 820px), (max-width: 960px) and (max-height: 480px)');
+  const short = useMedia('(max-height: 520px), (max-width: 820px) and (max-height: 665px)');
+  const roomy = useMedia('(min-height: 850px) and (min-width: 1100px)');
+  const reduced = useMedia('(prefers-reduced-motion: reduce)');
+  const stride = single ? 1 : 2;
+  const perPage = short ? 1 : roomy ? 3 : 2;
+  const [category, setCategory] = useState('');
   const [sort, setSort] = useState('featured');
-  const published = useMemo(() => books.filter((book) => !book.is_draft), [books]);
-  const featured = useMemo(() => {
-    const ids = landingContent?.featured_book_ids || [];
-    const preferred = ids.map((id) => published.find((book) => book.id === id)).filter(Boolean) as Book[];
-    return [...preferred, ...published.filter((book) => book.is_featured && !preferred.some((p) => p.id === book.id))].slice(0, 4);
-  }, [landingContent, published]);
-  const latest = useMemo(() => {
-    const ids = landingContent?.latest_publications || [];
-    const preferred = ids.map((id) => published.find((book) => book.id === id)).filter(Boolean) as Book[];
-    const remainder = [...published].sort((a, b) => (b.publication_year || 0) - (a.publication_year || 0) || b.id - a.id);
-    const combined = [...preferred, ...remainder.filter((book) => !preferred.some((p) => p.id === book.id))];
-    const featuredIds = new Set(featured.map((book) => book.id));
-    return combined.filter((book) => !featuredIds.has(book.id)).slice(0, 4);
-  }, [featured, landingContent, published]);
-  const results = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    const matching = published.filter((book) => {
-      const categoryMatch = category === 'all' || String(book.category_id || '') === category || String(book.subcategory_id || '') === category;
-      const searchMatch = !normalized || [book.title, book.subject || '', ...(book.authors || []).map((author) => author.name)].join(' ').toLowerCase().includes(normalized);
-      return categoryMatch && searchMatch;
-    });
-    if (sort === 'title') matching.sort((a, b) => a.title.localeCompare(b.title));
-    if (sort === 'price-low') matching.sort((a, b) => a.selling_price - b.selling_price);
-    if (sort === 'price-high') matching.sort((a, b) => b.selling_price - a.selling_price);
-    if (sort === 'newest') matching.sort((a, b) => (b.publication_year || 0) - (a.publication_year || 0) || b.id - a.id);
-    return matching;
-  }, [category, published, query, sort]);
-  const aboutCopy = landingContent?.about_description || 'Dotcom Publications brings together academic textbooks, research monographs and educational works for readers, scholars and institutions.';
-  const heroHeading = landingContent?.hero_heading || 'Books for teaching and research';
-  const heroImage = landingContent?.hero_image || HERO_PHOTO;
-
+  const [filter, setFilter] = useState('');
+  const [query, setQuery] = useState('');
+  const [newsletter, setNewsletter] = useState('');
+  const [letter, setLetter] = useState({ name: '', email: '', subject: '', message: '' });
+  const root = useRef<HTMLElement>(null);
+  const catalogue = useMemo(() => {
+    const list = books.filter(
+      (b) =>
+        (!category || [b.category_id, b.subcategory_id].some((id) => String(id) === category)) &&
+        matches(b, filter),
+    );
+    if (sort === 'title') list.sort((a, b) => a.title.localeCompare(b.title));
+    if (sort === 'low' || sort === 'high')
+      list.sort((a, b) => (a.selling_price - b.selling_price) * (sort === 'low' ? 1 : -1));
+    if (sort === 'new')
+      list.sort((a, b) => (b.publication_year || 0) - (a.publication_year || 0) || b.id - a.id);
+    if (sort === 'featured') list.sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
+    return list;
+  }, [books, category, filter, sort]);
+  const found = useMemo(() => (query.trim() ? books.filter((b) => matches(b, query)) : []), [books, query]);
+  const featured = useMemo(
+    () =>
+      preferred(
+        content?.featured_book_ids,
+        [...books].sort((a, b) => Number(b.is_featured) - Number(a.is_featured)),
+      ),
+    [books, content],
+  );
+  const releases = useMemo(
+    () =>
+      preferred(
+        content?.latest_publications,
+        [...books].sort((a, b) => (b.publication_year || 0) - (a.publication_year || 0) || b.id - a.id),
+      ),
+    [books, content],
+  );
+  const searchStart = 16 + even(Math.ceil(catalogue.length / perPage));
+  const contactStart = searchStart + even(Math.ceil(found.length / perPage));
+  const pathAt = (p: number) =>
+    p >= contactStart
+      ? '/contact'
+      : p >= searchStart
+        ? '/search'
+        : p >= 16
+          ? '/books'
+          : p >= 4 && p <= 5
+            ? '/about'
+            : '/';
+  const anchor = (path: string) =>
+    path === '/about'
+      ? 4
+      : path === '/books'
+        ? 16
+        : path === '/search'
+          ? searchStart
+          : path === '/contact'
+            ? contactStart
+            : 0;
+  const [intro, setIntro] = useState(reduced ? 1 : 0);
+  const introRef = useRef(intro);
+  const updateIntro = (v: number) => {
+    introRef.current = clamp(v);
+    setIntro(introRef.current);
+  };
+  const { at, position, turn, travel, busy, stop } = useTurns(
+    reduced ? anchor(currentPath) : 0,
+    stride,
+    contactStart + 1,
+    reduced,
+  );
+  const pending = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const cancelIntro = () => {
+    pending.current.forEach(clearTimeout);
+    pending.current = [];
+  };
+  const stateLocation = (path: string) => {
+    const saved = history.state?.publicationPage;
+    if (saved?.path === path) return anchor(path) + saved.offset;
+    if (path === '/')
+      return location.hash === '#new-releases'
+        ? 8
+        : location.hash === '#editorial-statement'
+          ? 6
+          : location.hash === '#contact'
+            ? 14
+            : 0;
+    return anchor(path);
+  };
+  const seek = (page: number, fast = true) => {
+    cancelIntro();
+    if (introRef.current < 1 && !reduced && fast) {
+      stop();
+      [0.25, 0.68, 1]
+        .filter((n) => n > introRef.current)
+        .forEach((n, i) => pending.current.push(setTimeout(() => updateIntro(n), i * 190)));
+      pending.current.push(setTimeout(() => travel(page, true), 590));
+    } else {
+      updateIntro(1);
+      travel(page, fast);
+    }
+  };
+  const lastRoute = useRef(currentPath);
+  const pop = useRef(false);
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>('.editorial-reveal'));
-    if (!elements.length) return;
-    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      elements.forEach((element) => element.classList.add('is-visible'));
+    const back = () => {
+      pop.current = true;
+      if (location.pathname === lastRoute.current && active) {
+        seek(stateLocation(location.pathname));
+        pop.current = false;
+      }
+    };
+    window.addEventListener('popstate', back);
+    return () => window.removeEventListener('popstate', back);
+  });
+  useEffect(() => () => cancelIntro(), []);
+  useLayoutEffect(() => {
+    if (!active) {
+      cancelIntro();
+      stop();
+    }
+  }, [active]);
+  useLayoutEffect(() => {
+    if (lastRoute.current === currentPath) return;
+    const previous = lastRoute.current;
+    lastRoute.current = currentPath;
+    if (!active) {
+      cancelIntro();
+      stop();
       return;
     }
-
-    let previousScrollY = window.scrollY;
-    const observer = new IntersectionObserver((entries) => {
-      const currentScrollY = window.scrollY;
-      const direction = currentScrollY < previousScrollY ? 'up' : 'down';
-      previousScrollY = currentScrollY;
-
-      entries.forEach((entry) => {
-        const element = entry.target as HTMLElement;
-        element.style.setProperty('--reveal-offset', direction === 'up' ? '-40px' : '40px');
-        element.classList.toggle('is-visible', entry.isIntersecting);
-      });
-    }, { threshold: 0.18, rootMargin: '-48px 0px -48px 0px' });
-
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, [isBookstore, books.length]);
-
-  const cardGrid = (items: Book[]) => items.length ? (
-    <div className="bookshop-grid">{items.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onDetails={() => onBookDetails(book)} onAdd={() => onAddToCart(book)} />)}</div>
-  ) : <p className="bookshop-empty">New titles will appear here as they are added to the catalogue.</p>;
-
-  return <div className="storefront editorial-storefront">
-    {isAboutPage ? <main className="editorial-info-page">
-      <section className="editorial-info-hero">
-        <p className="editorial-kicker editorial-kicker-dark">About the press</p>
-        <h1>{landingContent?.about_title || 'Books made for a life of learning'}</h1>
-        <p>{aboutCopy}</p>
-      </section>
-      <section className="editorial-info-section">
-        <div className="editorial-info-image"><img src={READING_ROOM_PHOTO} alt="A quiet reading room lined with books" loading="lazy" /></div>
-        <div className="editorial-info-copy">
-          <p className="editorial-kicker editorial-kicker-dark">Our purpose</p>
-          <h2>Publishing for classrooms, libraries and research</h2>
-          <p>We work with educators and scholars to make rigorous ideas useful to the people who teach, study and build on them. Our catalogue brings textbooks, specialist monographs and learning resources together under one academic publishing house.</p>
-          <button className="editorial-button editorial-button-green" onClick={() => onNavigate('/books')}>Explore the catalogue <ArrowRight size={16} /></button>
-        </div>
-      </section>
-      <section className="editorial-info-principle">
-        <p className="editorial-kicker editorial-kicker-dark">How we publish</p>
-        <h2>Careful editorial work, lasting reference</h2>
-        <p>Each title is shaped around its subject and readers, with attention to clear teaching, sound research and dependable use in academic settings.</p>
-      </section>
-    </main> : isContactPage ? <main className="editorial-info-page editorial-contact-page">
-      <section className="editorial-info-hero">
-        <p className="editorial-kicker editorial-kicker-dark">Contact</p>
-        <h1>Talk with our publishing team</h1>
-        <p>For course adoption, institutional orders, author enquiries or help finding a title, reach us using the details below.</p>
-      </section>
-      <section className="editorial-contact-details">
-        <article><span>Email</span><h2>{landingContent?.contact_email || siteSettings?.contact_email || 'editor@dotcompublications.com'}</h2><a href={`mailto:${landingContent?.contact_email || siteSettings?.contact_email || 'editor@dotcompublications.com'}`}>Write to the team <ArrowRight size={15} /></a></article>
-        <article><span>Telephone</span><h2>{landingContent?.contact_phone || siteSettings?.phone || '+91 11 4567 8900'}</h2><a href={`tel:${(landingContent?.contact_phone || siteSettings?.phone || '+91 11 4567 8900').replace(/[^+\d]/g, '')}`}>Call the office <ArrowRight size={15} /></a></article>
-        <article><span>Office</span><h2>{landingContent?.contact_address || 'Knowledge Park III, Institutional Area, Greater Noida, Delhi NCR, India'}</h2><p>Academic and institutional publishing enquiries are welcome.</p></article>
-      </section>
-      <section className="editorial-info-principle">
-        <h2>Looking for a course text?</h2><p>Browse the catalogue by title, author or subject.</p>
-        <button className="editorial-button editorial-button-green" onClick={() => onNavigate('/books')}>Visit the bookstore <ArrowRight size={16} /></button>
-      </section>
-    </main> : !isBookstore ? <>
-      <section className="editorial-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(37, 24, 28, .78) 0%, rgba(37, 24, 28, .56) 48%, rgba(37, 24, 28, .18) 100%), url("${heroImage}")` }}>
-        <div className="editorial-hero-content">
-          <p className="editorial-kicker">Independent academic publishing</p>
-          <h1>{heroHeading}</h1>
-          <p className="editorial-hero-description">{landingContent?.hero_description || 'Peer-reviewed textbooks and research monographs for students, faculty and institutional libraries.'}</p>
-          <button className="editorial-button editorial-button-green" onClick={() => onNavigate('/books')}>Browse academic books <ArrowRight size={16} /></button>
-        </div>
-        <span className="photo-credit">Library photograph · Unsplash</span>
-      </section>
-
-      <section className="editorial-section editorial-reveal" id="featured-books">
-        <div className="editorial-section-heading"><h2>Featured books</h2><button className="editorial-text-link" onClick={() => onNavigate('/books')}>View all titles <ArrowRight size={16} /></button></div>
-        {cardGrid(featured)}
-      </section>
-
-      <section className="editorial-about editorial-reveal" id="about">
-        <div className="editorial-about-image"><img src={READING_ROOM_PHOTO} alt="Books displayed on a library shelf" loading="lazy" /><span className="photo-credit">Library photograph · Unsplash</span></div>
-        <div className="editorial-about-copy"><h2>{landingContent?.about_title || 'Books made for a life of learning'}</h2><p>{aboutCopy}</p><button className="editorial-button editorial-button-green" onClick={() => document.getElementById('editorial-statement')?.scrollIntoView({ behavior: 'smooth' })}>How we publish <ArrowRight size={16} /></button></div>
-      </section>
-
-      <section id="editorial-statement" className="editorial-statement editorial-reveal">
-        <h2>Made for the work of teaching and research</h2>
-        <p>Our catalogue brings faculty research into the classroom through considered textbooks, specialist monographs and learning resources.</p>
-      </section>
-
-      <section className="editorial-section editorial-releases editorial-reveal" id="new-releases">
-        <div className="editorial-section-heading"><h2>New releases</h2><button className="editorial-text-link" onClick={() => onNavigate('/books')}>Browse recent titles <ArrowRight size={16} /></button></div>
-        {cardGrid(latest)}
-      </section>
-
-      <section className="editorial-testimonials editorial-reveal"><h2>For classrooms and libraries</h2><p>Find course texts, research monographs and educational works selected for students, faculty and institutional collections.</p><button className="editorial-text-link" onClick={() => onNavigate('/books')}>Find books by subject <ArrowRight size={16} /></button></section>
-
-      <section className="editorial-newsletter editorial-reveal"><div><h2>Course texts and research titles</h2><p>Browse the catalogue by subject, author or title.</p></div><button className="editorial-button editorial-button-light" onClick={() => onNavigate('/books')}>Browse the catalogue <ArrowRight size={16} /></button></section>
-    </> : <section className="bookstore-page">
-      <p className="editorial-kicker editorial-kicker-dark">Dotcom Publications</p><h1>Bookstore</h1><p className="bookstore-intro">Explore our academic books, research monographs and learning resources.</p>
-      <div className="bookstore-controls"><label className="bookstore-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search books or authors" aria-label="Search books or authors" /></label>
-        <label className="bookstore-filter"><span>Subject</span><select value={category} onChange={(event) => setCategory(event.target.value)}><option value="all">All subjects</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-        <label className="bookstore-filter"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Recommended</option><option value="newest">Newest</option><option value="title">Title A–Z</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option></select></label>
+    if (
+      !dock.some((d) => d.path === previous && d.path !== '/cart') &&
+      !pop.current &&
+      pathAt(position.current) === currentPath
+    )
+      return;
+    pop.current = false;
+    seek(stateLocation(currentPath));
+  }, [currentPath, active]);
+  useEffect(() => {
+    if (active && (currentPath !== '/' || location.hash)) seek(stateLocation(currentPath));
+  }, []);
+  useEffect(() => {
+    if (intro === 1 && !turn && pathAt(at) === currentPath) onArrived();
+  }, [at, intro, turn, currentPath, onArrived]);
+  // Remap a logical leaf when filters, catalogue size or the viewport change.
+  const prior = useRef({ searchStart, contactStart, perPage, stride });
+  useLayoutEffect(() => {
+    const old = prior.current;
+    prior.current = { searchStart, contactStart, perPage, stride };
+    const p = position.current;
+    let dest = p;
+    if (p >= old.contactStart) dest = contactStart + p - old.contactStart;
+    else if (p >= old.searchStart)
+      dest = Math.min(
+        contactStart - 1,
+        searchStart + Math.floor(((p - old.searchStart) * old.perPage) / perPage),
+      );
+    else if (p >= 16) dest = Math.min(searchStart - 1, 16 + Math.floor(((p - 16) * old.perPage) / perPage));
+    if (dest !== p || old.stride !== stride) travel(dest, false, true);
+  }, [searchStart, contactStart, perPage, stride]);
+  const jump = (path: string) => {
+    if (path === '/cart') {
+      onCart();
+      return;
+    }
+    const dest = anchor(path);
+    if (currentPath === path) {
+      history.replaceState({ ...history.state, publicationPage: { path, offset: 0 } }, '');
+      seek(dest);
+    } else onNavigate(path);
+  };
+  // Gestures stay within the current destination. Links may cross these boundaries.
+  const bounds = (page: number) => {
+    if (page < 16) return [0, 15];
+    if (page < searchStart) return [16, searchStart - 1];
+    if (page < contactStart) return [searchStart, contactStart - 1];
+    return [contactStart, contactStart + 1];
+  };
+  const [firstPage, lastPage] = bounds(at);
+  const step = (dir: number) => {
+    cancelIntro();
+    if (introRef.current < 1 || (position.current === 0 && dir < 0)) {
+      if (reduced) updateIntro(1);
+      else updateIntro(introRef.current + dir * 0.25);
+      return;
+    }
+    const target = position.current + dir * stride;
+    const [first, last] = bounds(position.current);
+    if (target < first || target > last || !travel(target)) return;
+    const path = pathAt(target);
+    if (path !== currentPath) {
+      lastRoute.current = path;
+      onNavigate(path);
+    }
+    history.replaceState({ ...history.state, publicationPage: { path, offset: target - anchor(path) } }, '');
+  };
+  useBookInput(root, active, step, (delta) => {
+    if (reduced || busy.current || (introRef.current === 1 && (position.current !== 0 || delta >= 0)))
+      return false;
+    cancelIntro();
+    updateIntro(introRef.current + Math.max(-240, Math.min(240, delta)) / 800);
+    return true;
+  });
+  const changeList = (path: string, change: () => void) => {
+    change();
+    travel(anchor(path), false, true);
+    history.replaceState({ ...history.state, publicationPage: { path, offset: 0 } }, '');
+  };
+  const email = content?.contact_email || settings?.contact_email;
+  const phone = content?.contact_phone || settings?.phone;
+  const address = content?.contact_address || settings?.address;
+  const brand = settings?.company_name || 'Dotcom Publications';
+  const logo = settings?.logo_url || '/logo.jpg';
+  const action = (label: string, path: string) => (
+    <button className="tb-link" onClick={() => jump(path)}>
+      {label}
+      <ArrowRight size={17} />
+    </button>
+  );
+  const contact = (
+    <address>
+      {address && <p>{address}</p>}
+      {email && <a href={'mailto:' + email}>{email}</a>}
+      {phone && <a href={'tel:' + phone.replace(/[^+\d]/g, '')}>{phone}</a>}
+    </address>
+  );
+  const rows = (items: Book[], large = false) => (
+    <div className="tb-entries">
+      {items.map((b) => (
+        <PrintedBook key={b.id} book={b} choose={onBookDetails} large={large} />
+      ))}
+    </div>
+  );
+  const header = (text: string) => <h2>{text}</h2>;
+  const heroImage = content?.hero_image || '/reading-room/library.jpg';
+  const image = (url: string, alt: string, caption: string) => (
+    <figure className="tb-figure">
+      <img
+        src={url}
+        alt={alt}
+        draggable={false}
+        onError={(e) => {
+          if (!e.currentTarget.src.endsWith('/reading-room/library.jpg'))
+            e.currentTarget.src = '/reading-room/library.jpg';
+        }}
+      />
+      <figcaption>{caption}</figcaption>
+    </figure>
+  );
+  const homeLeaf = (p: number): ReactNode => {
+    switch (p) {
+      case 0:
+        return image(heroImage, 'Shelves in a sunlit academic library', 'The reading room');
+      case 1:
+        return (
+          <div className="tb-prose tb-hero">
+            <AnimatedHeading as="h1" text={content?.hero_heading || 'Books for teaching and research'} />
+            <p>
+              {content?.hero_description ||
+                'Academic textbooks, research monographs and educational resources.'}
+            </p>
+            {action('Browse academic books', '/books')}
+          </div>
+        );
+      case 2:
+      case 3:
+        return (
+          <>
+            {header(p === 2 ? 'Featured books' : 'In the collection')}
+            {rows(featured.slice((p - 2) * perPage, (p - 1) * perPage))}
+            {p === 3 && action('View all books', '/books')}
+          </>
+        );
+      case 4:
+        return (
+          <>
+            {image('/reading-room/study.jpg', 'A reading space lined with books', 'Inside the reading room')}
+            {!!content?.about_stats?.length && (
+              <dl className="tb-highlights">
+                {content.about_stats.slice(0, 2).map((stat) => (
+                  <div key={stat.label}>
+                    <dt>{stat.label}</dt>
+                    <dd>{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </>
+        );
+      case 5:
+        return (
+          <div className="tb-prose">
+            {header(content?.about_title || 'About the publishing house')}
+            <p className="tb-drop">
+              {content?.about_description ||
+                'Dotcom Publications brings together academic textbooks, research monographs and educational works for readers, scholars and institutions.'}
+            </p>
+            {action('Contact the press', '/contact')}
+          </div>
+        );
+      case 6:
+        return (
+          <div className="tb-prose tb-statement">{header('Made for the work of teaching and research')}</div>
+        );
+      case 7:
+        return (
+          <div className="tb-prose">
+            {header('How we publish')}
+            <p>
+              Our catalogue brings faculty research into the classroom through considered textbooks,
+              specialist monographs and learning resources.
+            </p>
+            {action('Explore the catalogue', '/books')}
+          </div>
+        );
+      case 8:
+      case 9:
+        return (
+          <>
+            {header(p === 8 ? 'New releases' : 'Recently published')}
+            {rows(releases.slice(p - 8, p - 7), true)}
+            {p === 9 && action('Browse recent titles', '/books')}
+          </>
+        );
+      case 10:
+        return (
+          <div className="tb-prose">
+            {header('Reader voices')}
+            <p>No reader testimonials have been published yet.</p>
+          </div>
+        );
+      case 11:
+        return (
+          <div className="tb-prose">
+            {header('For classrooms and libraries')}
+            <p>
+              Find course texts, research monographs and educational works selected for students, faculty and
+              institutional collections.
+            </p>
+            {action('Find books by subject', '/books')}
+          </div>
+        );
+      case 12:
+        return (
+          <div className="tb-news-art" aria-label="An illustration of stacked printed pages" role="img">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <i key={i} style={{ '--i': i } as CSSProperties} />
+            ))}
+          </div>
+        );
+      case 13:
+        return (
+          <div className="tb-prose">
+            {header('Newsletter')}
+            <p>Request updates on course texts and research titles by email.</p>
+            <form
+              className="tb-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (email)
+                  location.href =
+                    'mailto:' +
+                    email +
+                    '?subject=Newsletter%20request&body=' +
+                    encodeURIComponent('Please send publication updates to ' + newsletter + '.');
+              }}
+            >
+              <label>
+                Email address
+                <input
+                  type="email"
+                  required
+                  value={newsletter}
+                  onChange={(e) => setNewsletter(e.target.value)}
+                />
+              </label>
+              <button className="tb-button" disabled={!email}>
+                Prepare email request <ArrowRight size={15} />
+              </button>
+              <small>
+                {email
+                  ? 'Opens your email app so you can send the request.'
+                  : 'Newsletter requests are currently unavailable.'}
+              </small>
+            </form>
+          </div>
+        );
+      case 14:
+        return (
+          <div className="tb-prose">
+            <img className="tb-logo" src={logo} alt="" />
+            {header(brand)}
+            {contact}
+          </div>
+        );
+      default:
+        return (
+          <div className="tb-prose">
+            {header('Directory')}
+            <div className="tb-directory">
+              {dock.slice(1, 5).map((d) => (
+                <a
+                  key={d.path}
+                  href={d.path}
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    e.preventDefault();
+                    jump(d.path);
+                  }}
+                >
+                  {d.name}
+                  <ArrowRight size={16} />
+                </a>
+              ))}
+              {settings?.catalogue_download_url && (
+                <a href={settings.catalogue_download_url}>Download catalogue</a>
+              )}
+              <div className="tb-socials">
+                {Object.entries(settings?.social_links || {})
+                  .filter(([, url]) => url && /^https?:\/\//i.test(url))
+                  .map(([name, url]) => (
+                    <a key={name} href={url}>
+                      {name}
+                    </a>
+                  ))}
+              </div>
+            </div>
+            <small>{content?.footer_text || '© ' + new Date().getFullYear() + ' ' + brand}</small>
+          </div>
+        );
+    }
+  };
+  const listLeaf = (p: number, search: boolean) => {
+    const n = p - (search ? searchStart : 16),
+      list = search ? found : catalogue,
+      first = n === 0;
+    return (
+      <div className="tb-list-page">
+        {header(
+          first ? (search ? 'Search the catalogue' : 'Book Store') : search ? 'Search results' : 'Catalogue',
+        )}
+        {first && (
+          <div className="tb-filters">
+            <label className="tb-query">
+              <Search size={16} />
+              <input
+                type="search"
+                aria-label={search ? 'Search titles, authors, ISBN or subject' : 'Filter catalogue'}
+                placeholder="Title, author, ISBN or subject"
+                value={search ? query : filter}
+                onChange={(e) =>
+                  changeList(search ? '/search' : '/books', () =>
+                    search ? setQuery(e.target.value) : setFilter(e.target.value),
+                  )
+                }
+              />
+            </label>
+            {!search && (
+              <div className="tb-selects">
+                <select
+                  aria-label="Subject"
+                  value={category}
+                  onChange={(e) => changeList('/books', () => setCategory(e.target.value))}
+                >
+                  <option value="">All subjects</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  aria-label="Sort books"
+                  value={sort}
+                  onChange={(e) => changeList('/books', () => setSort(e.target.value))}
+                >
+                  <option value="featured">Recommended</option>
+                  <option value="new">Newest</option>
+                  <option value="title">Title A–Z</option>
+                  <option value="low">Price ↑</option>
+                  <option value="high">Price ↓</option>
+                </select>
+              </div>
+            )}
+          </div>
+        )}
+        {list.length > 0 ? (
+          <>
+            <small className="tb-count">
+              {n * perPage < list.length
+                ? `Titles ${n * perPage + 1}–${Math.min(list.length, (n + 1) * perPage)} of ${list.length}`
+                : 'End of results'}
+            </small>
+            {rows(list.slice(n * perPage, (n + 1) * perPage))}
+          </>
+        ) : (
+          <p>
+            {search && !query.trim()
+              ? 'Enter a title, author, ISBN or subject.'
+              : 'No matching titles. Try another search or subject.'}
+          </p>
+        )}
       </div>
-      <div className="bookstore-result-count">Showing {results.length} {results.length === 1 ? 'book' : 'books'}</div>
-      {results.length ? <div className="bookshop-grid">{results.map((book) => <BookCard key={book.id} book={book} onOpen={() => onOpenBook(book)} onDetails={() => onBookDetails(book)} onAdd={() => onAddToCart(book)} />)}</div> : <p className="bookshop-empty">No books match these filters. Try another search or subject.</p>}
-    </section>}
-
-    <footer className="editorial-footer" id="contact"><div className="editorial-footer-brand"><a href="/" onClick={(event) => { event.preventDefault(); onNavigate('/'); }}>Dotcom Publications</a><p>{siteSettings?.description || 'Academic publishing for a curious world.'}</p></div><div><h3>Explore</h3><a href="/books" onClick={(event) => { event.preventDefault(); onNavigate('/books'); }}>Bookstore</a><a href="/about" onClick={(event) => { event.preventDefault(); onNavigate('/about'); }}>About us</a></div><div><h3>Contact</h3><a href="/contact" onClick={(event) => { event.preventDefault(); onNavigate('/contact'); }}>Contact the publishing team</a><p>{landingContent?.contact_phone || siteSettings?.phone || ''}</p></div><div className="editorial-copyright">© {new Date().getFullYear()} Dotcom Publications. {landingContent?.footer_text || 'All rights reserved.'}</div></footer>
-  </div>;
-};
+    );
+  };
+  const render = (p: number) => {
+    const name =
+      p < 16
+        ? chapters[Math.floor(p / 2)]
+        : p < searchStart
+          ? 'Book Store'
+          : p < contactStart
+            ? 'Catalogue search'
+            : 'Contact the press';
+    const body =
+      p < 16 ? (
+        homeLeaf(p)
+      ) : p < contactStart ? (
+        listLeaf(p, p >= searchStart)
+      ) : p === contactStart ? (
+        <div className="tb-prose">
+          {header('Contact the press')}
+          {contact}
+        </div>
+      ) : (
+        <form
+          className="tb-form tb-contact"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (email)
+              location.href =
+                'mailto:' +
+                email +
+                '?subject=' +
+                encodeURIComponent(letter.subject) +
+                '&body=' +
+                encodeURIComponent(letter.message + '\n\n' + letter.name + '\n' + letter.email);
+          }}
+        >
+          {header('Write to us')}
+          {(['name', 'email', 'subject'] as const).map((k) => (
+            <label key={k}>
+              {k === 'name' ? 'Full name' : k === 'email' ? 'Email address' : 'Subject'}
+              <input
+                required
+                type={k === 'email' ? 'email' : 'text'}
+                value={letter[k]}
+                onChange={(e) => setLetter({ ...letter, [k]: e.target.value })}
+              />
+            </label>
+          ))}
+          <label>
+            Message
+            <textarea
+              required
+              rows={3}
+              value={letter.message}
+              onChange={(e) => setLetter({ ...letter, message: e.target.value })}
+            />
+          </label>
+          <button className="tb-button" disabled={!email}>
+            Prepare email <ArrowRight size={15} />
+          </button>
+          <small>
+            {email ? 'Send your message from your email app.' : 'A contact email is currently unavailable.'}
+          </small>
+        </form>
+      );
+    return (
+      <article className={'tb-page ' + (p === 0 || p === 4 ? 'photo' : '')}>
+        <header>{p === 1 ? 'Independent academic publishing' : p % 2 === 0 ? brand : name}</header>
+        <div className="tb-body">{body}</div>
+        <footer>
+          <span>{name}</span>
+          <b>{String(p + 1).padStart(2, '0')}</b>
+        </footer>
+      </article>
+    );
+  };
+  const opening = clamp((intro - 0.22) / 0.42),
+    zoom = clamp((intro - 0.7) / 0.3),
+    approach = clamp(intro / 0.22);
+  const scale = (single ? 0.67 : 0.55) + approach * 0.07 + zoom * (single ? 0.26 : 0.38);
+  const css = {
+    '--expand': zoom,
+    '--cover-tilt': -2.2 * (1 - opening) + 'deg',
+    '--open': opening,
+    '--angle': -179 * opening + 'deg',
+    '--book-scale': scale,
+    '--shift': single ? '0%' : -25 * (1 - opening) + '%',
+    '--left-depth': 2 + (4 * at) / (contactStart + 1) + 'px',
+    '--right-depth': 6 - (4 * at) / (contactStart + 1) + 'px',
+  } as CSSProperties;
+  return (
+    <main className="tb-world" ref={root} inert={!active} style={css} aria-label="Publisher's textbook">
+      <div className="tb-stage">
+        <div className={'tb-volume' + (single ? ' single' : '') + (opening >= 1 ? ' open' : '')}>
+          <div className="tb-boards" aria-hidden="true" />
+          <div
+            className="tb-paper"
+            aria-busy={!!turn}
+            inert={intro < 0.65 || !!turn}
+            aria-hidden={intro < 0.65}
+          >
+            <Leaves at={at} single={single} turn={turn} render={render} />
+          </div>
+          <div
+            className="tb-hardcover"
+            inert={opening >= 1}
+            aria-hidden={opening >= 1}
+            role="button"
+            aria-label="Open Dotcom Publications"
+            tabIndex={0}
+            onClick={() => seek(0)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                seek(0);
+              }
+            }}
+          >
+            <div className="tb-jacket">
+              <img src={logo} alt="Dotcom Publications logo" />
+              <strong>
+                Dotcom
+                <br />
+                Publications
+              </strong>
+              <div className="tb-jacket-art" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+            <div className="tb-endpaper" />
+          </div>
+        </div>
+      </div>
+      <div className="tb-controls">
+        <button
+          aria-label="Previous page"
+          disabled={intro === 0 || (intro === 1 && at === firstPage && (firstPage > 0 || reduced))}
+          onClick={() => step(-1)}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <span aria-live="polite">
+          {intro < 1 ? 'Scroll to open' : single ? `Page ${at + 1}` : `Pages ${at + 1}–${at + 2}`}
+        </span>
+        <button
+          aria-label={intro < 1 ? 'Open the book' : 'Next page'}
+          disabled={intro === 1 && at + stride > lastPage}
+          onClick={() => (intro < 1 ? seek(0) : step(1))}
+        >
+          <ArrowRight size={18} />
+        </button>
+      </div>
+      <nav className="tb-dock" aria-label="Book navigation">
+        {dock.map((d) => (
+          <button
+            key={d.path}
+            aria-current={pathAt(at) === d.path ? 'page' : undefined}
+            onClick={(e) => {
+              e.currentTarget.focus({ preventScroll: true });
+              jump(d.path);
+            }}
+          >
+            <d.icon size={18} />
+            <span>{d.name}</span>
+            {d.path === '/cart' && cartCount > 0 && <b>{cartCount}</b>}
+          </button>
+        ))}
+      </nav>
+    </main>
+  );
+}
+function matches(book: Book, query: string) {
+  const term = query.trim().toLowerCase();
+  return (
+    !term ||
+    [book.title, book.subtitle, book.isbn, book.subject, book.category_name, authors(book)].some((v) =>
+      v?.toLowerCase().includes(term),
+    ) ||
+    (!!book.isbn &&
+      /^[\dXx\s-]+$/.test(term) &&
+      book.isbn.replace(/[-\s]/g, '').includes(term.replace(/[-\s]/g, '')))
+  );
+}
+function preferred(ids: number[] | undefined, list: Book[]) {
+  const lookup = new Map(list.map((b) => [b.id, b]));
+  return Array.from(new Set([...(ids || []), ...lookup.keys()]))
+    .map((id) => lookup.get(id))
+    .filter((b): b is Book => !!b);
+}

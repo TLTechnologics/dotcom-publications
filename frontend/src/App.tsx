@@ -15,12 +15,15 @@ import { BookFormModal } from './components/books/BookFormModal';
 import { BookPreviewModal } from './components/books/BookPreviewModal';
 import { AuthorFormModal } from './components/authors/AuthorFormModal';
 import { CategoryFormModal } from './components/categories/CategoryFormModal';
-import { CustomerStorefront } from './components/customer/CustomerStorefront';
 import { PortalLoginPage } from './components/auth/PortalLoginPage';
 
 import { NavigationTab, DashboardStats, Book, Author, Category, Publisher, LandingPageContent, SiteSettings, User } from './types';
 import { api } from './services/api';
 import { ToastProvider, useToast } from './context/ToastContext';
+
+const CustomerStorefront = React.lazy(() =>
+  import('./components/customer/CustomerStorefront').then(module => ({ default: module.CustomerStorefront }))
+);
 
 const VALID_ADMIN_TABS: NavigationTab[] = [
   'dashboard',
@@ -40,6 +43,16 @@ function getNormalizedPath(): string {
   if (typeof window === 'undefined') return '/';
   const p = window.location.pathname.toLowerCase().replace(/\/+$/, '');
   return p || '/';
+}
+
+async function getStorefrontCatalogue() {
+  const first = await api.getBooks({ limit: 100 });
+  const items = [...first.items];
+  for (let page = 2; page <= first.pages; page++) {
+    const batch = await api.getBooks({ limit: 100, page });
+    items.push(...batch.items);
+  }
+  return { ...first, items: Array.from(new Map(items.map(book => [book.id, book])).values()) };
 }
 
 export function DotcomPlatform() {
@@ -149,7 +162,7 @@ export function DotcomPlatform() {
         api.getAuthors().catch(() => []),
         api.getCategories(false).catch(() => []),
         api.getPublishers().catch(() => []),
-        api.getBooks({ limit: 100 }).catch(() => ({ items: [], total: 0 })),
+        (isAdminPath ? api.getBooks({ limit: 100 }) : getStorefrontCatalogue()).catch(() => ({ items: [], total: 0 })),
         api.getLandingPage().catch(() => null),
         api.getSettings().catch(() => null),
         shouldLoadAdminData ? api.getOrders().catch(() => []) : Promise.resolve([]),
@@ -373,15 +386,17 @@ export function DotcomPlatform() {
   // ROUTE: Customer Storefront (Default at '/')
   // ==========================================
   return (
-    <CustomerStorefront
-      books={booksList}
-      categories={categories}
-      landingContent={landingContent}
-      siteSettings={siteSettings}
-      onNavigate={navigate}
-      isAdminLoggedIn={!!currentUser}
-      currentPath={currentPath}
-    />
+    <React.Suspense fallback={<div role="status" className="p-6">Opening bookstore…</div>}>
+      <CustomerStorefront
+        books={booksList}
+        categories={categories}
+        landingContent={landingContent}
+        siteSettings={siteSettings}
+        onNavigate={navigate}
+        isAdminLoggedIn={!!currentUser}
+        currentPath={currentPath}
+      />
+    </React.Suspense>
   );
 }
 
