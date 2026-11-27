@@ -504,7 +504,6 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
       {/* Main Storefront Header */}
       <header
         className={`storefront-header z-40 ${navScrolled || currentPath === '/books' ? 'storefront-header-solid' : 'storefront-header-over-hero'}`}
-        style={!navScrolled && currentPath !== '/books' ? { backdropFilter: 'blur(14px) saturate(145%)' } : undefined}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
           {/* Logo & Brand Identity */}
@@ -566,13 +565,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Search Input with Live Dropdown */}
             <div className="relative hidden sm:block w-48 lg:w-64">
-              <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
+              <Search className="storefront-search-icon w-3.5 h-3.5 text-[#82777A] absolute left-3 top-2.5" />
               <input
                 type="text"
                 placeholder="Search title, author, ISBN..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A] transition-all"
+                className="storefront-search w-full pl-9 pr-3 py-1.5 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF8F3] focus:bg-white text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A] transition-all"
               />
               {searchQuery && (
                 <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-sm border border-[#EAE3DE] shadow-sm p-3 z-50 max-h-96 overflow-y-auto space-y-2">
@@ -689,13 +688,13 @@ export const CustomerStorefront: React.FC<CustomerStorefrontProps> = ({
         {/* Mobile Search Bar Row */}
         <div className="sm:hidden px-4 pb-3 pt-1 border-t border-[#EAE3DE]/60 relative">
           <div className="relative w-full">
-            <Search className="w-3.5 h-3.5 text-[#82777A] absolute left-3.5 top-3.5" />
+            <Search className="storefront-search-icon w-3.5 h-3.5 text-[#82777A] absolute left-3.5 top-3.5" />
             <input
               type="text"
               placeholder="Search books, authors, ISBN..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-3 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
+              className="storefront-search w-full h-11 pl-10 pr-3 text-xs rounded-sm border border-[#EAE3DE] bg-[#FAF9F5] text-[#181716] placeholder-[#82777A] focus:outline-none focus:ring-2 focus:ring-[#EED97A]"
             />
           </div>
           {searchQuery && (
