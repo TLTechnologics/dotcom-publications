@@ -507,18 +507,26 @@
   transform: translateX(-50%);
   display: flex;
   align-items: stretch;
-  color: #fff7e9;
-  background: rgba(83, 18, 37, 0.78);
-  -webkit-backdrop-filter: blur(22px) saturate(175%);
-  backdrop-filter: blur(22px) saturate(175%);
-  border: 1px solid rgba(255, 225, 133, 0.7);
-  border-radius: 14px;
+  color: #fff;
+  background:
+    linear-gradient(118deg, rgba(105, 35, 52, .78), rgba(77, 18, 35, .84) 54%, rgba(52, 10, 25, .8)),
+    rgba(255, 238, 232, .12);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  backdrop-filter: blur(24px) saturate(165%);
+  border: 1px solid rgba(255, 255, 255, .5);
+  border-radius: 15px;
   padding: 5px;
-  box-shadow: 0 12px 34px rgba(38, 8, 19, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  box-shadow: 0 10px 30px rgba(43, 7, 19, .38), inset 0 1px 0 rgba(255, 255, 255, .48);
   z-index: 3;
+  animation: tb-glass-arrive .42s cubic-bezier(.2,.75,.25,1) both;
 }
 .tb-dock button {
   position: relative;
+  isolation: isolate;
+  transform: translateY(calc((var(--dock-lift, 1) - 1) * -58px)) scale(var(--dock-lift, 1));
+  transform-origin: center bottom;
+  transition: transform .32s cubic-bezier(.2,.82,.25,1), color .2s ease, background-color .2s ease, box-shadow .2s ease;
+  will-change: transform;
   min-height: 46px;
   min-width: 64px;
   display: grid;
@@ -532,9 +540,35 @@
   color: inherit;
   white-space: nowrap;
 }
+.tb-dock button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(255,255,255,.42), rgba(255,255,255,.12)) padding-box;
+  opacity: 0;
+  transform: scale(.86);
+  transition: transform .22s cubic-bezier(.2,.75,.25,1), opacity .22s ease;
+}
 .tb-dock button:hover,
 .tb-dock button[aria-current] {
-  background: rgba(180, 121, 135, 0.48);
+  background: rgba(255, 255, 255, .15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 2px 9px rgba(41,45,113,.12);
+}
+.tb-dock button:hover::before,
+.tb-dock button[aria-current]::before {
+  opacity: 1;
+  transform: scale(1);
+}
+.tb-dock button:active { transform: scale(.94); }
+.tb-dock button svg { transition: transform .22s cubic-bezier(.2,.75,.25,1), filter .22s ease; }
+.tb-dock button:hover svg,
+.tb-dock button[aria-current] svg { transform: translateY(-2px); filter: drop-shadow(0 2px 4px rgba(255,255,255,.38)); }
+@keyframes tb-glass-arrive {
+  from { opacity: 0; transform: translate(-50%, 12px) scale(.97); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 .tb-dock b {
   position: absolute;
@@ -747,6 +781,7 @@
     max-width: calc(100% - 8px);
   }
   .tb-dock button {
+    transform: none;
     min-width: clamp(45px, 14vw, 65px);
     padding: 3px;
     font-size: 11px;
@@ -942,5 +977,13 @@
 }
 
 @supports not ((backdrop-filter: blur(1px))) {
-  .tb-dock { background: #531225; }
+  .tb-dock { background: #340a19; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-dock, .tb-dock button, .tb-dock button::before, .tb-dock button svg {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }

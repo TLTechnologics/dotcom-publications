@@ -697,7 +697,25 @@ export function EditorialStorefront({
           <ArrowRight size={18} />
         </button>
       </div>
-      <nav className="tb-dock" aria-label="Book navigation">
+      <nav
+        className="tb-dock"
+        aria-label="Book navigation"
+        onPointerMove={(event) => {
+          if (event.pointerType !== 'mouse') return;
+          const buttons = event.currentTarget.querySelectorAll<HTMLElement>('button');
+          buttons.forEach((button) => {
+            const rect = button.getBoundingClientRect();
+            const distance = Math.abs(event.clientX - (rect.left + rect.width / 2));
+            const influence = Math.max(0, 1 - distance / 105);
+            button.style.setProperty('--dock-lift', String(1 + influence * 0.3));
+          });
+        }}
+        onPointerLeave={(event) => {
+          event.currentTarget.querySelectorAll<HTMLElement>('button').forEach((button) =>
+            button.style.removeProperty('--dock-lift'),
+          );
+        }}
+      >
         {dock.map((d) => (
           <button
             key={d.path}
