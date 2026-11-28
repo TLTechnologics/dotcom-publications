@@ -33,11 +33,9 @@
   isolation: isolate;
   overflow: hidden;
   touch-action: pinch-zoom;
-  background-color: #d6c2a2;
+  background-color: #f3f1ec;
   background-image:
-    linear-gradient(115deg, #fff9e69c, transparent 61%, #8c735032),
-    repeating-linear-gradient(1deg, transparent 0 3px, #9074500b 4px, transparent 6px 11px),
-    repeating-linear-gradient(178.8deg, #decaa900 0 27px, #9270470d 29px, transparent 31px 59px);
+    radial-gradient(ellipse at 52% 47%, #ffffff 0%, #f8f7f3 54%, #eeece6 100%);
 }
 .tb-stage {
   position: absolute;
@@ -509,12 +507,14 @@
   transform: translateX(-50%);
   display: flex;
   align-items: stretch;
-  background: #652536;
   color: #fff7e9;
-  border: 1px solid #854655;
-  border-radius: 8px;
-  padding: 3px;
-  box-shadow: 0 4px 11px #33231e40;
+  background: rgba(83, 18, 37, 0.78);
+  -webkit-backdrop-filter: blur(22px) saturate(175%);
+  backdrop-filter: blur(22px) saturate(175%);
+  border: 1px solid rgba(255, 225, 133, 0.7);
+  border-radius: 14px;
+  padding: 5px;
+  box-shadow: 0 12px 34px rgba(38, 8, 19, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.34);
   z-index: 3;
 }
 .tb-dock button {
@@ -526,7 +526,7 @@
   align-content: center;
   gap: 2px;
   padding: 3px 7px;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
   color: inherit;
@@ -534,7 +534,7 @@
 }
 .tb-dock button:hover,
 .tb-dock button[aria-current] {
-  background: #844354;
+  background: rgba(180, 121, 135, 0.48);
 }
 .tb-dock b {
   position: absolute;
@@ -939,4 +939,8 @@
   .tb-volume .tb-page {
     padding-bottom: calc(8px + var(--expand) * 74px);
   }
+}
+
+@supports not ((backdrop-filter: blur(1px))) {
+  .tb-dock { background: #531225; }
 }
