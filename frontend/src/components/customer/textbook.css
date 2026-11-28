@@ -45,7 +45,6 @@
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   display: grid;
   place-items: center;
-  perspective: 2200px;
 }
 .tb-volume,
 .tb-detail-volume {
@@ -137,7 +136,7 @@
   position: absolute;
   inset: 0 0 0 50%;
   transform-origin: left center;
-  transform: perspective(2000px) rotateY(var(--angle));
+  transform: perspective(4800px) rotateY(var(--angle));
   transform-style: preserve-3d;
   transition: transform 0.24s ease-out;
   pointer-events: none;
@@ -302,10 +301,6 @@
   float: left;
   font: 400 3.4em/0.85 var(--serif);
   padding: 5px 6px 0 0;
-  color: var(--accent);
-}
-.tb-prose.tb-statement h2 {
-  font-size: clamp(36px, min(4.2vw, 8.5vh), 70px);
   color: var(--accent);
 }
 .tb-figure {
@@ -506,28 +501,6 @@
   gap: 12px;
   color: var(--accent);
   font-weight: 600;
-}
-.tb-news-art {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #ede5d4;
-}
-.tb-news-art i {
-  position: absolute;
-  left: 15%;
-  right: -15%;
-  height: 31%;
-  top: calc(24% + var(--i) * 5%);
-  transform: skewY(-21deg) rotate(6deg);
-  border: 1px solid #702233;
-  border-right: 11px solid #702233;
-  background: #f8f5ed;
-  box-shadow: 3px 3px #ccbfa9;
-}
-.tb-news-art i:last-child {
-  background: #783242;
 }
 .tb-dock {
   position: absolute;
@@ -887,21 +860,33 @@
     transform 0.24s ease-out,
     width 0.24s ease-out;
 }
+/* The first left leaf is printed on the inside board. The rigid board itself
+   occludes the right leaf, in both directions, around the same spine. */
 .tb-hardcover {
-  opacity: 1;
-  transition:
-    transform 0.28s ease-out,
-    opacity 0.08s ease-in;
+  z-index: 1;
+  transition: transform 0.24s ease-out;
+}
+.tb-hardcover[data-resting='true'] {
+  visibility: hidden;
 }
 .tb-volume.open .tb-hardcover {
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    transform 0.28s ease-out,
-    opacity 0.08s 0.21s,
-    visibility 0s 0.29s;
+  pointer-events: none;
 }
-
+.tb-volume:not(.single):has(.tb-hardcover[data-resting='false']) .tb-leaf.left {
+  opacity: 0;
+}
+.tb-volume:not(.single):has(.tb-hardcover[data-resting='false']) .tb-boards:before {
+  visibility: hidden;
+}
+.tb-endpaper {
+  background: var(--paper);
+  overflow: hidden;
+  border: solid #662736;
+  border-width: 5px 0 6px 6px;
+}
+.tb-volume.single .tb-hardcover {
+  transform: perspective(4800px) rotateY(var(--angle));
+}
 .tb-socials {
   display: flex;
   flex-wrap: wrap;
@@ -936,16 +921,22 @@
   }
 }
 
-.tb-volume { max-width: none; }
+.tb-volume {
+  max-width: none;
+}
 .tb-volume .tb-page {
   padding-bottom: calc(12px + var(--expand) * (90px + env(safe-area-inset-bottom)));
 }
-.tb-controls { z-index: 2; }
+.tb-controls {
+  z-index: 2;
+}
 .tb-directory > a {
   width: 100%;
   justify-content: space-between;
   border-bottom: 1px solid var(--rule);
 }
 @media (max-height: 590px) {
-  .tb-volume .tb-page { padding-bottom: calc(8px + var(--expand) * 74px); }
+  .tb-volume .tb-page {
+    padding-bottom: calc(8px + var(--expand) * 74px);
+  }
 }

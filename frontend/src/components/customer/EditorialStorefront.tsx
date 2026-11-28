@@ -27,15 +27,17 @@ interface Props {
   onCart: () => void;
 }
 const chapters = [
-  'Opening spread',
-  'Featured books',
-  'About the press',
-  'Editorial statement',
-  'New releases',
-  'Reader voices',
-  'Newsletter',
-  'Publisher information',
-];
+  ['hero', 'Opening spread'],
+  ['featured', 'Featured books'],
+  ['about', 'About the press'],
+  ['releases', 'New releases'],
+  ['voices', 'Reader voices'],
+  ['contact', 'Contact the press'],
+  ['footer', 'Publisher information'],
+] as const;
+type Chapter = (typeof chapters)[number][0];
+const firstLeaf = (id: Chapter) => chapters.findIndex(([key]) => key === id) * 2;
+const catalogueStart = chapters.length * 2;
 const dock = [
   { path: '/', name: 'Home', icon: Home },
   { path: '/books', name: 'Book Store', icon: BookOpen },
@@ -53,7 +55,6 @@ const money = (b: Book) =>
   }).format(b.selling_price);
 const authors = (b: Book) => b.authors?.map((a) => a.name).join(', ');
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
-const even = (n: number) => Math.max(2, 2 * Math.ceil(n / 2));
 function PrintedBook({
   book,
   choose,
@@ -105,8 +106,7 @@ export function EditorialStorefront({
   const [category, setCategory] = useState('');
   const [sort, setSort] = useState('featured');
   const [filter, setFilter] = useState('');
-  const [query, setQuery] = useState('');
-  const [newsletter, setNewsletter] = useState('');
+  const focusSearch = useRef(false);
   const [letter, setLetter] = useState({ name: '', email: '', subject: '', message: '' });
   const root = useRef<HTMLElement>(null);
   const catalogue = useMemo(() => {
@@ -123,7 +123,6 @@ export function EditorialStorefront({
     if (sort === 'featured') list.sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
     return list;
   }, [books, category, filter, sort]);
-  const found = useMemo(() => (query.trim() ? books.filter((b) => matches(b, query)) : []), [books, query]);
   const featured = useMemo(
     () =>
       preferred(
@@ -140,28 +139,21 @@ export function EditorialStorefront({
       ),
     [books, content],
   );
-  const searchStart = 16 + even(Math.ceil(catalogue.length / perPage));
-  const contactStart = searchStart + even(Math.ceil(found.length / perPage));
-  const pathAt = (p: number) =>
-    p >= contactStart
-      ? '/contact'
-      : p >= searchStart
-        ? '/search'
-        : p >= 16
-          ? '/books'
-          : p >= 4 && p <= 5
-            ? '/about'
-            : '/';
+  const pageCount = catalogueStart + Math.max(1, Math.ceil(catalogue.length / perPage));
+  const folio = (p: number) => (p >= catalogueStart ? p - catalogueStart + 1 : p + 1);
+  const pathAt = (p: number) => {
+    if (p >= catalogueStart) return '/books';
+    const chapter = chapters[Math.floor(p / 2)][0];
+    return chapter === 'contact' || chapter === 'about' ? '/' + chapter : '/';
+  };
   const anchor = (path: string) =>
-    path === '/about'
-      ? 4
-      : path === '/books'
-        ? 16
-        : path === '/search'
-          ? searchStart
-          : path === '/contact'
-            ? contactStart
-            : 0;
+    path === '/books' || path === '/search'
+      ? catalogueStart
+      : path === '/contact'
+        ? firstLeaf('contact')
+        : path === '/about'
+          ? firstLeaf('about')
+          : 0;
   const [intro, setIntro] = useState(reduced ? 1 : 0);
   const introRef = useRef(intro);
   const updateIntro = (v: number) => {
@@ -171,7 +163,7 @@ export function EditorialStorefront({
   const { at, position, turn, travel, busy, stop } = useTurns(
     reduced ? anchor(currentPath) : 0,
     stride,
-    contactStart + 1,
+    pageCount - 1,
     reduced,
   );
   const pending = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -182,14 +174,8 @@ export function EditorialStorefront({
   const stateLocation = (path: string) => {
     const saved = history.state?.publicationPage;
     if (saved?.path === path) return anchor(path) + saved.offset;
-    if (path === '/')
-      return location.hash === '#new-releases'
-        ? 8
-        : location.hash === '#editorial-statement'
-          ? 6
-          : location.hash === '#contact'
-            ? 14
-            : 0;
+    if (path === '/' && location.hash === '#new-releases') return firstLeaf('releases');
+    if (path === '/' && location.hash === '#contact') return firstLeaf('contact');
     return anchor(path);
   };
   const seek = (page: number, fast = true) => {
@@ -250,22 +236,43 @@ export function EditorialStorefront({
     if (intro === 1 && !turn && pathAt(at) === currentPath) onArrived();
   }, [at, intro, turn, currentPath, onArrived]);
   // Remap a logical leaf when filters, catalogue size or the viewport change.
-  const prior = useRef({ searchStart, contactStart, perPage, stride });
+  const prior = useRef({ perPage, stride });
   useLayoutEffect(() => {
     const old = prior.current;
-    prior.current = { searchStart, contactStart, perPage, stride };
+    prior.current = { perPage, stride };
     const p = position.current;
-    let dest = p;
-    if (p >= old.contactStart) dest = contactStart + p - old.contactStart;
-    else if (p >= old.searchStart)
-      dest = Math.min(
-        contactStart - 1,
-        searchStart + Math.floor(((p - old.searchStart) * old.perPage) / perPage),
-      );
-    else if (p >= 16) dest = Math.min(searchStart - 1, 16 + Math.floor(((p - 16) * old.perPage) / perPage));
+    const dest =
+      p < catalogueStart
+        ? p
+        : Math.min(
+            pageCount - 1,
+            catalogueStart + Math.floor(((p - catalogueStart) * old.perPage) / perPage),
+          );
     if (dest !== p || old.stride !== stride) travel(dest, false, true);
-  }, [searchStart, contactStart, perPage, stride]);
+  }, [pageCount, perPage, stride]);
+  const focusCatalogueInput = () => {
+    const input = root.current?.querySelector<HTMLInputElement>('.tb-leaf input[type=search]');
+    if (input && active && intro === 1 && !turn && at === catalogueStart) {
+      input.focus({ preventScroll: true });
+      focusSearch.current = false;
+    }
+  };
+  useEffect(() => {
+    if (focusSearch.current && currentPath === '/books') focusCatalogueInput();
+  });
+  useEffect(() => {
+    if (currentPath === '/search') {
+      focusSearch.current = true;
+      history.replaceState({}, '', '/books');
+      onNavigate('/books');
+    }
+  }, [currentPath]);
   const jump = (path: string) => {
+    focusSearch.current = path === '/search';
+    if (focusSearch.current) {
+      path = '/books';
+      if (currentPath === path) focusCatalogueInput();
+    }
     if (path === '/cart') {
       onCart();
       return;
@@ -278,10 +285,8 @@ export function EditorialStorefront({
   };
   // Gestures stay within the current destination. Links may cross these boundaries.
   const bounds = (page: number) => {
-    if (page < 16) return [0, 15];
-    if (page < searchStart) return [16, searchStart - 1];
-    if (page < contactStart) return [searchStart, contactStart - 1];
-    return [contactStart, contactStart + 1];
+    if (page < catalogueStart) return [0, catalogueStart - 1];
+    return [catalogueStart, pageCount - 1];
   };
   const [firstPage, lastPage] = bounds(at);
   const step = (dir: number) => {
@@ -356,9 +361,9 @@ export function EditorialStorefront({
   );
   const homeLeaf = (p: number): ReactNode => {
     switch (p) {
-      case 0:
+      case firstLeaf('hero'):
         return image(heroImage, 'Shelves in a sunlit academic library', 'The reading room');
-      case 1:
+      case firstLeaf('hero') + 1:
         return (
           <div className="tb-prose tb-hero">
             <AnimatedHeading as="h1" text={content?.hero_heading || 'Books for teaching and research'} />
@@ -369,16 +374,16 @@ export function EditorialStorefront({
             {action('Browse academic books', '/books')}
           </div>
         );
-      case 2:
-      case 3:
+      case firstLeaf('featured'):
+      case firstLeaf('featured') + 1:
         return (
           <>
-            {header(p === 2 ? 'Featured books' : 'In the collection')}
-            {rows(featured.slice((p - 2) * perPage, (p - 1) * perPage))}
-            {p === 3 && action('View all books', '/books')}
+            {header(p % 2 === 0 ? 'Featured books' : 'In the collection')}
+            {rows(featured.slice((p % 2) * perPage, ((p % 2) + 1) * perPage))}
+            {p % 2 === 1 && action('View all books', '/books')}
           </>
         );
-      case 4:
+      case firstLeaf('about'):
         return (
           <>
             {image('/reading-room/study.jpg', 'A reading space lined with books', 'Inside the reading room')}
@@ -394,7 +399,7 @@ export function EditorialStorefront({
             )}
           </>
         );
-      case 5:
+      case firstLeaf('about') + 1:
         return (
           <div className="tb-prose">
             {header(content?.about_title || 'About the publishing house')}
@@ -405,38 +410,23 @@ export function EditorialStorefront({
             {action('Contact the press', '/contact')}
           </div>
         );
-      case 6:
-        return (
-          <div className="tb-prose tb-statement">{header('Made for the work of teaching and research')}</div>
-        );
-      case 7:
-        return (
-          <div className="tb-prose">
-            {header('How we publish')}
-            <p>
-              Our catalogue brings faculty research into the classroom through considered textbooks,
-              specialist monographs and learning resources.
-            </p>
-            {action('Explore the catalogue', '/books')}
-          </div>
-        );
-      case 8:
-      case 9:
+      case firstLeaf('releases'):
+      case firstLeaf('releases') + 1:
         return (
           <>
-            {header(p === 8 ? 'New releases' : 'Recently published')}
-            {rows(releases.slice(p - 8, p - 7), true)}
-            {p === 9 && action('Browse recent titles', '/books')}
+            {header(p === firstLeaf('releases') ? 'New releases' : 'Recently published')}
+            {rows(releases.slice(p % 2, (p % 2) + 1), true)}
+            {p === firstLeaf('releases') + 1 && action('Browse recent titles', '/books')}
           </>
         );
-      case 10:
+      case firstLeaf('voices'):
         return (
           <div className="tb-prose">
             {header('Reader voices')}
             <p>No reader testimonials have been published yet.</p>
           </div>
         );
-      case 11:
+      case firstLeaf('voices') + 1:
         return (
           <div className="tb-prose">
             {header('For classrooms and libraries')}
@@ -447,52 +437,7 @@ export function EditorialStorefront({
             {action('Find books by subject', '/books')}
           </div>
         );
-      case 12:
-        return (
-          <div className="tb-news-art" aria-label="An illustration of stacked printed pages" role="img">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <i key={i} style={{ '--i': i } as CSSProperties} />
-            ))}
-          </div>
-        );
-      case 13:
-        return (
-          <div className="tb-prose">
-            {header('Newsletter')}
-            <p>Request updates on course texts and research titles by email.</p>
-            <form
-              className="tb-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (email)
-                  location.href =
-                    'mailto:' +
-                    email +
-                    '?subject=Newsletter%20request&body=' +
-                    encodeURIComponent('Please send publication updates to ' + newsletter + '.');
-              }}
-            >
-              <label>
-                Email address
-                <input
-                  type="email"
-                  required
-                  value={newsletter}
-                  onChange={(e) => setNewsletter(e.target.value)}
-                />
-              </label>
-              <button className="tb-button" disabled={!email}>
-                Prepare email request <ArrowRight size={15} />
-              </button>
-              <small>
-                {email
-                  ? 'Opens your email app so you can send the request.'
-                  : 'Newsletter requests are currently unavailable.'}
-              </small>
-            </form>
-          </div>
-        );
-      case 14:
+      case firstLeaf('footer'):
         return (
           <div className="tb-prose">
             <img className="tb-logo" src={logo} alt="" />
@@ -537,58 +482,51 @@ export function EditorialStorefront({
         );
     }
   };
-  const listLeaf = (p: number, search: boolean) => {
-    const n = p - (search ? searchStart : 16),
-      list = search ? found : catalogue,
+  const listLeaf = (p: number) => {
+    const n = p - catalogueStart,
+      list = catalogue,
       first = n === 0;
     return (
       <div className="tb-list-page">
-        {header(
-          first ? (search ? 'Search the catalogue' : 'Book Store') : search ? 'Search results' : 'Catalogue',
-        )}
+        {header(first ? 'Book Store' : 'Catalogue')}
         {first && (
           <div className="tb-filters">
             <label className="tb-query">
               <Search size={16} />
               <input
                 type="search"
-                aria-label={search ? 'Search titles, authors, ISBN or subject' : 'Filter catalogue'}
+                aria-label="Search titles, authors, ISBN or subject"
                 placeholder="Title, author, ISBN or subject"
-                value={search ? query : filter}
-                onChange={(e) =>
-                  changeList(search ? '/search' : '/books', () =>
-                    search ? setQuery(e.target.value) : setFilter(e.target.value),
-                  )
-                }
+                value={filter}
+                onChange={(e) => changeList('/books', () => setFilter(e.target.value))}
               />
             </label>
-            {!search && (
-              <div className="tb-selects">
-                <select
-                  aria-label="Subject"
-                  value={category}
-                  onChange={(e) => changeList('/books', () => setCategory(e.target.value))}
-                >
-                  <option value="">All subjects</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  aria-label="Sort books"
-                  value={sort}
-                  onChange={(e) => changeList('/books', () => setSort(e.target.value))}
-                >
-                  <option value="featured">Recommended</option>
-                  <option value="new">Newest</option>
-                  <option value="title">Title A–Z</option>
-                  <option value="low">Price ↑</option>
-                  <option value="high">Price ↓</option>
-                </select>
-              </div>
-            )}
+
+            <div className="tb-selects">
+              <select
+                aria-label="Subject"
+                value={category}
+                onChange={(e) => changeList('/books', () => setCategory(e.target.value))}
+              >
+                <option value="">All subjects</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                aria-label="Sort books"
+                value={sort}
+                onChange={(e) => changeList('/books', () => setSort(e.target.value))}
+              >
+                <option value="featured">Recommended</option>
+                <option value="new">Newest</option>
+                <option value="title">Title A–Z</option>
+                <option value="low">Price ↑</option>
+                <option value="high">Price ↓</option>
+              </select>
+            </div>
           </div>
         )}
         {list.length > 0 ? (
@@ -601,85 +539,75 @@ export function EditorialStorefront({
             {rows(list.slice(n * perPage, (n + 1) * perPage))}
           </>
         ) : (
-          <p>
-            {search && !query.trim()
-              ? 'Enter a title, author, ISBN or subject.'
-              : 'No matching titles. Try another search or subject.'}
-          </p>
+          <p>No matching titles. Try another search or subject.</p>
         )}
       </div>
     );
   };
   const render = (p: number) => {
-    const name =
-      p < 16
-        ? chapters[Math.floor(p / 2)]
-        : p < searchStart
-          ? 'Book Store'
-          : p < contactStart
-            ? 'Catalogue search'
-            : 'Contact the press';
-    const body =
-      p < 16 ? (
-        homeLeaf(p)
-      ) : p < contactStart ? (
-        listLeaf(p, p >= searchStart)
-      ) : p === contactStart ? (
-        <div className="tb-prose">
-          {header('Contact the press')}
-          {contact}
-        </div>
-      ) : (
-        <form
-          className="tb-form tb-contact"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (email)
-              location.href =
-                'mailto:' +
-                email +
-                '?subject=' +
-                encodeURIComponent(letter.subject) +
-                '&body=' +
-                encodeURIComponent(letter.message + '\n\n' + letter.name + '\n' + letter.email);
-          }}
-        >
-          {header('Write to us')}
-          {(['name', 'email', 'subject'] as const).map((k) => (
-            <label key={k}>
-              {k === 'name' ? 'Full name' : k === 'email' ? 'Email address' : 'Subject'}
-              <input
-                required
-                type={k === 'email' ? 'email' : 'text'}
-                value={letter[k]}
-                onChange={(e) => setLetter({ ...letter, [k]: e.target.value })}
-              />
-            </label>
-          ))}
-          <label>
-            Message
-            <textarea
+    if (p >= pageCount) return <div className="tb-page" aria-hidden="true" />;
+    const chapter = chapters[Math.floor(p / 2)];
+    const name = chapter?.[1] ?? 'Book Store';
+    const body = !chapter ? (
+      listLeaf(p)
+    ) : chapter[0] !== 'contact' ? (
+      homeLeaf(p)
+    ) : p % 2 === 0 ? (
+      <div className="tb-prose">
+        {header('Contact the press')}
+        {contact}
+      </div>
+    ) : (
+      <form
+        className="tb-form tb-contact"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (email)
+            location.href =
+              'mailto:' +
+              email +
+              '?subject=' +
+              encodeURIComponent(letter.subject) +
+              '&body=' +
+              encodeURIComponent(letter.message + '\n\n' + letter.name + '\n' + letter.email);
+        }}
+      >
+        {header('Write to us')}
+        {(['name', 'email', 'subject'] as const).map((k) => (
+          <label key={k}>
+            {k === 'name' ? 'Full name' : k === 'email' ? 'Email address' : 'Subject'}
+            <input
               required
-              rows={3}
-              value={letter.message}
-              onChange={(e) => setLetter({ ...letter, message: e.target.value })}
+              type={k === 'email' ? 'email' : 'text'}
+              value={letter[k]}
+              onChange={(e) => setLetter({ ...letter, [k]: e.target.value })}
             />
           </label>
-          <button className="tb-button" disabled={!email}>
-            Prepare email <ArrowRight size={15} />
-          </button>
-          <small>
-            {email ? 'Send your message from your email app.' : 'A contact email is currently unavailable.'}
-          </small>
-        </form>
-      );
+        ))}
+        <label>
+          Message
+          <textarea
+            required
+            rows={3}
+            value={letter.message}
+            onChange={(e) => setLetter({ ...letter, message: e.target.value })}
+          />
+        </label>
+        <button className="tb-button" disabled={!email}>
+          Prepare email <ArrowRight size={15} />
+        </button>
+        <small>
+          {email ? 'Send your message from your email app.' : 'A contact email is currently unavailable.'}
+        </small>
+      </form>
+    );
     return (
-      <article className={'tb-page ' + (p === 0 || p === 4 ? 'photo' : '')}>
+      <article className={'tb-page ' + (p === firstLeaf('hero') || p === firstLeaf('about') ? 'photo' : '')}>
         <header>{p === 1 ? 'Independent academic publishing' : p % 2 === 0 ? brand : name}</header>
         <div className="tb-body">{body}</div>
         <footer>
           <span>{name}</span>
-          <b>{String(p + 1).padStart(2, '0')}</b>
+          <b>{String(folio(p)).padStart(2, '0')}</b>
         </footer>
       </article>
     );
@@ -692,11 +620,11 @@ export function EditorialStorefront({
     '--expand': zoom,
     '--cover-tilt': -2.2 * (1 - opening) + 'deg',
     '--open': opening,
-    '--angle': -179 * opening + 'deg',
+    '--angle': -180 * opening + 'deg',
     '--book-scale': scale,
     '--shift': single ? '0%' : -25 * (1 - opening) + '%',
-    '--left-depth': 2 + (4 * at) / (contactStart + 1) + 'px',
-    '--right-depth': 6 - (4 * at) / (contactStart + 1) + 'px',
+    '--left-depth': 2 + (4 * at) / (pageCount - 1) + 'px',
+    '--right-depth': 6 - (4 * at) / (pageCount - 1) + 'px',
   } as CSSProperties;
   return (
     <main className="tb-world" ref={root} inert={!active} style={css} aria-label="Publisher's textbook">
@@ -713,6 +641,7 @@ export function EditorialStorefront({
           </div>
           <div
             className="tb-hardcover"
+            data-resting={at !== 0 || !!turn}
             inert={opening >= 1}
             aria-hidden={opening >= 1}
             role="button"
@@ -739,7 +668,9 @@ export function EditorialStorefront({
                 <i />
               </div>
             </div>
-            <div className="tb-endpaper" />
+            <div className="tb-endpaper" aria-hidden="true">
+              {!single && render(0)}
+            </div>
           </div>
         </div>
       </div>
@@ -752,7 +683,11 @@ export function EditorialStorefront({
           <ArrowLeft size={18} />
         </button>
         <span aria-live="polite">
-          {intro < 1 ? 'Scroll to open' : single ? `Page ${at + 1}` : `Pages ${at + 1}–${at + 2}`}
+          {intro < 1
+            ? 'Scroll to open'
+            : single || at + 1 >= pageCount
+              ? `Page ${folio(at)}`
+              : `Pages ${folio(at)}–${folio(at + 1)}`}
         </span>
         <button
           aria-label={intro < 1 ? 'Open the book' : 'Next page'}
